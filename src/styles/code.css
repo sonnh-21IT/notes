@@ -1,0 +1,120 @@
+.inline-code {
+  font-family: var(--font-mono);
+  font-size: 0.9em;
+  font-weight: 500;
+  background: var(--inline-code-bg);
+  border: 1px solid var(--border);
+  padding: 2px 6px;
+  border-radius: 4px;
+  color: var(--text-body);
+}
+
+.code-block-shell {
+  margin: 28px 0;
+  border: 1px solid var(--code-border);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.code-block-toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 16px;
+  border-bottom: 1px solid var(--code-border);
+  background: color-mix(in srgb, var(--code-bg-top) 82%, var(--bg-elev) 18%);
+  color: var(--text-muted);
+  font-size: 12px;
+  letter-spacing: 0.02em;
+}
+
+.code-language {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--control-text);
+}
+
+.copy-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--control-border);
+  border-radius: 6px;
+  background: var(--bg-elev);
+  color: var(--control-text);
+  padding: 6px;
+  font: inherit;
+  cursor: pointer;
+  transition: color 120ms ease, border-color 120ms ease, background-color 120ms ease;
+}
+
+.copy-button svg {
+  width: 16px;
+  height: 16px;
+  display: block;
+}
+
+.copy-button:hover {
+  color: var(--text);
+  border-color: var(--link);
+  background: var(--bg-elev);
+}
+
+.copy-button:focus-visible {
+  outline: 2px solid var(--link);
+  outline-offset: 2px;
+}
+
+.code-block {
+  margin: 0;
+  padding: 14px 18px;
+  overflow-x: auto;
+  border: 0;
+  border-radius: 0;
+  background: var(--shiki-light-bg, var(--code-bg-bottom));
+  box-shadow: none;
+  tab-size: 2;
+  -webkit-font-smoothing: antialiased;
+}
+
+:root[data-theme='dark'] .code-block {
+  background: var(--shiki-dark-bg, var(--code-bg-bottom));
+}
+
+.code-block code {
+  display: block;
+  font-family: var(--font-mono);
+  font-size: clamp(15px, 0.9em, 16px);
+  font-weight: 500;
+  line-height: 1;
+  letter-spacing: 0.015em;
+  font-variant-ligatures: none;
+  background: none;
+}
+
+.code-block .line {
+  display: block;
+  line-height: 1;
+  margin: 0;
+  padding: 0;
+}
+
+.code-block .line:empty {
+  display: none;
+}
+
+.code-block.shiki code span {
+  color: var(--shiki-light, var(--text));
+  font-style: var(--shiki-light-font-style, normal);
+  font-weight: var(--shiki-light-font-weight, 500);
+  text-decoration: var(--shiki-light-text-decoration, none);
+}
+
+:root[data-theme='dark'] .code-block.shiki code span {
+  color: var(--shiki-dark, var(--text));
+  font-style: var(--shiki-dark-font-style, normal);
+  font-weight: var(--shiki-dark-font-weight, 500);
+  text-decoration: var(--shiki-dark-text-decoration, none);
+}

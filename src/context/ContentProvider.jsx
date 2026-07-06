@@ -1,0 +1,46 @@
+import { createContext, useContext, useEffect, useMemo, useState } from 'react'
+import { loadSiteContent } from '@/data/content'
+
+const SiteContentContext = createContext(null)
+
+export function ContentProvider({ children }) {
+  const [state, setState] = useState({
+    status: 'loading',
+    data: {},
+    error: null,
+  })
+
+  useEffect(() => {
+    let active = true
+
+    loadSiteContent()
+      .then((data) => {
+        if (active) setState({ status: 'ready', data, error: null })
+      })
+      .catch((error) => {
+        if (active) {
+          setState({
+            status: 'error',
+            data: {},
+            error: error instanceof Error ? error : new Error(String(error)),
+          })
+        }
+      })
+
+    return () => {
+      active = false
+    }
+  }, [])
+
+  const value = useMemo(() => state, [state])
+
+  return <SiteContentContext.Provider value={value}>{children}</SiteContentContext.Provider>
+}
+
+export function useSiteContentState() {
+  const state = useContext(SiteContentContext)
+  if (!state) {
+    throw new Error('useSiteContentState must be used within ContentProvider')
+  }
+  return state
+}
