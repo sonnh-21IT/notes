@@ -1,0 +1,143 @@
+.notes-list-controls {
+  display: grid;
+  gap: 10px;
+  margin-bottom: 4px;
+}
+
+.notes-toolbar {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+
+.notes-search {
+  min-width: 0;
+}
+
+.notes-search-wrap {
+  position: relative;
+  flex: 0 0 auto;
+  width: min(240px, 36%);
+  min-width: 140px;
+}
+
+.notes-search-input {
+  width: 100%;
+  padding: 10px 40px 10px 14px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  font: inherit;
+  font-size: 16px;
+  line-height: 1.4;
+  color: var(--text-body);
+  background: var(--bg-spot);
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.notes-search-clear {
+  position: absolute;
+  top: 50%;
+  right: 8px;
+  transform: translateY(-50%);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border: 0;
+  border-radius: 999px;
+  font-size: 20px;
+  line-height: 1;
+  color: var(--text-muted);
+  background: transparent;
+  cursor: pointer;
+  transition: color 0.15s ease, background-color 0.15s ease;
+}
+
+.notes-search-clear:hover {
+  color: var(--text-body);
+  background: color-mix(in srgb, var(--text) 8%, transparent 92%);
+}
+
+.notes-search-clear:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.notes-search-input::placeholder {
+  color: var(--text-subtle);
+}
+
+.notes-search-input:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 18%, transparent 82%);
+}
+
+.notes-empty {
+  margin: 0;
+  color: var(--text-muted);
+  font-size: 16px;
+  line-height: 1.6;
+}
+
+.content-list--loading {
+  opacity: 0.55;
+  pointer-events: none;
+}
+
+.notes-pagination {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 20px;
+  padding-top: 16px;
+  border-top: 1px solid var(--border);
+}
+
+.notes-pagination-status {
+  font-size: 14px;
+  color: var(--text-muted);
+}
+
+.notes-pagination-btn {
+  padding: 8px 14px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-body);
+  background: var(--bg-spot);
+  cursor: pointer;
+  transition: border-color 0.15s ease, color 0.15s ease;
+}
+
+.notes-pagination-btn:hover:not(:disabled) {
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--border) 65%);
+  color: var(--accent);
+}
+
+.notes-pagination-btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.about-pinned-notes {
+  margin-top: 8px;
+  padding-top: 28px;
+  border-top: 1px solid var(--border);
+}
+
+.about-pinned-notes .content-section-title {
+  margin-top: 0;
+}
+
+.about-pinned-notes-intro {
+  color: var(--text-muted);
+}

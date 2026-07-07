@@ -1,7 +1,8 @@
 import { useParams } from 'react-router-dom'
-import ArticleHeader from '@/content/components/ArticleHeader'
-import MdxBody from '@/content/mdx/MdxBody'
+import ArticleHeader from '@/mdx/components/ArticleHeader'
+import MdxBody from '@/mdx/MdxBody'
 import PageLoadState from '@/ui/PageLoadState'
+import PageMeta from '@/ui/PageMeta'
 import { useNote } from '@/hooks/usePageContent'
 
 function NotePage() {
@@ -11,6 +12,7 @@ function NotePage() {
   if (!loading && !error && !note) {
     return (
       <section className="page-stack content">
+        <PageMeta title="Note not found" path={`/notes/${slug}`} />
         <p className="content-label">Missing content</p>
         <h1 className="content-title">Note not found</h1>
       </section>
@@ -20,16 +22,25 @@ function NotePage() {
   return (
     <PageLoadState loading={loading} error={error}>
       {note && (
-        <article className="page-stack content note-page">
-          <ArticleHeader
+        <>
+          <PageMeta
             title={note.title}
-            publishedAt={note.publishedAt}
-            category={note.category}
-            coverImage={note.coverImage}
-            tags={note.tags}
+            description={note.summary}
+            path={`/notes/${note.slug}`}
+            type="article"
+            image={note.coverImage}
           />
-          <MdxBody component={note.MdxContent} />
-        </article>
+          <article className="page-stack content note-page">
+            <ArticleHeader
+              title={note.title}
+              publishedAt={note.publishedAt}
+              category={note.category}
+              coverImage={note.coverImage}
+              tags={note.tags}
+            />
+            <MdxBody component={note.MdxContent} />
+          </article>
+        </>
       )}
     </PageLoadState>
   )

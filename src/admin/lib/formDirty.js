@@ -1,3 +1,9 @@
+import { todayIsoDate } from '@/utils/dates'
+
+export function contentPageSnapshot({ body }) {
+  return { body: body ?? '' }
+}
+
 export function snapshotEquals(left, right) {
   return JSON.stringify(left) === JSON.stringify(right)
 }
@@ -25,8 +31,8 @@ export function noteSnapshot({
   publishedAt,
   coverImage,
   published,
+  pinned,
   body,
-  todayIsoDate,
 }) {
   return {
     slug: slug.trim(),
@@ -37,6 +43,7 @@ export function noteSnapshot({
     publishedAt: publishedAt || todayIsoDate(),
     coverImage: coverImage.trim() || null,
     published: published ?? true,
+    pinned: pinned ?? false,
     body: body ?? '',
   }
 }

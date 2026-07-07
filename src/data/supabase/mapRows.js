@@ -1,22 +1,14 @@
 export const noteListSelect = `
-  slug, title, summary, published_at, cover_image, published, category_id,
+  slug, title, summary, published_at, cover_image, published, pinned, category_id,
   categories ( id, name ),
   note_tags ( tag_id, tags ( id, name ) )
 `
 
 export const noteDetailSelect = `
-  slug, title, summary, published_at, cover_image, body, published, category_id,
+  slug, title, summary, published_at, cover_image, body, published, pinned, category_id,
   categories ( id, name ),
   note_tags ( tag_id, tags ( id, name ) )
 `
-
-export function sortNotesByCategory(notes) {
-  return [...notes].sort((a, b) => {
-    const byCategory = a.category.localeCompare(b.category)
-    if (byCategory !== 0) return byCategory
-    return (b.publishedAt ?? '').localeCompare(a.publishedAt ?? '')
-  })
-}
 
 export function mapNoteRow(row) {
   const tagLinks = row.note_tags ?? []
@@ -33,6 +25,7 @@ export function mapNoteRow(row) {
     tagIds: tagIdsFromJoin.length ? tagIdsFromJoin : (row.tagIds ?? []),
     publishedAt: row.published_at ?? null,
     coverImage: row.cover_image ?? null,
+    pinned: row.pinned ?? false,
     body: row.body ?? '',
   }
 }
@@ -40,6 +33,7 @@ export function mapNoteRow(row) {
 export function mapPageRow(row) {
   return {
     slug: row.slug,
+    title: row.title ?? '',
     body: row.body ?? '',
   }
 }

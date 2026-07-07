@@ -1,5 +1,5 @@
-import { createContext, useContext, useEffect, useMemo, useState } from 'react'
-import { loadSiteContent } from '@/data/content'
+import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react'
+import { loadSiteContent, onSiteContentInvalidate } from '@/data/content'
 
 const SiteContentContext = createContext(null)
 
@@ -9,6 +9,13 @@ export function ContentProvider({ children }) {
     data: {},
     error: null,
   })
+  const [reloadTick, setReloadTick] = useState(0)
+
+  const reload = useCallback(() => {
+    setReloadTick((tick) => tick + 1)
+  }, [])
+
+  useEffect(() => onSiteContentInvalidate(reload), [reload])
 
   useEffect(() => {
     let active = true
@@ -30,7 +37,7 @@ export function ContentProvider({ children }) {
     return () => {
       active = false
     }
-  }, [])
+  }, [reloadTick])
 
   const value = useMemo(() => state, [state])
 

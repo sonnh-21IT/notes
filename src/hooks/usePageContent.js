@@ -1,6 +1,13 @@
-import { useCallback, useEffect, useState } from 'react'
-import { isMdxContentReady } from '@/content/mdx/compileMdx'
-import { loadCategoriesList, loadNoteBySlug, loadNotesPage, loadPageContent, loadTagsList } from '@/data/content'
+import { useCallback } from 'react'
+import { isMdxContentReady } from '@/mdx/compileMdx'
+import {
+  loadCategoriesList,
+  loadNoteBySlug,
+  loadNotesPage,
+  loadPageContent,
+  loadPinnedNotes,
+  loadTagsList,
+} from '@/data/content'
 import { useAsyncResource } from '@/hooks/useAsyncResource'
 
 function withMdxReady({ loading, data, error }, { isCurrent = null } = {}) {
@@ -30,33 +37,17 @@ export function useCategoriesList() {
 }
 
 export function useNotesPage({ page, pageSize = 10, query = '', tagIds = [], categoryIds = [] }) {
-  const filterKey = `${query}\0${tagIds.join(',')}\0${categoryIds.join(',')}`
-  const [state, setState] = useState({ loading: true, data: null, error: null })
+  const loader = useCallback(
+    () => loadNotesPage({ page, pageSize, query, tagIds, categoryIds }),
+    [page, pageSize, query, tagIds, categoryIds],
+  )
 
-  useEffect(() => {
-    let active = true
-    setState((prev) => ({ ...prev, loading: true, error: null }))
+  return useAsyncResource(loader, [page, pageSize, query, tagIds, categoryIds])
+}
 
-    loadNotesPage({ page, pageSize, query, tagIds, categoryIds })
-      .then((data) => {
-        if (active) setState({ loading: false, data, error: null })
-      })
-      .catch((error) => {
-        if (active) {
-          setState({
-            loading: false,
-            data: null,
-            error: error instanceof Error ? error : new Error(String(error)),
-          })
-        }
-      })
-
-    return () => {
-      active = false
-    }
-  }, [page, pageSize, filterKey])
-
-  return state
+export function usePinnedNotes({ limit = 5 } = {}) {
+  const loader = useCallback(() => loadPinnedNotes({ limit }), [limit])
+  return useAsyncResource(loader, [limit])
 }
 
 export function useNote(slug) {

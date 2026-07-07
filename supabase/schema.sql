@@ -1,4 +1,4 @@
--- Portfolio content schema (public read, admin write via service role)
+-- Portfolio content schema (public read, owner-only admin writes via RLS)
 
 drop table if exists note_tags cascade;
 drop table if exists content_pages cascade;
@@ -39,7 +39,8 @@ create table notes (
   published_at date,
   cover_image text,
   body text not null default '',
-  published boolean not null default true
+  published boolean not null default true,
+  pinned boolean not null default false
 );
 
 create table note_tags (
@@ -84,53 +85,97 @@ create policy "Public read published note tags"
     )
   );
 
--- Admin: authenticated users
-create policy "Admin read settings"
-  on settings for select to authenticated using (true);
-create policy "Admin write settings"
-  on settings for insert to authenticated with check (true);
-create policy "Admin update settings"
-  on settings for update to authenticated using (true) with check (true);
+-- Owner-only admin (replace UUID — see README Security)
+drop function if exists public.is_site_owner();
 
-create policy "Admin read content"
-  on content for select to authenticated using (true);
-create policy "Admin write content"
-  on content for insert to authenticated with check (true);
-create policy "Admin update content"
-  on content for update to authenticated using (true) with check (true);
+create or replace function public.is_site_owner()
+returns boolean
+language sql
+stable
+security invoker
+set search_path = public
+as $$
+  select auth.uid() = '00000000-0000-0000-0000-000000000000'::uuid;
+$$;
 
-create policy "Admin read categories"
-  on categories for select to authenticated using (true);
-create policy "Admin write categories"
-  on categories for insert to authenticated with check (true);
-create policy "Admin update categories"
-  on categories for update to authenticated using (true) with check (true);
-create policy "Admin delete categories"
-  on categories for delete to authenticated using (true);
+-- Owner: read drafts + write CMS data
+create policy "Owner read all notes"
+  on notes for select to authenticated
+  using (is_site_owner());
 
-create policy "Admin read tags"
-  on tags for select to authenticated using (true);
-create policy "Admin write tags"
-  on tags for insert to authenticated with check (true);
-create policy "Admin update tags"
-  on tags for update to authenticated using (true) with check (true);
-create policy "Admin delete tags"
-  on tags for delete to authenticated using (true);
+create policy "Owner read all note tags"
+  on note_tags for select to authenticated
+  using (is_site_owner());
 
-create policy "Admin read all notes"
-  on notes for select to authenticated using (true);
-create policy "Admin write notes"
-  on notes for insert to authenticated with check (true);
-create policy "Admin update notes"
-  on notes for update to authenticated using (true) with check (true);
-create policy "Admin delete notes"
-  on notes for delete to authenticated using (true);
+create policy "Owner write settings"
+  on settings for insert to authenticated
+  with check (is_site_owner());
 
-create policy "Admin read note tags"
-  on note_tags for select to authenticated using (true);
-create policy "Admin write note tags"
-  on note_tags for insert to authenticated with check (true);
-create policy "Admin update note tags"
-  on note_tags for update to authenticated using (true) with check (true);
-create policy "Admin delete note tags"
-  on note_tags for delete to authenticated using (true);
+create policy "Owner update settings"
+  on settings for update to authenticated
+  using (is_site_owner())
+  with check (is_site_owner());
+
+create policy "Owner write content"
+  on content for insert to authenticated
+  with check (is_site_owner());
+
+create policy "Owner update content"
+  on content for update to authenticated
+  using (is_site_owner())
+  with check (is_site_owner());
+
+create policy "Owner write categories"
+  on categories for insert to authenticated
+  with check (is_site_owner());
+
+create policy "Owner update categories"
+  on categories for update to authenticated
+  using (is_site_owner())
+  with check (is_site_owner());
+
+create policy "Owner delete categories"
+  on categories for delete to authenticated
+  using (is_site_owner());
+
+create policy "Owner write tags"
+  on tags for insert to authenticated
+  with check (is_site_owner());
+
+create policy "Owner update tags"
+  on tags for update to authenticated
+  using (is_site_owner())
+  with check (is_site_owner());
+
+create policy "Owner delete tags"
+  on tags for delete to authenticated
+  using (is_site_owner());
+
+create policy "Owner write notes"
+  on notes for insert to authenticated
+  with check (is_site_owner());
+
+create policy "Owner update notes"
+  on notes for update to authenticated
+  using (is_site_owner())
+  with check (is_site_owner());
+
+create policy "Owner delete notes"
+  on notes for delete to authenticated
+  using (is_site_owner());
+
+create policy "Owner write note tags"
+  on note_tags for insert to authenticated
+  with check (is_site_owner());
+
+create policy "Owner update note tags"
+  on note_tags for update to authenticated
+  using (is_site_owner())
+  with check (is_site_owner());
+
+create policy "Owner delete note tags"
+  on note_tags for delete to authenticated
+  using (is_site_owner());
+
+-- Upgrade existing DBs without re-running the drops above (Supabase SQL editor)
+alter table notes add column if not exists pinned boolean not null default false;

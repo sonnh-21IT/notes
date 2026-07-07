@@ -1,66 +1,63 @@
-import { useEffect, useRef, useState } from 'react'
-import { compileMdx } from '@/content/mdx/compileMdx'
+import { useEffect, useState } from 'react'
+import { compileMdx } from '@/mdx/compileMdx'
 
 function useMdxPreview(body, enabled = true) {
-  const cacheRef = useRef({ body: null, Component: null })
-  const [MdxContent, setMdxContent] = useState(null)
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState('')
+  const [state, setState] = useState({
+    sourceBody: '',
+    MdxContent: null,
+    loading: false,
+    error: '',
+  })
+
+  const ready = Boolean(body) && state.sourceBody === body && state.MdxContent != null
 
   useEffect(() => {
-    if (!body) {
-      cacheRef.current = { body: null, Component: null }
-      setMdxContent(null)
-      setLoading(false)
-      setError('')
-      return undefined
-    }
-
-    if (!enabled) {
-      setLoading(false)
-      return undefined
-    }
-
-    if (cacheRef.current.body === body && cacheRef.current.Component) {
-      setMdxContent(() => cacheRef.current.Component)
-      setLoading(false)
-      setError('')
-      return undefined
-    }
+    if (!body || !enabled || ready) return undefined
 
     let active = true
-    const loadingTimer = setTimeout(() => {
-      if (active) setLoading(true)
+    const loadingTimer = window.setTimeout(() => {
+      if (active) setState((current) => ({ ...current, loading: true, error: '' }))
     }, 120)
 
-    setError('')
-
     compileMdx(body)
-      .then((Component) => {
-        if (active) {
-          cacheRef.current = { body, Component }
-          setMdxContent(() => Component)
-        }
+      .then((MdxContent) => {
+        if (!active) return
+        setState({ sourceBody: body, MdxContent, loading: false, error: '' })
       })
       .catch((err) => {
-        if (active) {
-          setError(err instanceof Error ? err.message : String(err))
-          setMdxContent(null)
-          cacheRef.current = { body: null, Component: null }
-        }
+        if (!active) return
+        setState({
+          sourceBody: body,
+          MdxContent: null,
+          loading: false,
+          error: err instanceof Error ? err.message : String(err),
+        })
       })
       .finally(() => {
-        clearTimeout(loadingTimer)
-        if (active) setLoading(false)
+        window.clearTimeout(loadingTimer)
       })
 
     return () => {
       active = false
-      clearTimeout(loadingTimer)
+      window.clearTimeout(loadingTimer)
     }
-  }, [body, enabled])
+  }, [body, enabled, ready])
 
-  return { MdxContent, loading, error }
+  if (!body) return { MdxContent: null, loading: false, error: '' }
+
+  if (!enabled) {
+    return {
+      MdxContent: state.sourceBody === body ? state.MdxContent : null,
+      loading: false,
+      error: '',
+    }
+  }
+
+  if (ready) {
+    return { MdxContent: state.MdxContent, loading: false, error: state.error }
+  }
+
+  return { MdxContent: null, loading: state.loading, error: state.error }
 }
 
 export default useMdxPreview

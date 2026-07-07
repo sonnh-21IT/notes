@@ -119,6 +119,7 @@ async function upsertAll() {
     cover_image: note.coverImage ?? null,
     body: readText(note.contentFile),
     published: true,
+    pinned: note.pinned ?? false,
   }))
 
   const { error: notesError } = await supabase.from('notes').upsert(notes)

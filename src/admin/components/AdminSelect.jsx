@@ -37,6 +37,11 @@ function AdminSelect({
 
   const canCreate = creatable && trimmedQuery && !matchedOption && onCreate
 
+  function closeMenu() {
+    setOpen(false)
+    setQuery('')
+  }
+
   useEffect(() => {
     if (!open) return undefined
 
@@ -45,11 +50,11 @@ function AdminSelect({
     }
 
     function onPointerDown(event) {
-      if (!wrapRef.current?.contains(event.target)) setOpen(false)
+      if (!wrapRef.current?.contains(event.target)) closeMenu()
     }
 
     function onKeyDown(event) {
-      if (event.key === 'Escape') setOpen(false)
+      if (event.key === 'Escape') closeMenu()
     }
 
     document.addEventListener('pointerdown', onPointerDown)
@@ -60,17 +65,12 @@ function AdminSelect({
     }
   }, [open, creatable])
 
-  useEffect(() => {
-    if (!open) setQuery('')
-  }, [open])
-
   async function handleCreate() {
     if (!canCreate || creating) return
 
     try {
       await onCreate(trimmedQuery)
-      setOpen(false)
-      setQuery('')
+      closeMenu()
     } catch {
       // ponytail: parent sets createError; keep menu open
     }
@@ -78,8 +78,7 @@ function AdminSelect({
 
   function selectOption(optionValue) {
     onChange(optionValue)
-    setOpen(false)
-    setQuery('')
+    closeMenu()
   }
 
   return (
@@ -91,7 +90,7 @@ function AdminSelect({
         aria-expanded={open}
         aria-controls={listId}
         aria-label={ariaLabel}
-        onClick={() => setOpen((current) => !current)}
+        onClick={() => (open ? closeMenu() : setOpen(true))}
       >
         <span className="admin-select-value">{displayLabel}</span>
         <ChevronDown className="admin-select-chevron" size={16} strokeWidth={2} aria-hidden />

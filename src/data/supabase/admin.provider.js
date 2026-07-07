@@ -1,4 +1,4 @@
-import { mapNoteRow, noteDetailSelect, noteListSelect, sortNotesByCategory } from '@/data/supabase/mapRows'
+import { mapNoteRow, noteDetailSelect, noteListSelect } from '@/data/supabase/mapRows'
 import { getSupabaseClient } from '@/data/supabase/client'
 
 function noteToRow(note) {
@@ -11,6 +11,7 @@ function noteToRow(note) {
     cover_image: note.coverImage || null,
     body: note.body ?? '',
     published: note.published ?? true,
+    pinned: note.pinned ?? false,
   }
 }
 
@@ -108,12 +109,13 @@ export async function adminListNotes() {
   const { data, error } = await supabase
     .from('notes')
     .select(noteListSelect)
-    .order('published_at', { ascending: false })
+    .order('published_at', { ascending: false, nullsFirst: false })
   if (error) throw error
-  return sortNotesByCategory((data ?? []).map((row) => ({
+  return (data ?? []).map((row) => ({
     ...mapNoteRow(row),
     published: row.published,
-  })))
+    pinned: row.pinned ?? false,
+  }))
 }
 
 export async function adminGetNote(slug) {
@@ -121,7 +123,7 @@ export async function adminGetNote(slug) {
   const { data, error } = await supabase.from('notes').select(noteDetailSelect).eq('slug', slug).maybeSingle()
   if (error) throw error
   if (!data) return null
-  return { ...mapNoteRow(data), published: data.published }
+  return { ...mapNoteRow(data), published: data.published, pinned: data.pinned ?? false }
 }
 
 export async function adminUpsertNote(note) {
@@ -131,6 +133,26 @@ export async function adminUpsertNote(note) {
   if (error) throw error
 
   await syncNoteTags(supabase, note.slug, [...new Set(note.tagIds ?? [])])
+}
+
+export async function adminUpdateNoteFlags({ slug, published, pinned }) {
+  const supabase = getSupabaseClient()
+
+  if (published === true) {
+    const { data, error } = await supabase.from('notes').select('body').eq('slug', slug).maybeSingle()
+    if (error) throw error
+    if (!data?.body?.trim()) {
+      throw new Error('Body is required to publish a note.')
+    }
+  }
+
+  const patch = {}
+  if (published !== undefined) patch.published = published
+  if (pinned !== undefined) patch.pinned = pinned
+  if (!Object.keys(patch).length) return
+
+  const { error } = await supabase.from('notes').update(patch).eq('slug', slug)
+  if (error) throw error
 }
 
 export async function adminDeleteNote(slug) {

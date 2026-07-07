@@ -4,14 +4,12 @@ import { getSupabaseClient, isSupabaseConfigured } from '@/data/supabase/client'
 const AuthContext = createContext(null)
 
 export function AuthProvider({ children }) {
+  const configured = isSupabaseConfigured()
   const [session, setSession] = useState(null)
-  const [loading, setLoading] = useState(isSupabaseConfigured())
+  const [loading, setLoading] = useState(configured)
 
   useEffect(() => {
-    if (!isSupabaseConfigured()) {
-      setLoading(false)
-      return undefined
-    }
+    if (!configured) return undefined
 
     const supabase = getSupabaseClient()
     let active = true
@@ -32,7 +30,7 @@ export function AuthProvider({ children }) {
       active = false
       subscription.subscription.unsubscribe()
     }
-  }, [])
+  }, [configured])
 
   const value = useMemo(
     () => ({

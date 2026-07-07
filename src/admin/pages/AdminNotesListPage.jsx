@@ -1,55 +1,55 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useDeferredValue, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { Folder, Plus, Tag } from 'lucide-react'
+import { Plus } from 'lucide-react'
+import { NotesActiveFilters, NotesFilterOptions } from '@/shared/notes/NotesFilterBar'
 import PageLoading from '@/ui/PageLoading'
 import AdminEmptyState from '@/admin/components/AdminEmptyState'
 import AdminFlash from '@/admin/components/AdminFlash'
-import AdminListItem from '@/admin/components/AdminListItem'
+import AdminNoteListItem from '@/admin/components/AdminNoteListItem'
 import AdminPageHeader from '@/admin/components/AdminPageHeader'
-import { adminListCategories, adminListNotes, adminListTags } from '@/data/supabase/admin.provider'
+import { useAdminNotesCatalog } from '@/admin/hooks/useAdminNotesCatalog'
+import { updateNoteFlags } from '@/data/admin'
+import { usePaginationState } from '@/hooks/usePaginationState'
 import { formatArticleDate } from '@/utils/formatArticleMeta'
 
 const NOTES_PAGE_SIZE = 10
-const statusOptions = [
+const listFilterOptions = [
   { value: 'all', label: 'All' },
+  { value: 'pinned', label: 'Pinned' },
   { value: 'published', label: 'Published' },
-  { value: 'draft', label: 'Draft' },
 ]
 
-function FilterKindIcon({ kind, className = 'notes-filter-kind-icon' }) {
-  const Icon = kind === 'category' ? Folder : Tag
-  return <Icon className={className} aria-hidden="true" size={12} strokeWidth={2} />
-}
-
 function noteMeta(note) {
-  const parts = [formatArticleDate(note.publishedAt), note.category, note.slug].filter(Boolean)
+  const parts = [
+    formatArticleDate(note.publishedAt),
+    note.category,
+    note.slug,
+  ].filter(Boolean)
   return parts.join(' · ')
 }
 
 function AdminNotesListPage() {
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState('')
-  const [notes, setNotes] = useState([])
-  const [categories, setCategories] = useState([])
-  const [tags, setTags] = useState([])
+  const { loading, error, data } = useAdminNotesCatalog()
+  const catalogNotes = useMemo(() => data?.notes ?? [], [data?.notes])
+  const [overrides, setOverrides] = useState({})
+  const [togglingSlug, setTogglingSlug] = useState(null)
+  const [actionError, setActionError] = useState('')
+  const notes = useMemo(
+    () => catalogNotes.map((note) => ({ ...note, ...overrides[note.slug] })),
+    [catalogNotes, overrides],
+  )
+  const categories = useMemo(() => data?.categories ?? [], [data?.categories])
+  const tags = useMemo(() => data?.tags ?? [], [data?.tags])
   const [query, setQuery] = useState('')
-  const [statusFilter, setStatusFilter] = useState('all')
+  const deferredQuery = useDeferredValue(query)
+  const [listFilter, setListFilter] = useState('all')
   const [activeCategoryIds, setActiveCategoryIds] = useState([])
   const [activeTagIds, setActiveTagIds] = useState([])
-  const [pageNumber, setPageNumber] = useState(1)
-
-  useEffect(() => {
-    Promise.all([adminListNotes(), adminListTags(), adminListCategories()])
-      .then(([notesData, tagsData, categoriesData]) => {
-        setNotes(notesData)
-        setTags(tagsData)
-        setCategories(categoriesData)
-      })
-      .catch((err) => setError(err instanceof Error ? err.message : String(err)))
-      .finally(() => setLoading(false))
-  }, [])
+  const filterKey = `${deferredQuery}\0${listFilter}\0${activeCategoryIds.join()}\0${activeTagIds.join()}`
+  const { pageNumber, setPageNumber } = usePaginationState(filterKey)
 
   const publishedCount = notes.filter((note) => note.published).length
+  const pinnedCount = notes.filter((note) => note.pinned).length
   const selectedCategories = useMemo(
     () => categories.filter((category) => activeCategoryIds.includes(category.id)),
     [categories, activeCategoryIds],
@@ -70,11 +70,11 @@ function AdminNotesListPage() {
     [categories, tags, activeCategoryIds, activeTagIds],
   )
   const filteredNotes = useMemo(() => {
-    const normalizedQuery = query.trim().toLowerCase()
+    const normalizedQuery = deferredQuery.trim().toLowerCase()
 
     return notes.filter((note) => {
-      if (statusFilter === 'published' && !note.published) return false
-      if (statusFilter === 'draft' && note.published) return false
+      if (listFilter === 'published' && !note.published) return false
+      if (listFilter === 'pinned' && !note.pinned) return false
       if (activeCategoryIds.length && !activeCategoryIds.includes(note.categoryId)) return false
       if (activeTagIds.length && !activeTagIds.some((id) => note.tagIds?.includes(id))) return false
       if (!normalizedQuery) return true
@@ -83,20 +83,13 @@ function AdminNotesListPage() {
         .filter(Boolean)
         .some((value) => String(value).toLowerCase().includes(normalizedQuery))
     })
-  }, [notes, query, statusFilter, activeCategoryIds, activeTagIds])
+  }, [notes, deferredQuery, listFilter, activeCategoryIds, activeTagIds])
   const pageCount = Math.max(1, Math.ceil(filteredNotes.length / NOTES_PAGE_SIZE))
+  const safePageNumber = Math.min(pageNumber, pageCount)
   const pagedNotes = useMemo(() => {
-    const start = (pageNumber - 1) * NOTES_PAGE_SIZE
+    const start = (safePageNumber - 1) * NOTES_PAGE_SIZE
     return filteredNotes.slice(start, start + NOTES_PAGE_SIZE)
-  }, [filteredNotes, pageNumber])
-
-  useEffect(() => {
-    setPageNumber(1)
-  }, [query, statusFilter, activeCategoryIds, activeTagIds])
-
-  useEffect(() => {
-    if (pageNumber > pageCount) setPageNumber(pageCount)
-  }, [pageNumber, pageCount])
+  }, [filteredNotes, safePageNumber])
 
   function selectFilter(option) {
     if (option.kind === 'category') {
@@ -107,9 +100,51 @@ function AdminNotesListPage() {
     setActiveTagIds((current) => [...current, option.id])
   }
 
-  if (loading) return <PageLoading label="Loading notes" />
+  function removeFilter(kind, id) {
+    if (kind === 'category') {
+      setActiveCategoryIds((current) => current.filter((item) => item !== id))
+      return
+    }
 
-  const hasActiveFilters = selectedCategories.length > 0 || selectedTags.length > 0
+    setActiveTagIds((current) => current.filter((item) => item !== id))
+  }
+
+  async function patchNoteFlags(slug, patch) {
+    const previous = notes.find((note) => note.slug === slug)
+    if (!previous) return
+
+    setTogglingSlug(slug)
+    setActionError('')
+    setOverrides((current) => ({
+      ...current,
+      [slug]: { ...current[slug], ...patch },
+    }))
+
+    try {
+      await updateNoteFlags({ slug, ...patch })
+    } catch (err) {
+      setOverrides((current) => {
+        const next = { ...current, [slug]: { ...current[slug] } }
+        for (const key of Object.keys(patch)) {
+          next[slug][key] = previous[key]
+        }
+        return next
+      })
+      setActionError(err instanceof Error ? err.message : String(err))
+    } finally {
+      setTogglingSlug(null)
+    }
+  }
+
+  function togglePublished(note) {
+    patchNoteFlags(note.slug, { published: !note.published })
+  }
+
+  function togglePinned(note) {
+    patchNoteFlags(note.slug, { pinned: !note.pinned })
+  }
+
+  if (loading) return <PageLoading label="Loading notes" />
 
   return (
     <div className="admin-page">
@@ -118,7 +153,7 @@ function AdminNotesListPage() {
         title="Articles"
         description={
           notes.length
-            ? `${notes.length} total · ${publishedCount} published`
+            ? `${notes.length} total · ${publishedCount} published · ${pinnedCount} pinned`
             : 'Write and publish blog posts.'
         }
         action={(
@@ -129,7 +164,8 @@ function AdminNotesListPage() {
         )}
       />
 
-      <AdminFlash type="error">{error}</AdminFlash>
+      <AdminFlash type="error">{error?.message}</AdminFlash>
+      <AdminFlash type="error">{actionError}</AdminFlash>
 
       {notes.length === 0 ? (
         <AdminEmptyState
@@ -145,7 +181,7 @@ function AdminNotesListPage() {
       ) : (
         <>
           <div className="admin-list-controls">
-            <div className="admin-list-toolbar" role="search">
+            <div className="admin-list-toolbar" role="search" aria-busy={query !== deferredQuery}>
               <label className="admin-list-search">
                 <span className="visually-hidden">Search notes</span>
                 <input
@@ -157,13 +193,13 @@ function AdminNotesListPage() {
                 />
               </label>
 
-              <div className="admin-status-filter" role="group" aria-label="Filter by status">
-                {statusOptions.map((option) => (
+              <div className="admin-status-filter" role="group" aria-label="Filter notes">
+                {listFilterOptions.map((option) => (
                   <button
                     key={option.value}
                     type="button"
-                    className={`admin-status-chip${statusFilter === option.value ? ' is-active' : ''}`}
-                    onClick={() => setStatusFilter(option.value)}
+                    className={`admin-status-chip${listFilter === option.value ? ' is-active' : ''}`}
+                    onClick={() => setListFilter(option.value)}
                   >
                     {option.label}
                   </button>
@@ -171,53 +207,13 @@ function AdminNotesListPage() {
               </div>
             </div>
 
-            {filterOptions.length > 0 && (
-              <div className="notes-tag-filters notes-tag-filters--scroll" role="group" aria-label="Filter by category and tag">
-                {filterOptions.map((option) => (
-                  <button
-                    key={`${option.kind}-${option.id}`}
-                    type="button"
-                    className="notes-tag-filter"
-                    aria-label={`${option.kind === 'category' ? 'Category' : 'Tag'}: ${option.name}`}
-                    onClick={() => selectFilter(option)}
-                  >
-                    <FilterKindIcon kind={option.kind} />
-                    {option.name}
-                  </button>
-                ))}
-              </div>
-            )}
+            <NotesFilterOptions filterOptions={filterOptions} onSelect={selectFilter} />
 
-            {hasActiveFilters && (
-              <div className="notes-active-filters" aria-label="Active filters">
-                {selectedCategories.map((category) => (
-                  <button
-                    key={`category-${category.id}`}
-                    type="button"
-                    className="notes-active-filter"
-                    aria-label={`Remove category: ${category.name}`}
-                    onClick={() => setActiveCategoryIds((current) => current.filter((id) => id !== category.id))}
-                  >
-                    <FilterKindIcon kind="category" />
-                    {category.name}
-                    <span className="notes-active-filter-remove" aria-hidden="true">×</span>
-                  </button>
-                ))}
-                {selectedTags.map((tag) => (
-                  <button
-                    key={`tag-${tag.id}`}
-                    type="button"
-                    className="notes-active-filter"
-                    aria-label={`Remove tag: ${tag.name}`}
-                    onClick={() => setActiveTagIds((current) => current.filter((id) => id !== tag.id))}
-                  >
-                    <FilterKindIcon kind="tag" />
-                    {tag.name}
-                    <span className="notes-active-filter-remove" aria-hidden="true">×</span>
-                  </button>
-                ))}
-              </div>
-            )}
+            <NotesActiveFilters
+              selectedCategories={selectedCategories}
+              selectedTags={selectedTags}
+              onRemove={removeFilter}
+            />
           </div>
 
           {filteredNotes.length === 0 ? (
@@ -229,16 +225,13 @@ function AdminNotesListPage() {
             <>
               <ul className="admin-list">
                 {pagedNotes.map((note) => (
-                  <AdminListItem
+                  <AdminNoteListItem
                     key={note.slug}
-                    to={`/admin/notes/${note.slug}`}
-                    title={note.title}
+                    note={note}
                     meta={noteMeta(note)}
-                    badge={
-                      note.published
-                        ? <span className="admin-badge admin-badge--live">Published</span>
-                        : <span className="admin-badge admin-badge--draft">Draft</span>
-                    }
+                    busy={togglingSlug === note.slug}
+                    onTogglePublished={togglePublished}
+                    onTogglePinned={togglePinned}
                   />
                 ))}
               </ul>
@@ -246,19 +239,19 @@ function AdminNotesListPage() {
                 <button
                   type="button"
                   className="admin-button admin-button--ghost admin-button--sm"
-                  disabled={pageNumber <= 1}
+                  disabled={safePageNumber <= 1}
                   onClick={() => setPageNumber((current) => current - 1)}
                 >
                   Previous
                 </button>
                 <span className="admin-list-pagination-status">
-                  Page {pageNumber} of {pageCount}
+                  Page {safePageNumber} of {pageCount}
                   {filteredNotes.length > 0 && ` (${filteredNotes.length} notes)`}
                 </span>
                 <button
                   type="button"
                   className="admin-button admin-button--ghost admin-button--sm"
-                  disabled={pageNumber >= pageCount}
+                  disabled={safePageNumber >= pageCount}
                   onClick={() => setPageNumber((current) => current + 1)}
                 >
                   Next

@@ -1,12 +1,7 @@
-@import './global.css';
-@import './tokens.css';
-@import './base.css';
-@import './layout.css';
-@import './content.css';
-@import './prose.css';
-@import './article.css';
-@import './code.css';
-@import './mdx-components.css';
-@import './footer.css';
-@import './responsive.css';
-@import './admin.css';
+/* Layer order: foundation → layout → shared → public → responsive → admin */
+@import './foundation/index.css';
+@import './layout/index.css';
+@import './shared/index.css';
+@import './public/index.css';
+@import './responsive/index.css';
+@import './admin/index.css';

@@ -1,11 +1,12 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { NavLink, useLocation } from 'react-router-dom'
 import { Menu, X } from 'lucide-react'
 import ThemeToggle from '@/ui/ThemeToggle'
+import { prefetchRoute } from '@/utils/prefetchRoute'
 
 const NAV_ITEMS = [
-  { to: '/about', label: 'About' },
-  { to: '/notes', label: 'Notes' },
+  { to: '/about', label: 'About', prefetch: () => prefetchRoute(() => import('@/pages/about/AboutPage')) },
+  { to: '/notes', label: 'Notes', prefetch: () => prefetchRoute(() => import('@/pages/notes/NotesPage')) },
 ]
 
 function MainNavigation({ open, onNavigate }) {
@@ -21,6 +22,8 @@ function MainNavigation({ open, onNavigate }) {
           to={item.to}
           className={({ isActive }) => `nav-link${isActive ? ' active' : ''}`}
           onClick={onNavigate}
+          onMouseEnter={item.prefetch}
+          onFocus={item.prefetch}
         >
           {item.label}
         </NavLink>
@@ -30,13 +33,9 @@ function MainNavigation({ open, onNavigate }) {
   )
 }
 
-function SiteHeader({ title, tagline }) {
-  const location = useLocation()
+function SiteHeaderInner({ title, tagline }) {
   const [menuOpen, setMenuOpen] = useState(false)
-
-  useEffect(() => {
-    setMenuOpen(false)
-  }, [location.pathname])
+  const closeMenu = () => setMenuOpen(false)
 
   return (
     <header className="site-header">
@@ -57,10 +56,15 @@ function SiteHeader({ title, tagline }) {
             {menuOpen ? <X size={22} strokeWidth={2} /> : <Menu size={22} strokeWidth={2} />}
           </button>
         </div>
-        <MainNavigation open={menuOpen} onNavigate={() => setMenuOpen(false)} />
+        <MainNavigation open={menuOpen} onNavigate={closeMenu} />
       </div>
     </header>
   )
+}
+
+function SiteHeader(props) {
+  const { pathname } = useLocation()
+  return <SiteHeaderInner key={pathname} {...props} />
 }
 
 export default SiteHeader

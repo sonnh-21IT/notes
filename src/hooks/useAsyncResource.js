@@ -1,20 +1,19 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useState } from 'react'
 
-export function useAsyncResource(loader, deps = []) {
-  const depsKey = useMemo(() => JSON.stringify(deps), deps)
+export function useAsyncResource(loader, deps) {
+  const depsKey = JSON.stringify(deps)
 
-  const [state, setState] = useState(() => ({
+  const [state, setState] = useState({
     loading: true,
     data: null,
     error: null,
     depsKey,
-  }))
+  })
 
   const stale = state.depsKey !== depsKey
 
   useEffect(() => {
     let active = true
-    setState({ loading: true, data: null, error: null, depsKey })
 
     loader()
       .then((data) => {
@@ -37,7 +36,7 @@ export function useAsyncResource(loader, deps = []) {
   }, [depsKey, loader])
 
   if (stale) {
-    return { loading: true, data: null, error: null }
+    return { loading: true, data: state.data, error: null }
   }
 
   return {

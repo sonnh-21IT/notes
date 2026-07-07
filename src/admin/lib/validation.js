@@ -1,14 +1,10 @@
+import { isSafeAssetUrl } from '@/utils/safeUrl'
+
 const SLUG_RE = /^[a-z0-9]+(?:-[a-z0-9]+)*$/
 const DATE_RE = /^\d{4}-\d{2}-\d{2}$/
 
 function isValidCoverUrl(value) {
-  if (value.startsWith('/')) return true
-  try {
-    const url = new URL(value)
-    return url.protocol === 'http:' || url.protocol === 'https:'
-  } catch {
-    return false
-  }
+  return isSafeAssetUrl(value)
 }
 
 function isValidHttpUrl(value) {

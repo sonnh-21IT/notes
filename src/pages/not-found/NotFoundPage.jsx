@@ -1,5 +1,6 @@
-import MdxBody from '@/content/mdx/MdxBody'
+import MdxBody from '@/mdx/MdxBody'
 import PageLoadState from '@/ui/PageLoadState'
+import PageMeta from '@/ui/PageMeta'
 import { usePageContent } from '@/hooks/usePageContent'
 
 function NotFoundPage() {
@@ -7,6 +8,7 @@ function NotFoundPage() {
 
   return (
     <PageLoadState loading={loading} error={error}>
+      <PageMeta title={notFoundContent?.title || 'Not found'} />
       <article className="page-stack content">
         <MdxBody component={notFoundContent?.MdxContent} />
       </article>

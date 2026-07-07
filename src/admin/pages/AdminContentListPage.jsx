@@ -1,10 +1,9 @@
-import { useEffect, useState } from 'react'
 import { AlertTriangle, FileText, Info, StickyNote } from 'lucide-react'
 import PageLoading from '@/ui/PageLoading'
 import AdminFlash from '@/admin/components/AdminFlash'
 import AdminListItem from '@/admin/components/AdminListItem'
 import AdminPageHeader from '@/admin/components/AdminPageHeader'
-import { adminListContent } from '@/data/supabase/admin.provider'
+import { useAdminContentList } from '@/admin/hooks/useAdminContentList'
 
 const pageIcons = {
   about: Info,
@@ -13,16 +12,7 @@ const pageIcons = {
 }
 
 function AdminContentListPage() {
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState('')
-  const [pages, setPages] = useState([])
-
-  useEffect(() => {
-    adminListContent()
-      .then(setPages)
-      .catch((err) => setError(err instanceof Error ? err.message : String(err)))
-      .finally(() => setLoading(false))
-  }, [])
+  const { loading, error, data: pages } = useAdminContentList()
 
   if (loading) return <PageLoading label="Loading content" />
 
@@ -34,10 +24,10 @@ function AdminContentListPage() {
         description="Site-wide MDX pages — about, notes intro, and 404."
       />
 
-      <AdminFlash type="error">{error}</AdminFlash>
+      <AdminFlash type="error">{error?.message}</AdminFlash>
 
       <ul className="admin-list">
-        {pages.map((page) => {
+        {(pages ?? []).map((page) => {
           const Icon = pageIcons[page.slug] ?? FileText
           return (
             <AdminListItem

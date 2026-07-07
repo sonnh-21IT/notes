@@ -2,12 +2,20 @@ import { isSupabaseConfigured } from '@/data/supabase/client'
 import {
   loadSupabaseCategoriesList,
   loadSupabaseNoteBySlug,
-  loadSupabaseNotesList,
   loadSupabaseNotesPage,
+  loadSupabasePinnedNotes,
   loadSupabasePageContent,
   loadSupabaseSiteContent,
   loadSupabaseTagsList,
 } from '@/data/supabase/content.provider'
+import { withBodyMdx } from '@/mdx/compileMdx'
+import { clearAsyncCache, withCache } from '@/utils/asyncCache'
+
+export const PUBLIC_CACHE_KEYS = {
+  site: 'site-content',
+  tags: 'tags-list',
+  categories: 'categories-list',
+}
 
 function assertSupabaseReady() {
   if (!isSupabaseConfigured()) {
@@ -15,19 +23,54 @@ function assertSupabaseReady() {
   }
 }
 
+const siteContentInvalidators = new Set()
+
+export function onSiteContentInvalidate(listener) {
+  siteContentInvalidators.add(listener)
+  return () => siteContentInvalidators.delete(listener)
+}
+
+export function invalidatePublicCache(...keys) {
+  for (const key of keys) clearAsyncCache(key)
+}
+
+export function invalidateSiteContent() {
+  invalidatePublicCache(PUBLIC_CACHE_KEYS.site)
+  for (const listener of siteContentInvalidators) listener()
+}
+
+export function invalidateTagsList() {
+  invalidatePublicCache(PUBLIC_CACHE_KEYS.tags)
+}
+
+export function invalidateCategoriesList() {
+  invalidatePublicCache(PUBLIC_CACHE_KEYS.categories)
+}
+
+const cachedSiteContent = withCache(
+  () => loadSupabaseSiteContent(),
+  () => PUBLIC_CACHE_KEYS.site,
+)
+
+const cachedTagsList = withCache(
+  () => loadSupabaseTagsList(),
+  () => PUBLIC_CACHE_KEYS.tags,
+)
+
+const cachedCategoriesList = withCache(
+  () => loadSupabaseCategoriesList(),
+  () => PUBLIC_CACHE_KEYS.categories,
+)
+
 export function loadSiteContent() {
   assertSupabaseReady()
-  return loadSupabaseSiteContent()
+  return cachedSiteContent()
 }
 
-export function loadPageContent(slug) {
+export async function loadPageContent(slug) {
   assertSupabaseReady()
-  return loadSupabasePageContent(slug)
-}
-
-export function loadNotesList() {
-  assertSupabaseReady()
-  return loadSupabaseNotesList()
+  const page = await loadSupabasePageContent(slug)
+  return withBodyMdx(page)
 }
 
 export function loadNotesPage(options) {
@@ -35,17 +78,23 @@ export function loadNotesPage(options) {
   return loadSupabaseNotesPage(options)
 }
 
+export function loadPinnedNotes(options) {
+  assertSupabaseReady()
+  return loadSupabasePinnedNotes(options)
+}
+
 export function loadTagsList() {
   assertSupabaseReady()
-  return loadSupabaseTagsList()
+  return cachedTagsList()
 }
 
 export function loadCategoriesList() {
   assertSupabaseReady()
-  return loadSupabaseCategoriesList()
+  return cachedCategoriesList()
 }
 
-export function loadNoteBySlug(slug) {
+export async function loadNoteBySlug(slug) {
   assertSupabaseReady()
-  return loadSupabaseNoteBySlug(slug)
+  const note = await loadSupabaseNoteBySlug(slug)
+  return withBodyMdx(note)
 }

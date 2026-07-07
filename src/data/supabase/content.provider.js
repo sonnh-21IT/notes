@@ -1,6 +1,5 @@
 import { getSupabaseClient } from '@/data/supabase/client'
-import { withBodyMdx } from '@/content/mdx/compileMdx'
-import { mapNoteRow, mapPageRow, noteDetailSelect, noteListSelect, sortNotesByCategory } from '@/data/supabase/mapRows'
+import { mapNoteRow, mapPageRow, noteDetailSelect, noteListSelect } from '@/data/supabase/mapRows'
 
 export async function loadSupabaseSiteContent() {
   const supabase = getSupabaseClient()
@@ -21,14 +20,14 @@ export async function loadSupabasePageContent(slug) {
   const supabase = getSupabaseClient()
   const { data, error } = await supabase
     .from('content')
-    .select('slug, body')
+    .select('slug, title, body')
     .eq('slug', slug)
     .maybeSingle()
 
   if (error) throw error
   if (!data) return null
 
-  return withBodyMdx(mapPageRow(data))
+  return mapPageRow(data)
 }
 
 export async function loadSupabaseNotesPage({ page = 1, pageSize = 10, query = '', tagIds = [], categoryIds = [] } = {}) {
@@ -54,15 +53,9 @@ export async function loadSupabaseNotesPage({ page = 1, pageSize = 10, query = '
     }
   }
 
-  const select = `
-    slug, title, summary, published_at, cover_image, published, category_id,
-    categories ( id, name ),
-    note_tags ( tag_id, tags ( id, name ) )
-  `
-
   let builder = supabase
     .from('notes')
-    .select(select, { count: 'exact' })
+    .select(noteListSelect, { count: 'exact' })
     .eq('published', true)
 
   if (slugFilter) {
@@ -109,16 +102,18 @@ export async function loadSupabaseCategoriesList() {
   return data ?? []
 }
 
-export async function loadSupabaseNotesList() {
+export async function loadSupabasePinnedNotes({ limit = 5 } = {}) {
   const supabase = getSupabaseClient()
   const { data, error } = await supabase
     .from('notes')
     .select(noteListSelect)
     .eq('published', true)
-    .order('published_at', { ascending: false })
+    .eq('pinned', true)
+    .order('published_at', { ascending: false, nullsFirst: false })
+    .limit(limit)
 
   if (error) throw error
-  return sortNotesByCategory((data ?? []).map(mapNoteRow))
+  return (data ?? []).map(mapNoteRow)
 }
 
 export async function loadSupabaseNoteBySlug(slug) {
@@ -133,5 +128,5 @@ export async function loadSupabaseNoteBySlug(slug) {
   if (error) throw error
   if (!data) return null
 
-  return withBodyMdx(mapNoteRow(data))
+  return mapNoteRow(data)
 }

@@ -18,4 +18,22 @@ export default defineConfig([
       parserOptions: { ecmaFeatures: { jsx: true } },
     },
   },
+  {
+    files: ['vite.config.js', 'scripts/**/*.js'],
+    languageOptions: {
+      globals: globals.node,
+    },
+  },
+  {
+    files: [
+      'src/context/**/*.{js,jsx}',
+      'src/hooks/**/*.{js,jsx}',
+      'src/admin/hooks/**/*.{js,jsx}',
+      'src/data/**/*.{js,jsx}',
+      'src/mdx/mdxComponents.jsx',
+    ],
+    rules: {
+      'react-refresh/only-export-components': 'off',
+    },
+  },
 ])
