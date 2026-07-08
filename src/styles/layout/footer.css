@@ -19,7 +19,3 @@
   flex-wrap: wrap;
   font-size: 14px;
 }
-
-.empty-content {
-  color: var(--text-muted);
-}

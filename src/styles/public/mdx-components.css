@@ -1,10 +1,40 @@
 .callout {
-  margin: 24px 0;
-  padding: 14px 18px;
+  margin: 20px 0;
+  padding: 12px 16px;
   border: 0;
   border-left: 3px solid var(--accent);
   background: var(--bg-elev);
-  border-radius: 8px;
+  border-radius: 0;
+}
+
+.mdx-empty-state {
+  margin: 20px 0;
+  padding: 14px 16px;
+  border-left: 3px solid var(--border);
+  background: color-mix(in srgb, var(--bg-elev) 70%, transparent 30%);
+}
+
+.mdx-empty-label {
+  margin: 0;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--text-subtle);
+}
+
+.mdx-empty-title {
+  margin: 4px 0 0;
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 1.45;
+  color: var(--text);
+}
+
+.mdx-empty-description {
+  margin: 6px 0 0;
+  color: var(--text-muted);
+  line-height: 1.6;
 }
 
 .callout-info {
