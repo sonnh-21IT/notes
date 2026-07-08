@@ -1,8 +1,9 @@
+import { useEffect } from 'react'
 import { AlertTriangle, FileText, Info, StickyNote } from 'lucide-react'
 import PageLoading from '@/ui/PageLoading'
-import AdminFlash from '@/admin/components/AdminFlash'
 import AdminListItem from '@/admin/components/AdminListItem'
 import AdminPageHeader from '@/admin/components/AdminPageHeader'
+import { useAdminToast } from '@/admin/hooks/useAdminToast'
 import { useAdminContentList } from '@/admin/hooks/useAdminContentList'
 
 const pageIcons = {
@@ -12,7 +13,12 @@ const pageIcons = {
 }
 
 function AdminContentListPage() {
+  const toast = useAdminToast()
   const { loading, error, data: pages } = useAdminContentList()
+
+  useEffect(() => {
+    if (error?.message) toast.showError(error.message)
+  }, [error, toast])
 
   if (loading) return <PageLoading label="Loading content" />
 
@@ -23,8 +29,6 @@ function AdminContentListPage() {
         title="Static pages"
         description="Site-wide MDX pages — about, notes intro, and 404."
       />
-
-      <AdminFlash type="error">{error?.message}</AdminFlash>
 
       <ul className="admin-list">
         {(pages ?? []).map((page) => {

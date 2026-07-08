@@ -1,5 +1,6 @@
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useLocation, useParams } from 'react-router-dom'
+import { useAdminToast } from '@/admin/hooks/useAdminToast'
 import useMdxPreview from '@/admin/hooks/useMdxPreview'
 import { contentPageSnapshot, snapshotEquals } from '@/admin/lib/formDirty'
 import { clearContentDraft } from '@/admin/lib/contentDraft'
@@ -9,12 +10,11 @@ import { getContent, updateContentBody } from '@/data/admin'
 export function useAdminContentEditor() {
   const { slug } = useParams()
   const location = useLocation()
+  const toast = useAdminToast()
+  const saveInFlightRef = useRef(false)
 
   const [loading, setLoading] = useState(true)
   const [view, setView] = useState(() => (location.state?.view === 'preview' ? 'preview' : 'edit'))
-  const [saving, setSaving] = useState(false)
-  const [error, setError] = useState('')
-  const [message, setMessage] = useState('')
   const [title, setTitle] = useState('')
   const [body, setBody] = useState('')
   const [fieldErrors, setFieldErrors] = useState({})
@@ -46,7 +46,7 @@ export function useAdminContentEditor() {
         }
       })
       .catch((err) => {
-        if (active) setError(err instanceof Error ? err.message : String(err))
+        if (active) toast.showError(err instanceof Error ? err.message : String(err))
       })
       .finally(() => {
         if (active) setLoading(false)
@@ -55,7 +55,7 @@ export function useAdminContentEditor() {
     return () => {
       active = false
     }
-  }, [slug, location.state])
+  }, [slug, location.state, toast])
 
   const runValidation = useCallback(() => {
     const result = validateContentBody(body)
@@ -64,30 +64,26 @@ export function useAdminContentEditor() {
   }, [body])
 
   const performSave = useCallback(async () => {
-    setSaving(true)
-    setError('')
-    setMessage('')
+    if (saveInFlightRef.current) return
+    saveInFlightRef.current = true
+    setConfirm(null)
 
     try {
       await updateContentBody({ slug, body })
       clearContentDraft()
       setBaseline(currentSnapshot)
-      setConfirm(null)
-      setMessage('Page saved.')
+      toast.showSuccess('Page saved.')
       setView('edit')
     } catch (err) {
-      setError(err instanceof Error ? err.message : String(err))
+      toast.showError(err instanceof Error ? err.message : String(err))
     } finally {
-      setSaving(false)
+      saveInFlightRef.current = false
     }
-  }, [slug, body, currentSnapshot])
+  }, [slug, body, currentSnapshot, toast])
 
   const requestSave = useCallback(() => {
-    setError('')
-    setMessage('')
-
     if (view === 'preview' && mdxError) {
-      setError('Fix MDX errors before saving.')
+      toast.showError('Fix MDX errors before saving.')
       return
     }
 
@@ -100,11 +96,9 @@ export function useAdminContentEditor() {
       confirmLabel: 'Save page',
       onConfirm: performSave,
     })
-  }, [view, mdxError, runValidation, title, slug, performSave])
+  }, [view, mdxError, runValidation, title, slug, performSave, toast])
 
   const handleShowPreview = useCallback(() => {
-    setError('')
-    setMessage('')
     setConfirm(null)
 
     if (!runValidation()) return
@@ -123,9 +117,6 @@ export function useAdminContentEditor() {
     view,
     isPreview,
     isDirty,
-    saving,
-    error,
-    message,
     confirm,
     setConfirm,
     setView,

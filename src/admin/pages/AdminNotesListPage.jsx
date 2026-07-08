@@ -1,14 +1,15 @@
-import { useDeferredValue, useMemo, useState } from 'react'
+import { useDeferredValue, useEffect, useMemo, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { Plus } from 'lucide-react'
 import { NotesActiveFilters, NotesFilterOptions } from '@/shared/notes/NotesFilterBar'
 import PageLoading from '@/ui/PageLoading'
 import AdminEmptyState from '@/admin/components/AdminEmptyState'
-import AdminFlash from '@/admin/components/AdminFlash'
 import AdminNoteListItem from '@/admin/components/AdminNoteListItem'
 import AdminPageHeader from '@/admin/components/AdminPageHeader'
+import { useAdminToast } from '@/admin/hooks/useAdminToast'
 import { useAdminNotesCatalog } from '@/admin/hooks/useAdminNotesCatalog'
-import { updateNoteFlags } from '@/data/admin'
+import { noteFlagsToastMessage } from '@/admin/lib/noteFlags'
+import { getAuthUserId, isSiteOwner, updateNoteFlags } from '@/data/admin'
 import { usePaginationState } from '@/hooks/usePaginationState'
 import { formatArticleDate } from '@/utils/formatArticleMeta'
 
@@ -29,11 +30,11 @@ function noteMeta(note) {
 }
 
 function AdminNotesListPage() {
+  const toast = useAdminToast()
+  const togglingRef = useRef(false)
   const { loading, error, data } = useAdminNotesCatalog()
   const catalogNotes = useMemo(() => data?.notes ?? [], [data?.notes])
   const [overrides, setOverrides] = useState({})
-  const [togglingSlug, setTogglingSlug] = useState(null)
-  const [actionError, setActionError] = useState('')
   const notes = useMemo(
     () => catalogNotes.map((note) => ({ ...note, ...overrides[note.slug] })),
     [catalogNotes, overrides],
@@ -47,6 +48,28 @@ function AdminNotesListPage() {
   const [activeTagIds, setActiveTagIds] = useState([])
   const filterKey = `${deferredQuery}\0${listFilter}\0${activeCategoryIds.join()}\0${activeTagIds.join()}`
   const { pageNumber, setPageNumber } = usePaginationState(filterKey)
+
+  useEffect(() => {
+    let active = true
+
+    Promise.all([isSiteOwner(), getAuthUserId()])
+      .then(([canWrite, userId]) => {
+        if (!active || canWrite !== false || !userId) return
+        toast.showError(
+          `Signed in as ${userId}, but this account is not the site owner in Supabase. `
+          + 'Update is_site_owner() in the SQL editor with this UUID.',
+        )
+      })
+      .catch(() => {})
+
+    return () => {
+      active = false
+    }
+  }, [toast])
+
+  useEffect(() => {
+    if (error?.message) toast.showError(error.message)
+  }, [error, toast])
 
   const publishedCount = notes.filter((note) => note.published).length
   const pinnedCount = notes.filter((note) => note.pinned).length
@@ -110,18 +133,24 @@ function AdminNotesListPage() {
   }
 
   async function patchNoteFlags(slug, patch) {
+    if (togglingRef.current) return
+
     const previous = notes.find((note) => note.slug === slug)
     if (!previous) return
 
-    setTogglingSlug(slug)
-    setActionError('')
+    togglingRef.current = true
     setOverrides((current) => ({
       ...current,
       [slug]: { ...current[slug], ...patch },
     }))
 
     try {
-      await updateNoteFlags({ slug, ...patch })
+      const result = await updateNoteFlags({ slug, ...patch })
+      setOverrides((current) => ({
+        ...current,
+        [slug]: { ...current[slug], published: result.published, pinned: result.pinned },
+      }))
+      toast.showSuccess(noteFlagsToastMessage(patch))
     } catch (err) {
       setOverrides((current) => {
         const next = { ...current, [slug]: { ...current[slug] } }
@@ -130,9 +159,9 @@ function AdminNotesListPage() {
         }
         return next
       })
-      setActionError(err instanceof Error ? err.message : String(err))
+      toast.showError(err instanceof Error ? err.message : String(err))
     } finally {
-      setTogglingSlug(null)
+      togglingRef.current = false
     }
   }
 
@@ -163,9 +192,6 @@ function AdminNotesListPage() {
           </Link>
         )}
       />
-
-      <AdminFlash type="error">{error?.message}</AdminFlash>
-      <AdminFlash type="error">{actionError}</AdminFlash>
 
       {notes.length === 0 ? (
         <AdminEmptyState
@@ -229,7 +255,6 @@ function AdminNotesListPage() {
                     key={note.slug}
                     note={note}
                     meta={noteMeta(note)}
-                    busy={togglingSlug === note.slug}
                     onTogglePublished={togglePublished}
                     onTogglePinned={togglePinned}
                   />

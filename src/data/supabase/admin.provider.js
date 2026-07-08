@@ -1,6 +1,20 @@
 import { mapNoteRow, noteDetailSelect, noteListSelect } from '@/data/supabase/mapRows'
 import { getSupabaseClient } from '@/data/supabase/client'
 
+async function throwNoteFlagsWriteError(supabase) {
+  const { data: { session } } = await supabase.auth.getSession()
+  const userId = session?.user?.id
+
+  if (!userId) {
+    throw new Error('Not signed in.')
+  }
+
+  throw new Error(
+    `Write blocked by Supabase RLS. You are signed in as ${userId}, but is_site_owner() does not include this user. `
+    + 'In Supabase → SQL editor, update is_site_owner() with your Auth user UUID (see supabase/schema.sql).',
+  )
+}
+
 function noteToRow(note) {
   return {
     slug: note.slug,
@@ -135,6 +149,19 @@ export async function adminUpsertNote(note) {
   await syncNoteTags(supabase, note.slug, [...new Set(note.tagIds ?? [])])
 }
 
+export async function adminIsSiteOwner() {
+  const supabase = getSupabaseClient()
+  const { data, error } = await supabase.rpc('is_site_owner')
+  if (error) return null
+  return Boolean(data)
+}
+
+export async function adminGetAuthUserId() {
+  const supabase = getSupabaseClient()
+  const { data: { session } } = await supabase.auth.getSession()
+  return session?.user?.id ?? null
+}
+
 export async function adminUpdateNoteFlags({ slug, published, pinned }) {
   const supabase = getSupabaseClient()
 
@@ -151,8 +178,21 @@ export async function adminUpdateNoteFlags({ slug, published, pinned }) {
   if (pinned !== undefined) patch.pinned = pinned
   if (!Object.keys(patch).length) return
 
-  const { error } = await supabase.from('notes').update(patch).eq('slug', slug)
+  const { data, error } = await supabase
+    .from('notes')
+    .update(patch)
+    .eq('slug', slug)
+    .select('slug, published, pinned')
+
   if (error) throw error
+  if (!data?.length) {
+    await throwNoteFlagsWriteError(supabase)
+  }
+
+  return {
+    published: data[0].published,
+    pinned: data[0].pinned ?? false,
+  }
 }
 
 export async function adminDeleteNote(slug) {

@@ -1,4 +1,5 @@
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { useAdminToast } from '@/admin/hooks/useAdminToast'
 import { settingsSnapshot, snapshotEquals } from '@/admin/lib/formDirty'
 import { validateSettings } from '@/admin/lib/validation'
 import { getSettings, updateSettings } from '@/data/admin'
@@ -9,10 +10,10 @@ function emptyLink() {
 }
 
 export function useAdminSettings() {
+  const toast = useAdminToast()
+  const saveInFlightRef = useRef(false)
+
   const [loading, setLoading] = useState(true)
-  const [saving, setSaving] = useState(false)
-  const [error, setError] = useState('')
-  const [message, setMessage] = useState('')
   const [headerTitle, setHeaderTitle] = useState('')
   const [headerTagline, setHeaderTagline] = useState('')
   const [socialLinks, setSocialLinks] = useState([])
@@ -35,9 +36,9 @@ export function useAdminSettings() {
           socialLinks: nextLinks,
         }))
       })
-      .catch((err) => setError(err instanceof Error ? err.message : String(err)))
+      .catch((err) => toast.showError(err instanceof Error ? err.message : String(err)))
       .finally(() => setLoading(false))
-  }, [])
+  }, [toast])
 
   const updateLink = useCallback((index, field, value) => {
     setSocialLinks((links) => links.map((link, i) => (i === index ? { ...link, [field]: value } : link)))
@@ -52,9 +53,9 @@ export function useAdminSettings() {
   }, [headerTitle, socialLinks])
 
   const performSave = useCallback(async () => {
-    setSaving(true)
-    setError('')
-    setMessage('')
+    if (saveInFlightRef.current) return
+    saveInFlightRef.current = true
+    setConfirm(null)
 
     try {
       await updateSettings({
@@ -65,18 +66,15 @@ export function useAdminSettings() {
       })
       invalidateSiteContent()
       setBaseline(settingsSnapshot({ headerTitle, headerTagline, socialLinks }))
-      setConfirm(null)
-      setMessage('Settings saved.')
+      toast.showSuccess('Settings saved.')
     } catch (err) {
-      setError(err instanceof Error ? err.message : String(err))
+      toast.showError(err instanceof Error ? err.message : String(err))
     } finally {
-      setSaving(false)
+      saveInFlightRef.current = false
     }
-  }, [headerTitle, headerTagline, socialLinks])
+  }, [headerTitle, headerTagline, socialLinks, toast])
 
   const requestRemoveLink = useCallback((index) => {
-    setError('')
-    setMessage('')
     setConfirm({
       title: 'Remove social link?',
       description: 'This removes the row from settings. Save changes to apply it publicly.',
@@ -91,8 +89,6 @@ export function useAdminSettings() {
 
   const handleSave = useCallback((event) => {
     event.preventDefault()
-    setError('')
-    setMessage('')
 
     if (!runValidation()) return
 
@@ -118,9 +114,6 @@ export function useAdminSettings() {
 
   return {
     loading,
-    saving,
-    error,
-    message,
     confirm,
     setConfirm,
     headerTitle,

@@ -1,21 +1,26 @@
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useLocation, useNavigate, useParams } from 'react-router-dom'
+import { useAdminToast } from '@/admin/hooks/useAdminToast'
 import useMdxPreview from '@/admin/hooks/useMdxPreview'
-import { noteSnapshot, snapshotEquals } from '@/admin/lib/formDirty'
+import { noteDirtySnapshot, noteHasUserContent, snapshotEquals } from '@/admin/lib/formDirty'
+import { noteFlagsToastMessage } from '@/admin/lib/noteFlags'
 import { clearNoteDraft } from '@/admin/lib/noteDraft'
-import { validateNoteFields } from '@/admin/lib/validation'
+import { isValidNoteSlug, validateNoteFields } from '@/admin/lib/validation'
 import {
   deleteNote,
   getNote,
   listCategories,
   listTags,
+  updateNoteFlags,
   upsertCategory,
   upsertNote,
   upsertTag,
 } from '@/data/admin'
 import { invalidateCategoriesList, invalidateTagsList } from '@/data/content'
+import { useDebouncedValue } from '@/hooks/useDebouncedValue'
 
 import { todayIsoDate } from '@/utils/dates'
+import { sanitizeSlugInput, slugify } from '@/utils/slugify'
 
 function findTagByName(tags, name) {
   const normalized = name.trim().toLowerCase()
@@ -24,68 +29,140 @@ function findTagByName(tags, name) {
 }
 
 function snapshotFromFields(fields) {
-  return noteSnapshot(fields)
+  return noteDirtySnapshot(fields)
+}
+
+function emptyNoteFormFields() {
+  return {
+    slug: '',
+    title: '',
+    summary: '',
+    categoryId: '',
+    selectedTagIds: [],
+    publishedAt: todayIsoDate(),
+    coverImage: '',
+    published: true,
+    pinned: false,
+    body: '',
+  }
+}
+
+function draftToFields(draft) {
+  return {
+    slug: draft.slug ?? '',
+    title: draft.title ?? '',
+    summary: draft.summary ?? '',
+    categoryId: draft.categoryId != null ? String(draft.categoryId) : '',
+    selectedTagIds: draft.tagIds ?? [],
+    publishedAt: draft.publishedAt || todayIsoDate(),
+    coverImage: draft.coverImage ?? '',
+    published: draft.published ?? true,
+    pinned: draft.pinned ?? false,
+    body: draft.body ?? '',
+  }
+}
+
+function noteToFields(note) {
+  return {
+    slug: note.slug,
+    title: note.title,
+    summary: note.summary,
+    categoryId: note.categoryId != null ? String(note.categoryId) : '',
+    selectedTagIds: note.tagIds ?? [],
+    publishedAt: note.publishedAt || todayIsoDate(),
+    coverImage: note.coverImage ?? '',
+    published: note.published ?? true,
+    pinned: note.pinned ?? false,
+    body: note.body ?? '',
+  }
+}
+
+function readInitialNoteFields(routeSlug, locationState) {
+  if (routeSlug !== 'new') return emptyNoteFormFields()
+
+  const draft = locationState?.draft
+  if (draft?.editSlug === routeSlug) return draftToFields(draft)
+
+  return emptyNoteFormFields()
+}
+
+function readInitialSlugManual(routeSlug, locationState) {
+  if (routeSlug !== 'new') return false
+
+  const draft = locationState?.draft
+  if (draft?.editSlug !== routeSlug) return false
+
+  const draftSlug = (draft.slug ?? '').trim()
+  return Boolean(draftSlug && draftSlug !== slugify(draft.title ?? ''))
 }
 
 export function useAdminNoteEditor() {
   const { slug: routeSlug } = useParams()
   const location = useLocation()
   const navigate = useNavigate()
+  const toast = useAdminToast()
+  const saveInFlightRef = useRef(false)
+  const togglingFlagsRef = useRef(false)
+  const slugCheckRef = useRef(0)
   const isNew = routeSlug === 'new'
+  const initialFields = readInitialNoteFields(routeSlug, location.state)
 
-  const [loading, setLoading] = useState(true)
+  const [loading, setLoading] = useState(() => routeSlug !== 'new')
   const [view, setView] = useState(() => (location.state?.view === 'preview' ? 'preview' : 'edit'))
-  const [saving, setSaving] = useState(false)
   const [creatingTag, setCreatingTag] = useState(false)
   const [creatingCategory, setCreatingCategory] = useState(false)
   const [categoryFieldError, setCategoryFieldError] = useState('')
-  const [error, setError] = useState('')
-  const [message, setMessage] = useState('')
   const [categories, setCategories] = useState([])
   const [allTags, setAllTags] = useState([])
-  const [slug, setSlug] = useState('')
-  const [title, setTitle] = useState('')
-  const [summary, setSummary] = useState('')
-  const [categoryId, setCategoryId] = useState('')
-  const [selectedTagIds, setSelectedTagIds] = useState([])
+  const [slug, setSlug] = useState(() => (isNew ? initialFields.slug : ''))
+  const [title, setTitle] = useState(() => (isNew ? initialFields.title : ''))
+  const [summary, setSummary] = useState(() => (isNew ? initialFields.summary : ''))
+  const [categoryId, setCategoryId] = useState(() => (isNew ? initialFields.categoryId : ''))
+  const [selectedTagIds, setSelectedTagIds] = useState(() => (isNew ? initialFields.selectedTagIds : []))
   const [tagQuery, setTagQuery] = useState('')
   const [tagFieldError, setTagFieldError] = useState('')
-  const [publishedAt, setPublishedAt] = useState(() => (isNew ? todayIsoDate() : ''))
-  const [coverImage, setCoverImage] = useState('')
-  const [published, setPublished] = useState(true)
-  const [pinned, setPinned] = useState(false)
-  const [body, setBody] = useState('')
+  const [publishedAt, setPublishedAt] = useState(() => (isNew ? initialFields.publishedAt : ''))
+  const [coverImage, setCoverImage] = useState(() => (isNew ? initialFields.coverImage : ''))
+  const [published, setPublished] = useState(() => (isNew ? initialFields.published : true))
+  const [pinned, setPinned] = useState(() => (isNew ? initialFields.pinned : false))
+  const [body, setBody] = useState(() => (isNew ? initialFields.body : ''))
   const [fieldErrors, setFieldErrors] = useState({})
+  const [slugCheckResult, setSlugCheckResult] = useState({ key: '', result: null })
+  const [slugManual, setSlugManual] = useState(() => readInitialSlugManual(routeSlug, location.state))
   const [confirm, setConfirm] = useState(null)
-  const [baseline, setBaseline] = useState(null)
+  const [baseline, setBaseline] = useState(() => (isNew ? snapshotFromFields(initialFields) : null))
 
   const isPreview = view === 'preview'
+  const debouncedSlug = useDebouncedValue(slug, 400)
+  const slugStatus = useMemo(() => {
+    if (!isNew) return null
+
+    const trimmed = slug.trim()
+    if (!trimmed) return null
+    if (!isValidNoteSlug(trimmed)) return 'unavailable'
+
+    const debouncedTrimmed = debouncedSlug.trim()
+    if (!isValidNoteSlug(debouncedTrimmed)) return 'unavailable'
+
+    if (slugCheckResult.key !== debouncedTrimmed) return null
+    if (slugCheckResult.result === 'available') return 'available'
+    if (slugCheckResult.result === 'taken') return 'unavailable'
+    return null
+  }, [isNew, slug, debouncedSlug, slugCheckResult])
   const { MdxContent, loading: mdxLoading, error: mdxError } = useMdxPreview(body, isPreview)
   const categoryName = categories.find((item) => String(item.id) === categoryId)?.name ?? ''
 
-  const applyDraft = useCallback((draft) => {
-    setSlug(draft.slug ?? '')
-    setTitle(draft.title ?? '')
-    setSummary(draft.summary ?? '')
-    setCategoryId(draft.categoryId != null ? String(draft.categoryId) : '')
-    setSelectedTagIds(draft.tagIds ?? [])
-    setPublishedAt(draft.publishedAt || todayIsoDate())
-    setCoverImage(draft.coverImage ?? '')
-    setPublished(draft.published ?? true)
-    setPinned(draft.pinned ?? false)
-    setBody(draft.body ?? '')
-    return snapshotFromFields({
-      slug: draft.slug ?? '',
-      title: draft.title ?? '',
-      summary: draft.summary ?? '',
-      categoryId: draft.categoryId != null ? String(draft.categoryId) : '',
-      selectedTagIds: draft.tagIds ?? [],
-      publishedAt: draft.publishedAt || todayIsoDate(),
-      coverImage: draft.coverImage ?? '',
-      published: draft.published ?? true,
-      pinned: draft.pinned ?? false,
-      body: draft.body ?? '',
-    })
+  const applyNoteFields = useCallback((fields) => {
+    setSlug(fields.slug)
+    setTitle(fields.title)
+    setSummary(fields.summary)
+    setCategoryId(fields.categoryId)
+    setSelectedTagIds(fields.selectedTagIds)
+    setPublishedAt(fields.publishedAt)
+    setCoverImage(fields.coverImage)
+    setPublished(fields.published)
+    setPinned(fields.pinned)
+    setBody(fields.body)
   }, [])
 
   const currentSnapshot = useMemo(
@@ -97,20 +174,41 @@ export function useAdminNoteEditor() {
       selectedTagIds,
       publishedAt,
       coverImage,
-      published,
-      pinned,
       body,
     }),
-    [slug, title, summary, categoryId, selectedTagIds, publishedAt, coverImage, published, pinned, body],
+    [slug, title, summary, categoryId, selectedTagIds, publishedAt, coverImage, body],
   )
 
   useEffect(() => {
+    if (!isNew) return
+
     let active = true
+
+    Promise.all([listCategories(), listTags()])
+      .then(([categoryRows, tagRows]) => {
+        if (!active) return
+        setCategories(categoryRows)
+        setAllTags(tagRows)
+      })
+      .catch((err) => {
+        if (active) toast.showError(err instanceof Error ? err.message : String(err))
+      })
+
+    return () => {
+      active = false
+    }
+  }, [isNew, routeSlug, location.state?.draft, toast])
+
+  useEffect(() => {
+    if (isNew) return
+
+    let active = true
+    const draft = location.state?.draft
 
     Promise.all([
       listCategories(),
       listTags(),
-      isNew ? Promise.resolve(null) : getNote(routeSlug),
+      getNote(routeSlug),
     ])
       .then(([categoryRows, tagRows, note]) => {
         if (!active) return
@@ -118,45 +216,16 @@ export function useAdminNoteEditor() {
         setCategories(categoryRows)
         setAllTags(tagRows)
 
-        const draft = location.state?.draft
         if (draft?.editSlug === routeSlug) {
-          setBaseline(applyDraft(draft))
+          const fields = draftToFields(draft)
+          applyNoteFields(fields)
+          setBaseline(snapshotFromFields(fields))
         } else if (note) {
-          setSlug(note.slug)
-          setTitle(note.title)
-          setSummary(note.summary)
-          setCategoryId(note.categoryId != null ? String(note.categoryId) : '')
-          setSelectedTagIds(note.tagIds ?? [])
-          setPublishedAt(note.publishedAt || todayIsoDate())
-          setCoverImage(note.coverImage ?? '')
-          setPublished(note.published ?? true)
-          setPinned(note.pinned ?? false)
-          setBody(note.body ?? '')
-          setBaseline(snapshotFromFields({
-            slug: note.slug,
-            title: note.title,
-            summary: note.summary,
-            categoryId: note.categoryId != null ? String(note.categoryId) : '',
-            selectedTagIds: note.tagIds ?? [],
-            publishedAt: note.publishedAt || todayIsoDate(),
-            coverImage: note.coverImage ?? '',
-            published: note.published ?? true,
-            pinned: note.pinned ?? false,
-            body: note.body ?? '',
-          }))
+          const fields = noteToFields(note)
+          applyNoteFields(fields)
+          setBaseline(snapshotFromFields(fields))
         } else {
-          setBaseline(snapshotFromFields({
-            slug: '',
-            title: '',
-            summary: '',
-            categoryId: '',
-            selectedTagIds: [],
-            publishedAt: todayIsoDate(),
-            coverImage: '',
-            published: true,
-            pinned: false,
-            body: '',
-          }))
+          setBaseline(snapshotFromFields(emptyNoteFormFields()))
         }
 
         if (location.state?.view === 'preview') {
@@ -164,7 +233,7 @@ export function useAdminNoteEditor() {
         }
       })
       .catch((err) => {
-        if (active) setError(err instanceof Error ? err.message : String(err))
+        if (active) toast.showError(err instanceof Error ? err.message : String(err))
       })
       .finally(() => {
         if (active) setLoading(false)
@@ -173,7 +242,31 @@ export function useAdminNoteEditor() {
     return () => {
       active = false
     }
-  }, [isNew, routeSlug, location.state, applyDraft])
+  }, [isNew, routeSlug, location.state?.draft, location.state?.view, applyNoteFields, toast])
+
+  useEffect(() => {
+    if (!isNew) return undefined
+
+    const trimmed = debouncedSlug.trim()
+    if (!trimmed || !isValidNoteSlug(trimmed)) return undefined
+
+    let active = true
+    const checkId = ++slugCheckRef.current
+
+    getNote(trimmed)
+      .then((note) => {
+        if (!active || slugCheckRef.current !== checkId) return
+        setSlugCheckResult({
+          key: trimmed,
+          result: note ? 'taken' : 'available',
+        })
+      })
+      .catch(() => {})
+
+    return () => {
+      active = false
+    }
+  }, [isNew, debouncedSlug])
 
   const trimmedTagQuery = tagQuery.trim()
   const matchedExistingTag = useMemo(
@@ -196,6 +289,27 @@ export function useAdminNoteEditor() {
   const clearFieldError = useCallback((key) => {
     setFieldErrors((current) => (current[key] ? { ...current, [key]: '' } : current))
   }, [])
+
+  const handleTitleChange = useCallback((value) => {
+    setTitle(value)
+    clearFieldError('title')
+    if (isNew && !slugManual) {
+      setSlug(slugify(value))
+      clearFieldError('slug')
+    }
+  }, [isNew, slugManual, clearFieldError])
+
+  const handleSlugChange = useCallback((value) => {
+    setSlugManual(true)
+    setSlug(sanitizeSlugInput(value))
+    clearFieldError('slug')
+  }, [clearFieldError])
+
+  const refreshSlugFromTitle = useCallback(() => {
+    setSlugManual(false)
+    setSlug(slugify(title))
+    clearFieldError('slug')
+  }, [title, clearFieldError])
 
   const selectTag = useCallback((tagId) => {
     setSelectedTagIds((current) => (current.includes(tagId) ? current : [...current, tagId]))
@@ -285,72 +399,91 @@ export function useAdminNoteEditor() {
     const result = validateNoteFields({
       slug,
       title,
+      summary,
       body,
       coverImage,
-      published,
       publishedAt,
     })
     setFieldErrors(result.errors)
     return result.valid
-  }, [slug, title, body, coverImage, published, publishedAt])
+  }, [slug, title, summary, body, coverImage, publishedAt])
 
-  const performSave = useCallback(async () => {
-    setSaving(true)
-    setError('')
-    setMessage('')
+  const validateSlugAvailable = useCallback(async () => {
+    if (!isNew) return true
+
+    const trimmed = slug.trim()
+    if (!isValidNoteSlug(trimmed)) return true
 
     try {
+      const existing = await getNote(trimmed)
+      if (existing) {
+        setSlugCheckResult({ key: trimmed, result: 'taken' })
+        return false
+      }
+      return true
+    } catch (err) {
+      toast.showError(err instanceof Error ? err.message : String(err))
+      return false
+    }
+  }, [isNew, slug, toast])
+
+  const performSave = useCallback(async () => {
+    if (saveInFlightRef.current) return
+    saveInFlightRef.current = true
+    setConfirm(null)
+
+    try {
+      if (!(await validateSlugAvailable())) return
+
       const payload = notePayload()
       await upsertNote(payload)
       clearNoteDraft()
       setBaseline(currentSnapshot)
-      setConfirm(null)
-      setMessage('Note saved.')
+      toast.showSuccess('Note saved.')
       setView('edit')
       if (isNew) {
         navigate(`/admin/notes/${payload.slug}`, { replace: true })
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : String(err))
+      toast.showError(err instanceof Error ? err.message : String(err))
     } finally {
-      setSaving(false)
+      saveInFlightRef.current = false
     }
-  }, [notePayload, currentSnapshot, isNew, navigate])
+  }, [notePayload, currentSnapshot, isNew, navigate, toast, validateSlugAvailable])
 
   const performDelete = useCallback(async () => {
-    setSaving(true)
-    setError('')
+    if (saveInFlightRef.current) return
+    saveInFlightRef.current = true
+    setConfirm(null)
 
     try {
       await deleteNote(slug)
       navigate('/admin/notes', { replace: true })
     } catch (err) {
-      setError(err instanceof Error ? err.message : String(err))
-      setSaving(false)
-      setConfirm(null)
+      toast.showError(err instanceof Error ? err.message : String(err))
+      saveInFlightRef.current = false
     }
-  }, [slug, navigate])
+  }, [slug, navigate, toast])
 
-  const handleShowPreview = useCallback(() => {
-    setError('')
-    setMessage('')
+  const handleShowPreview = useCallback(async () => {
     setConfirm(null)
 
     if (!runValidation()) return
+    if (!(await validateSlugAvailable())) return
 
     setView('preview')
-  }, [runValidation])
+  }, [runValidation, validateSlugAvailable])
 
-  const requestSave = useCallback(() => {
-    setError('')
-    setMessage('')
+  const requestSave = useCallback(async () => {
+    setConfirm(null)
 
     if (view === 'preview' && mdxError) {
-      setError('Fix MDX errors before saving.')
+      toast.showError('Fix MDX errors before saving.')
       return
     }
 
     if (!runValidation()) return
+    if (!(await validateSlugAvailable())) return
 
     setConfirm({
       kind: 'save',
@@ -362,12 +495,10 @@ export function useAdminNoteEditor() {
       confirmLabel: 'Save note',
       onConfirm: performSave,
     })
-  }, [view, mdxError, runValidation, published, title, performSave])
+  }, [view, mdxError, runValidation, validateSlugAvailable, published, title, performSave, toast])
 
   const handleDelete = useCallback(() => {
     if (isNew) return
-    setError('')
-    setMessage('')
     setConfirm({
       kind: 'delete',
       title: `Delete "${title.trim() || slug}"?`,
@@ -378,19 +509,77 @@ export function useAdminNoteEditor() {
     })
   }, [isNew, title, slug, performDelete])
 
+  const patchNoteFlags = useCallback(async (patch) => {
+    if (isNew || !slug.trim() || togglingFlagsRef.current) return
+
+    const previous = { published, pinned }
+    togglingFlagsRef.current = true
+
+    if (patch.published !== undefined) setPublished(patch.published)
+    if (patch.pinned !== undefined) setPinned(patch.pinned)
+
+    try {
+      const result = await updateNoteFlags({ slug: slug.trim(), ...patch })
+      setPublished(result.published)
+      setPinned(result.pinned)
+      toast.showSuccess(noteFlagsToastMessage(patch))
+    } catch (err) {
+      setPublished(previous.published)
+      setPinned(previous.pinned)
+      toast.showError(err instanceof Error ? err.message : String(err))
+    } finally {
+      togglingFlagsRef.current = false
+    }
+  }, [isNew, slug, published, pinned, toast])
+
+  const togglePublished = useCallback(() => {
+    if (isNew) {
+      setPublished((value) => !value)
+      return
+    }
+    patchNoteFlags({ published: !published })
+  }, [isNew, patchNoteFlags, published])
+
+  const togglePinned = useCallback(() => {
+    if (isNew) {
+      setPinned((value) => !value)
+      return
+    }
+    patchNoteFlags({ pinned: !pinned })
+  }, [isNew, patchNoteFlags, pinned])
+
   const isDirty = baseline !== null && !snapshotEquals(currentSnapshot, baseline)
+
+  const hasUserContent = useMemo(
+    () => noteHasUserContent({
+      slug,
+      title,
+      summary,
+      categoryId,
+      selectedTagIds,
+      coverImage,
+      body,
+    }),
+    [slug, title, summary, categoryId, selectedTagIds, coverImage, body],
+  )
+
+  const slugSaveBlocked = isNew && Boolean(slug.trim()) && slugStatus !== 'available'
+
+  const saveDisabled = !isDirty
+    || (isPreview && mdxLoading)
+    || (isNew && (!hasUserContent || slugSaveBlocked))
 
   return {
     loading,
     isNew,
     slug,
     title,
+    published,
+    pinned,
     view,
     isPreview,
     isDirty,
-    saving,
-    error,
-    message,
+    saveDisabled,
     confirm,
     setConfirm,
     setView,
@@ -404,14 +593,12 @@ export function useAdminNoteEditor() {
     },
     form: {
       isNew,
-      published,
-      setPublished,
-      pinned,
-      setPinned,
       title,
-      setTitle,
+      handleTitleChange,
       slug,
-      setSlug,
+      handleSlugChange,
+      refreshSlugFromTitle,
+      slugStatus,
       summary,
       setSummary,
       categoryId,
@@ -443,9 +630,15 @@ export function useAdminNoteEditor() {
       removeTag,
       toggleTag,
       selectTag,
+      published,
+      pinned,
+      onTogglePublished: togglePublished,
+      onTogglePinned: togglePinned,
     },
     requestSave,
     handleShowPreview,
     handleDelete,
+    togglePublished,
+    togglePinned,
   }
 }

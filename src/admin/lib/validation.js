@@ -3,6 +3,14 @@ import { isSafeAssetUrl } from '@/utils/safeUrl'
 const SLUG_RE = /^[a-z0-9]+(?:-[a-z0-9]+)*$/
 const DATE_RE = /^\d{4}-\d{2}-\d{2}$/
 
+export const SLUG_TAKEN_MESSAGE = 'This slug is already in use.'
+
+export function isValidNoteSlug(slug) {
+  const trimmed = slug?.trim() ?? ''
+  if (!trimmed) return false
+  return SLUG_RE.test(trimmed)
+}
+
 function isValidCoverUrl(value) {
   return isSafeAssetUrl(value)
 }
@@ -22,13 +30,13 @@ function isValidDateString(value) {
   return !Number.isNaN(date.getTime())
 }
 
-export function validateNoteFields({ slug, title, body, coverImage, published, publishedAt }) {
+export function validateNoteFields({ slug, title, summary, body, coverImage, publishedAt }) {
   const errors = {}
   const trimmedSlug = slug?.trim() ?? ''
 
   if (!trimmedSlug) {
     errors.slug = 'Slug is required.'
-  } else if (!SLUG_RE.test(trimmedSlug)) {
+  } else if (!isValidNoteSlug(trimmedSlug)) {
     errors.slug = 'Use lowercase letters, numbers, and hyphens only.'
   }
 
@@ -36,8 +44,12 @@ export function validateNoteFields({ slug, title, body, coverImage, published, p
     errors.title = 'Title is required.'
   }
 
-  if (published && !body?.trim()) {
-    errors.body = 'Body is required when the note is published.'
+  if (!summary?.trim()) {
+    errors.summary = 'Summary is required.'
+  }
+
+  if (!body?.trim()) {
+    errors.body = 'Body is required.'
   }
 
   const cover = coverImage?.trim()

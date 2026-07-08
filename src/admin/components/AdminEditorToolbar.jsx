@@ -6,22 +6,19 @@ function AdminEditorToolbar({
   onBackToEdit,
   onSave,
   saveLabel,
-  saving = false,
   disabled = false,
   saveDisabled = false,
   extra,
 }) {
-  const locked = saving || disabled
-
   return (
     <div className="admin-form-footer admin-preview-actions">
       {mode === 'preview' ? (
-        <button type="button" className="admin-button admin-button--ghost" onClick={onBackToEdit} disabled={locked}>
+        <button type="button" className="admin-button admin-button--ghost" onClick={onBackToEdit} disabled={disabled}>
           <ArrowLeft size={16} aria-hidden="true" />
           Back to edit
         </button>
       ) : (
-        <button type="button" className="admin-button admin-button--ghost" onClick={onShowPreview} disabled={locked}>
+        <button type="button" className="admin-button admin-button--ghost" onClick={onShowPreview} disabled={disabled}>
           <Eye size={16} aria-hidden="true" />
           Preview
         </button>
@@ -30,9 +27,9 @@ function AdminEditorToolbar({
         type="button"
         className="admin-button admin-button--primary"
         onClick={onSave}
-        disabled={locked || saveDisabled}
+        disabled={disabled || saveDisabled}
       >
-        {saving ? 'Saving…' : saveLabel}
+        {saveLabel}
       </button>
       {extra}
     </div>

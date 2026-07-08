@@ -42,6 +42,10 @@
   color: var(--text);
 }
 
+.admin-page-title-below {
+  margin-top: 10px;
+}
+
 .admin-page-desc {
   margin: 6px 0 0;
   max-width: 48ch;
@@ -249,11 +253,6 @@
   display: inline-flex;
   flex-shrink: 0;
   gap: 4px;
-  padding: 4px;
-  border: 1px solid var(--border-chrome);
-  border-radius: 12px;
-  background: color-mix(in srgb, var(--bg-spot) 88%, var(--bg) 12%);
-  box-shadow: 0 1px 0 color-mix(in srgb, var(--shadow-strong) 65%, transparent 35%);
 }
 
 .admin-note-flag {

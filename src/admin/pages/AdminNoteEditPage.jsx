@@ -1,9 +1,8 @@
-import { Link } from 'react-router-dom'
+import { Link, useParams } from 'react-router-dom'
 import ArticleHeader from '@/mdx/components/ArticleHeader'
 import PageLoading from '@/ui/PageLoading'
 import AdminConfirmPanel from '@/admin/components/AdminConfirmPanel'
 import AdminEditorToolbar from '@/admin/components/AdminEditorToolbar'
-import AdminFlash from '@/admin/components/AdminFlash'
 import AdminMdxPreviewPane from '@/admin/components/AdminMdxPreviewPane'
 import AdminNoteForm from '@/admin/components/AdminNoteForm'
 import AdminPageHeader from '@/admin/components/AdminPageHeader'
@@ -17,6 +16,11 @@ const headerDescriptions = {
 }
 
 function AdminNoteEditPage() {
+  const { slug: routeSlug } = useParams()
+  return <AdminNoteEditPageView key={routeSlug} />
+}
+
+function AdminNoteEditPageView() {
   const editor = useAdminNoteEditor()
   const {
     loading,
@@ -25,9 +29,7 @@ function AdminNoteEditPage() {
     view,
     isPreview,
     isDirty,
-    saving,
-    error,
-    message,
+    saveDisabled,
     confirm,
     setConfirm,
     setView,
@@ -48,7 +50,7 @@ function AdminNoteEditPage() {
       <p className="admin-breadcrumb">
         <Link to="/admin/notes">Notes</Link>
         <span aria-hidden="true"> / </span>
-        {isNew ? 'New' : slug}
+        {isNew ? (form.title.trim() || 'New') : (form.title.trim() || slug)}
         {isPreview && (
           <>
             <span aria-hidden="true"> / </span>
@@ -58,7 +60,7 @@ function AdminNoteEditPage() {
       </p>
 
       <AdminPageHeader
-        title={isNew ? 'New note' : form.title}
+        title={form.title.trim() || (isNew ? 'New note' : slug)}
         description={headerDescriptions[headerMode]}
       />
 
@@ -88,9 +90,6 @@ function AdminNoteEditPage() {
         />
       )}
 
-      <AdminFlash type="error">{error}</AdminFlash>
-      <AdminFlash type="success">{message}</AdminFlash>
-
       {confirm && (
         <AdminConfirmPanel
           title={confirm.title}
@@ -98,7 +97,6 @@ function AdminNoteEditPage() {
           tone={confirm.tone}
           confirmLabel={confirm.confirmLabel}
           cancelLabel="Cancel"
-          loading={saving}
           onCancel={() => setConfirm(null)}
           onConfirm={confirm.onConfirm}
         />
@@ -113,16 +111,15 @@ function AdminNoteEditPage() {
         }}
         onSave={requestSave}
         saveLabel="Save note"
-        saving={saving}
         disabled={Boolean(confirm)}
-        saveDisabled={!isDirty || (isPreview && mdxPreview.loading)}
+        saveDisabled={saveDisabled}
         extra={
           view === 'edit' && !isNew ? (
             <button
               type="button"
               className="admin-button admin-button--danger"
               onClick={handleDelete}
-              disabled={saving || Boolean(confirm)}
+              disabled={Boolean(confirm)}
             >
               Delete
             </button>

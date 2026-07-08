@@ -1,21 +1,22 @@
+import { RefreshCw } from 'lucide-react'
+import { useMemo } from 'react'
 import AdminField from '@/admin/components/AdminField'
+import AdminNoteFlags from '@/admin/components/AdminNoteFlags'
 import AdminSelect from '@/admin/components/AdminSelect'
+import AdminSlugStatus from '@/admin/components/AdminSlugStatus'
 import AdminTagSection from '@/admin/components/AdminTagSection'
 import AdminValidationSummary from '@/admin/components/AdminValidationSummary'
 import { fieldClassName } from '@/admin/lib/validation'
-import { slugify } from '@/utils/slugify'
 
 function AdminNoteForm({ form, onSubmit }) {
   const {
     isNew,
-    published,
-    setPublished,
-    pinned,
-    setPinned,
     title,
-    setTitle,
+    handleTitleChange,
     slug,
-    setSlug,
+    handleSlugChange,
+    refreshSlugFromTitle,
+    slugStatus,
     summary,
     setSummary,
     categoryId,
@@ -47,7 +48,22 @@ function AdminNoteForm({ form, onSubmit }) {
     removeTag,
     toggleTag,
     selectTag,
+    published,
+    pinned,
+    onTogglePublished,
+    onTogglePinned,
   } = form
+
+  const slugInvalid = isNew
+    ? slugStatus === 'unavailable' || Boolean(fieldErrors.slug)
+    : Boolean(fieldErrors.slug)
+
+  const summaryErrors = useMemo(() => {
+    if (!isNew) return fieldErrors
+    const next = { ...fieldErrors }
+    delete next.slug
+    return next
+  }, [fieldErrors, isNew])
 
   return (
     <form
@@ -57,129 +73,129 @@ function AdminNoteForm({ form, onSubmit }) {
         onSubmit()
       }}
     >
-      <section className="admin-section admin-note-status">
-        <label className="admin-switch admin-switch--compact">
-          <input
-            type="checkbox"
-            className="admin-switch-input"
-            checked={published}
-            onChange={(e) => setPublished(e.target.checked)}
-            aria-label="Published"
-          />
-          <span className="admin-switch-track" aria-hidden="true">
-            <span className="admin-switch-knob" />
-          </span>
-          <span className="admin-note-status-hint">
-            {published ? 'Visible on the public site when saved.' : 'Saved as draft — hidden from the site.'}
-          </span>
-        </label>
+      <div className="admin-note-metadata">
+        <div className="admin-note-meta">
+          <AdminField label="Title" error={fieldErrors.title} className="admin-field--full">
+            <div className="admin-title-input-row">
+              <input
+                className={fieldClassName('admin-input', fieldErrors.title)}
+                value={title}
+                onChange={(e) => handleTitleChange(e.target.value)}
+              />
+              <AdminNoteFlags
+                published={published}
+                pinned={pinned}
+                onTogglePublished={onTogglePublished}
+                onTogglePinned={onTogglePinned}
+              />
+            </div>
+          </AdminField>
 
-        <label className="admin-switch admin-switch--compact">
-          <input
-            type="checkbox"
-            className="admin-switch-input"
-            checked={pinned}
-            onChange={(e) => setPinned(e.target.checked)}
-            aria-label="Pinned on About"
-          />
-          <span className="admin-switch-track" aria-hidden="true">
-            <span className="admin-switch-knob" />
-          </span>
-          <span className="admin-note-status-hint">
-            {pinned
-              ? 'Featured on the About page when published (newest first, max 5).'
-              : 'Not featured on the About page.'}
-          </span>
-        </label>
-      </section>
+          <div className="admin-slug-category-row">
+            <label className="admin-field admin-slug-field">
+              <span className="admin-label">Slug</span>
+              <div className={`admin-slug-input-wrap${isNew ? ' admin-slug-input-wrap--affixed' : ''}`}>
+                <input
+                  className={fieldClassName('admin-input', slugInvalid)}
+                  value={slug}
+                  onChange={(e) => handleSlugChange(e.target.value)}
+                  disabled={!isNew}
+                  placeholder={isNew ? 'my-new-note' : undefined}
+                  aria-invalid={slugInvalid || undefined}
+                />
+                {isNew ? (
+                  <div className="admin-slug-input-affixes">
+                    <button
+                      type="button"
+                      className="admin-slug-refresh"
+                      aria-label="Regenerate slug from title"
+                      title="Regenerate from title"
+                      onClick={refreshSlugFromTitle}
+                    >
+                      <RefreshCw size={12} strokeWidth={2.25} aria-hidden="true" />
+                    </button>
+                    <AdminSlugStatus status={slugStatus} />
+                  </div>
+                ) : null}
+              </div>
+            </label>
 
-      <div className="admin-note-meta">
-        <AdminField label="Title" error={fieldErrors.title} className="admin-field--full">
-          <input
-            className={fieldClassName('admin-input', fieldErrors.title)}
-            value={title}
-            onChange={(e) => {
-              setTitle(e.target.value)
-              clearFieldError('title')
-            }}
-          />
-        </AdminField>
+            <label className="admin-field admin-category-field">
+              <span className="admin-label">Category</span>
+              <AdminSelect
+                value={categoryId}
+                onChange={(next) => {
+                  setCategoryId(next)
+                  setCategoryFieldError('')
+                }}
+                options={[
+                  { value: '', label: 'None' },
+                  ...categories.map((category) => ({
+                    value: String(category.id),
+                    label: category.name,
+                  })),
+                ]}
+                creatable
+                onCreate={handleCreateCategory}
+                creating={creatingCategory}
+                createError={categoryFieldError}
+                emptyLabel="None"
+              />
+            </label>
+          </div>
+        </div>
 
-        <AdminField label="Slug" error={fieldErrors.slug}>
-          <input
-            className={fieldClassName('admin-input', fieldErrors.slug)}
-            value={slug}
-            onChange={(e) => {
-              setSlug(slugify(e.target.value))
-              clearFieldError('slug')
-            }}
-            readOnly={!isNew}
-            placeholder={isNew ? 'my-new-note' : undefined}
-          />
-        </AdminField>
+        <div className="admin-note-taxonomy">
+          <AdminTagSection
+          selectedTags={selectedTags}
+          tagQuery={tagQuery}
+          tagFieldError={tagFieldError}
+          matchedExistingTag={matchedExistingTag}
+          canCreateTag={canCreateTag}
+          creatingTag={creatingTag}
+          allTags={allTags}
+          visibleTags={visibleTags}
+          selectedTagIds={selectedTagIds}
+          onTagQueryChange={(e) => {
+            setTagQuery(e.target.value)
+            setTagFieldError('')
+          }}
+          onTagInputKeyDown={handleTagInputKeyDown}
+          onCreateTag={handleCreateTag}
+          onRemoveTag={removeTag}
+          onToggleTag={toggleTag}
+          onAttachExisting={() => {
+            selectTag(matchedExistingTag.id)
+            setTagQuery('')
+          }}
+        />
+        </div>
 
-        <label className="admin-field">
-          <span className="admin-label">Category</span>
-          <AdminSelect
-            value={categoryId}
-            onChange={(next) => {
-              setCategoryId(next)
-              setCategoryFieldError('')
-            }}
-            options={[
-              { value: '', label: 'None' },
-              ...categories.map((category) => ({
-                value: String(category.id),
-                label: category.name,
-              })),
-            ]}
-            creatable
-            onCreate={handleCreateCategory}
-            creating={creatingCategory}
-            createError={categoryFieldError}
-            emptyLabel="None"
-          />
-        </label>
+        <div className="admin-note-meta">
+          <AdminField label="Summary" error={fieldErrors.summary} className="admin-field--full">
+            <textarea
+              className={fieldClassName('admin-textarea', fieldErrors.summary)}
+              rows={2}
+              value={summary}
+              onChange={(e) => {
+                setSummary(e.target.value)
+                clearFieldError('summary')
+              }}
+            />
+          </AdminField>
 
-        <AdminField label="Summary" className="admin-field--full">
-          <textarea className="admin-textarea" rows={2} value={summary} onChange={(e) => setSummary(e.target.value)} />
-        </AdminField>
-
-        <AdminField label="Cover image URL" error={fieldErrors.coverImage} className="admin-field--full">
-          <input
-            className={fieldClassName('admin-input', fieldErrors.coverImage)}
-            value={coverImage}
-            onChange={(e) => {
-              setCoverImage(e.target.value)
-              clearFieldError('coverImage')
-            }}
-          />
-        </AdminField>
+          <AdminField label="Cover image URL" error={fieldErrors.coverImage} className="admin-field--full">
+            <input
+              className={fieldClassName('admin-input', fieldErrors.coverImage)}
+              value={coverImage}
+              onChange={(e) => {
+                setCoverImage(e.target.value)
+                clearFieldError('coverImage')
+              }}
+            />
+          </AdminField>
+        </div>
       </div>
-
-      <AdminTagSection
-        selectedTags={selectedTags}
-        tagQuery={tagQuery}
-        tagFieldError={tagFieldError}
-        matchedExistingTag={matchedExistingTag}
-        canCreateTag={canCreateTag}
-        creatingTag={creatingTag}
-        allTags={allTags}
-        visibleTags={visibleTags}
-        selectedTagIds={selectedTagIds}
-        onTagQueryChange={(e) => {
-          setTagQuery(e.target.value)
-          setTagFieldError('')
-        }}
-        onTagInputKeyDown={handleTagInputKeyDown}
-        onCreateTag={handleCreateTag}
-        onRemoveTag={removeTag}
-        onToggleTag={toggleTag}
-        onAttachExisting={() => {
-          selectTag(matchedExistingTag.id)
-          setTagQuery('')
-        }}
-      />
 
       <AdminField label="Body (MDX)" error={fieldErrors.body} className="admin-note-body">
         <textarea
@@ -193,7 +209,7 @@ function AdminNoteForm({ form, onSubmit }) {
         />
       </AdminField>
 
-      <AdminValidationSummary errors={fieldErrors} />
+      <AdminValidationSummary errors={summaryErrors} />
     </form>
   )
 }

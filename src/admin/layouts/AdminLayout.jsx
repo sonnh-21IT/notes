@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { NavLink, Outlet, Link } from 'react-router-dom'
 import { ExternalLink, FileText, LogOut, Menu, Settings, StickyNote, X } from 'lucide-react'
+import AdminToastProvider from '@/admin/components/AdminToast'
 import { useAuthState } from '@/context/AuthProvider'
 import ThemeToggle from '@/ui/ThemeToggle'
 
@@ -28,7 +29,8 @@ function AdminLayout() {
   }
 
   return (
-    <div className={`admin-shell${menuOpen ? ' admin-shell--menu-open' : ''}`}>
+    <AdminToastProvider>
+      <div className={`admin-shell${menuOpen ? ' admin-shell--menu-open' : ''}`}>
       <aside className="admin-sidebar">
         <header className="admin-sidebar-header">
           <div className="admin-sidebar-brand">
@@ -91,7 +93,8 @@ function AdminLayout() {
       <main className="admin-main">
         <Outlet />
       </main>
-    </div>
+      </div>
+    </AdminToastProvider>
   )
 }
 

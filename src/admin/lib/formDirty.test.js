@@ -1,5 +1,11 @@
 import { describe, expect, it } from 'vitest'
-import { snapshotEquals, noteSnapshot, settingsSnapshot } from '@/admin/lib/formDirty'
+import {
+  snapshotEquals,
+  noteSnapshot,
+  noteDirtySnapshot,
+  noteHasUserContent,
+  settingsSnapshot,
+} from '@/admin/lib/formDirty'
 
 describe('snapshotEquals', () => {
   it('compares serialized snapshots', () => {
@@ -34,6 +40,50 @@ describe('noteSnapshot', () => {
       pinned: false,
       body: 'body',
     })
+  })
+})
+
+describe('noteDirtySnapshot', () => {
+  it('ignores published and pinned', () => {
+    const base = {
+      slug: 'note',
+      title: 'Note',
+      summary: '',
+      categoryId: null,
+      selectedTagIds: [],
+      publishedAt: '2026-01-01',
+      coverImage: '',
+      body: 'body',
+    }
+
+    expect(noteDirtySnapshot({ ...base, published: true, pinned: false }))
+      .toEqual(noteDirtySnapshot({ ...base, published: false, pinned: true }))
+  })
+})
+
+describe('noteHasUserContent', () => {
+  const empty = {
+    slug: '',
+    title: '',
+    summary: '',
+    categoryId: '',
+    selectedTagIds: [],
+    coverImage: '',
+    body: '',
+  }
+
+  it('is false when all content fields are empty', () => {
+    expect(noteHasUserContent(empty)).toBe(false)
+  })
+
+  it('ignores published and pinned', () => {
+    expect(noteHasUserContent(empty)).toBe(false)
+  })
+
+  it('is true when any content field is filled', () => {
+    expect(noteHasUserContent({ ...empty, title: 'Note' })).toBe(true)
+    expect(noteHasUserContent({ ...empty, slug: 'note' })).toBe(true)
+    expect(noteHasUserContent({ ...empty, categoryId: '1' })).toBe(true)
   })
 })
 

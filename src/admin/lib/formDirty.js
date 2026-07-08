@@ -47,3 +47,30 @@ export function noteSnapshot({
     body: body ?? '',
   }
 }
+
+export function noteDirtySnapshot(fields) {
+  const snapshot = noteSnapshot(fields)
+  return Object.fromEntries(
+    Object.entries(snapshot).filter(([key]) => key !== 'published' && key !== 'pinned'),
+  )
+}
+
+export function noteHasUserContent({
+  slug,
+  title,
+  summary,
+  categoryId,
+  selectedTagIds,
+  coverImage,
+  body,
+}) {
+  return Boolean(
+    slug?.trim()
+    || title?.trim()
+    || summary?.trim()
+    || body?.trim()
+    || categoryId
+    || (selectedTagIds?.length ?? 0) > 0
+    || coverImage?.trim(),
+  )
+}

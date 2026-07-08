@@ -2,7 +2,6 @@ import { Plus } from 'lucide-react'
 import PageLoading from '@/ui/PageLoading'
 import AdminConfirmPanel from '@/admin/components/AdminConfirmPanel'
 import AdminField from '@/admin/components/AdminField'
-import AdminFlash from '@/admin/components/AdminFlash'
 import AdminPageHeader from '@/admin/components/AdminPageHeader'
 import AdminSocialLinkRow from '@/admin/components/AdminSocialLinkRow'
 import AdminValidationSummary from '@/admin/components/AdminValidationSummary'
@@ -17,9 +16,6 @@ function AdminSettingsPage() {
   const settings = useAdminSettings()
   const {
     loading,
-    saving,
-    error,
-    message,
     confirm,
     setConfirm,
     headerTitle,
@@ -88,8 +84,6 @@ function AdminSettingsPage() {
         </div>
 
         <AdminValidationSummary errors={fieldErrors} />
-        <AdminFlash type="error">{error}</AdminFlash>
-        <AdminFlash type="success">{message}</AdminFlash>
 
         {confirm && (
           <AdminConfirmPanel
@@ -98,15 +92,14 @@ function AdminSettingsPage() {
             tone={confirm.tone}
             confirmLabel={confirm.confirmLabel}
             cancelLabel="Cancel"
-            loading={saving}
             onCancel={() => setConfirm(null)}
             onConfirm={confirm.onConfirm}
           />
         )}
 
         <div className="admin-form-footer admin-form-footer--sticky">
-          <button type="submit" className="admin-button admin-button--primary" disabled={saving || Boolean(confirm) || !isDirty}>
-            {saving ? 'Saving…' : 'Save changes'}
+          <button type="submit" className="admin-button admin-button--primary" disabled={Boolean(confirm) || !isDirty}>
+            Save changes
           </button>
         </div>
       </form>

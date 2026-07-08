@@ -3,7 +3,6 @@ import PageLoading from '@/ui/PageLoading'
 import AdminConfirmPanel from '@/admin/components/AdminConfirmPanel'
 import AdminEditorToolbar from '@/admin/components/AdminEditorToolbar'
 import AdminField from '@/admin/components/AdminField'
-import AdminFlash from '@/admin/components/AdminFlash'
 import AdminMdxPreviewPane from '@/admin/components/AdminMdxPreviewPane'
 import AdminPageHeader from '@/admin/components/AdminPageHeader'
 import AdminValidationSummary from '@/admin/components/AdminValidationSummary'
@@ -20,9 +19,6 @@ function AdminContentEditPage() {
     view,
     isPreview,
     isDirty,
-    saving,
-    error,
-    message,
     confirm,
     setConfirm,
     setView,
@@ -100,9 +96,6 @@ function AdminContentEditPage() {
         />
       )}
 
-      <AdminFlash type="error">{error}</AdminFlash>
-      <AdminFlash type="success">{message}</AdminFlash>
-
       {confirm && (
         <AdminConfirmPanel
           title={confirm.title}
@@ -110,7 +103,6 @@ function AdminContentEditPage() {
           tone={confirm.tone}
           confirmLabel={confirm.confirmLabel}
           cancelLabel="Cancel"
-          loading={saving}
           onCancel={() => setConfirm(null)}
           onConfirm={confirm.onConfirm}
         />
@@ -125,7 +117,6 @@ function AdminContentEditPage() {
         }}
         onSave={requestSave}
         saveLabel="Save page"
-        saving={saving}
         disabled={Boolean(confirm)}
         saveDisabled={!isDirty || (isPreview && mdxPreview.loading)}
       />

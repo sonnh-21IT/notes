@@ -1,10 +1,9 @@
 import { Link } from 'react-router-dom'
-import { Eye, EyeOff, Pin, PinOff } from 'lucide-react'
+import AdminNoteFlags from '@/admin/components/AdminNoteFlags'
 
 function AdminNoteListItem({
   note,
   meta,
-  busy,
   onTogglePublished,
   onTogglePinned,
 }) {
@@ -18,34 +17,20 @@ function AdminNoteListItem({
           </span>
         </Link>
 
-        <div className="admin-note-flags" role="group" aria-label="Note status">
-          <button
-            type="button"
-            className={`admin-note-flag${note.published ? ' is-on' : ' is-off'}`}
-            disabled={busy}
-            aria-pressed={note.published}
-            aria-label={note.published ? 'Unpublish note' : 'Publish note'}
-            title={note.published ? 'Visible on site — click to unpublish' : 'Draft — click to publish'}
-            onClick={() => onTogglePublished(note)}
-          >
-            {note.published
-              ? <Eye size={16} strokeWidth={2.25} aria-hidden="true" />
-              : <EyeOff size={16} strokeWidth={2.25} aria-hidden="true" />}
-          </button>
-          <button
-            type="button"
-            className={`admin-note-flag${note.pinned ? ' is-on' : ' is-off'}`}
-            disabled={busy}
-            aria-pressed={note.pinned}
-            aria-label={note.pinned ? 'Unpin note' : 'Pin note on About'}
-            title={note.pinned ? 'Pinned on About — click to unpin' : 'Not pinned — click to pin on About'}
-            onClick={() => onTogglePinned(note)}
-          >
-            {note.pinned
-              ? <Pin size={16} strokeWidth={2.25} aria-hidden="true" />
-              : <PinOff size={16} strokeWidth={2.25} aria-hidden="true" />}
-          </button>
-        </div>
+        <AdminNoteFlags
+          published={note.published}
+          pinned={note.pinned}
+          onTogglePublished={(event) => {
+            event.preventDefault()
+            event.stopPropagation()
+            onTogglePublished(note)
+          }}
+          onTogglePinned={(event) => {
+            event.preventDefault()
+            event.stopPropagation()
+            onTogglePinned(note)
+          }}
+        />
       </div>
     </li>
   )

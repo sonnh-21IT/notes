@@ -98,6 +98,8 @@ as $$
   select auth.uid() = '00000000-0000-0000-0000-000000000000'::uuid;
 $$;
 
+grant execute on function public.is_site_owner() to authenticated;
+
 -- Owner: read drafts + write CMS data
 create policy "Owner read all notes"
   on notes for select to authenticated
@@ -179,3 +181,15 @@ create policy "Owner delete note tags"
 
 -- Upgrade existing DBs without re-running the drops above (Supabase SQL editor)
 alter table notes add column if not exists pinned boolean not null default false;
+
+create or replace function public.is_site_owner()
+returns boolean
+language sql
+stable
+security invoker
+set search_path = public
+as $$
+  select auth.uid() = '00000000-0000-0000-0000-000000000000'::uuid;
+$$;
+
+grant execute on function public.is_site_owner() to authenticated;
