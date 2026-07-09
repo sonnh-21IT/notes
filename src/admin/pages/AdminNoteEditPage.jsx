@@ -28,7 +28,6 @@ function AdminNoteEditPageView() {
     slug,
     view,
     isPreview,
-    isDirty,
     saveDisabled,
     confirm,
     setConfirm,
