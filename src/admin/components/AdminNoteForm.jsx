@@ -1,6 +1,8 @@
 import { RefreshCw } from 'lucide-react'
 import { useMemo } from 'react'
+import AdminCoverImageField from '@/admin/components/AdminCoverImageField'
 import AdminField from '@/admin/components/AdminField'
+import AdminFieldError from '@/admin/components/AdminFieldError'
 import AdminNoteFlags from '@/admin/components/AdminNoteFlags'
 import AdminSelect from '@/admin/components/AdminSelect'
 import AdminSlugStatus from '@/admin/components/AdminSlugStatus'
@@ -22,7 +24,9 @@ function AdminNoteForm({ form, onSubmit }) {
     categoryId,
     setCategoryId,
     coverImage,
-    setCoverImage,
+    coverUploading,
+    handleCoverSelect,
+    handleCoverRemove,
     body,
     setBody,
     categories,
@@ -184,16 +188,16 @@ function AdminNoteForm({ form, onSubmit }) {
             />
           </AdminField>
 
-          <AdminField label="Cover image URL" error={fieldErrors.coverImage} className="admin-field--full">
-            <input
-              className={fieldClassName('admin-input', fieldErrors.coverImage)}
+          <div className="admin-field admin-field--full">
+            <span className="admin-label">Cover image</span>
+            <AdminCoverImageField
               value={coverImage}
-              onChange={(e) => {
-                setCoverImage(e.target.value)
-                clearFieldError('coverImage')
-              }}
+              uploading={coverUploading}
+              onSelectFile={handleCoverSelect}
+              onRemove={handleCoverRemove}
             />
-          </AdminField>
+            <AdminFieldError message={fieldErrors.coverImage} />
+          </div>
         </div>
       </div>
 

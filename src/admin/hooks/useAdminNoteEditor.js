@@ -7,11 +7,13 @@ import { noteFlagsToastMessage } from '@/admin/lib/noteFlags'
 import { clearNoteDraft } from '@/admin/lib/noteDraft'
 import { isValidNoteSlug, validateNoteFields } from '@/admin/lib/validation'
 import {
+  deleteCoverImage,
   deleteNote,
   getNote,
   listCategories,
   listTags,
   updateNoteFlags,
+  uploadCoverImage,
   upsertCategory,
   upsertNote,
   upsertTag,
@@ -104,6 +106,8 @@ export function useAdminNoteEditor() {
   const saveInFlightRef = useRef(false)
   const togglingFlagsRef = useRef(false)
   const slugCheckRef = useRef(0)
+  const sessionCoverUploadsRef = useRef(new Set())
+  const coverImageRef = useRef('')
   const isNew = routeSlug === 'new'
   const initialFields = readInitialNoteFields(routeSlug, location.state)
 
@@ -123,6 +127,7 @@ export function useAdminNoteEditor() {
   const [tagFieldError, setTagFieldError] = useState('')
   const [publishedAt, setPublishedAt] = useState(() => (isNew ? initialFields.publishedAt : ''))
   const [coverImage, setCoverImage] = useState(() => (isNew ? initialFields.coverImage : ''))
+  const [coverUploading, setCoverUploading] = useState(false)
   const [published, setPublished] = useState(() => (isNew ? initialFields.published : true))
   const [pinned, setPinned] = useState(() => (isNew ? initialFields.pinned : false))
   const [body, setBody] = useState(() => (isNew ? initialFields.body : ''))
@@ -131,6 +136,8 @@ export function useAdminNoteEditor() {
   const [slugManual, setSlugManual] = useState(() => readInitialSlugManual(routeSlug, location.state))
   const [confirm, setConfirm] = useState(null)
   const [baseline, setBaseline] = useState(() => (isNew ? snapshotFromFields(initialFields) : null))
+
+  coverImageRef.current = coverImage
 
   const isPreview = view === 'preview'
   const debouncedSlug = useDebouncedValue(slug, 400)
@@ -268,6 +275,16 @@ export function useAdminNoteEditor() {
     }
   }, [isNew, debouncedSlug])
 
+  useEffect(() => {
+    const sessionUploads = sessionCoverUploadsRef.current
+    return () => {
+      for (const url of sessionUploads) {
+        deleteCoverImage(url).catch(() => {})
+      }
+      sessionUploads.clear()
+    }
+  }, [])
+
   const trimmedTagQuery = tagQuery.trim()
   const matchedExistingTag = useMemo(
     () => findTagByName(allTags, trimmedTagQuery),
@@ -310,6 +327,41 @@ export function useAdminNoteEditor() {
     setSlug(slugify(title))
     clearFieldError('slug')
   }, [title, clearFieldError])
+
+  const handleCoverSelect = useCallback(async (file) => {
+    const previous = coverImageRef.current
+    setCoverUploading(true)
+    clearFieldError('coverImage')
+
+    try {
+      const url = await uploadCoverImage(file)
+      sessionCoverUploadsRef.current.add(url)
+      setCoverImage(url)
+
+      if (previous && sessionCoverUploadsRef.current.has(previous)) {
+        sessionCoverUploadsRef.current.delete(previous)
+        deleteCoverImage(previous).catch(() => {})
+      }
+    } catch (err) {
+      setFieldErrors((current) => ({
+        ...current,
+        coverImage: err instanceof Error ? err.message : String(err),
+      }))
+    } finally {
+      setCoverUploading(false)
+    }
+  }, [clearFieldError])
+
+  const handleCoverRemove = useCallback(() => {
+    const previous = coverImageRef.current
+    setCoverImage('')
+    clearFieldError('coverImage')
+
+    if (previous && sessionCoverUploadsRef.current.has(previous)) {
+      sessionCoverUploadsRef.current.delete(previous)
+      deleteCoverImage(previous).catch(() => {})
+    }
+  }, [clearFieldError])
 
   const selectTag = useCallback((tagId) => {
     setSelectedTagIds((current) => (current.includes(tagId) ? current : [...current, tagId]))
@@ -435,8 +487,19 @@ export function useAdminNoteEditor() {
     try {
       if (!(await validateSlugAvailable())) return
 
+      const previousCover = baseline?.coverImage ?? null
       const payload = notePayload()
       await upsertNote(payload)
+
+      if (previousCover && previousCover !== payload.coverImage) {
+        await deleteCoverImage(previousCover).catch(() => {})
+      }
+
+      if (payload.coverImage) {
+        sessionCoverUploadsRef.current.delete(payload.coverImage)
+      }
+      sessionCoverUploadsRef.current.clear()
+
       clearNoteDraft()
       setBaseline(currentSnapshot)
       toast.showSuccess('Note saved.')
@@ -449,7 +512,7 @@ export function useAdminNoteEditor() {
     } finally {
       saveInFlightRef.current = false
     }
-  }, [notePayload, currentSnapshot, isNew, navigate, toast, validateSlugAvailable])
+  }, [notePayload, currentSnapshot, baseline, isNew, navigate, toast, validateSlugAvailable])
 
   const performDelete = useCallback(async () => {
     if (saveInFlightRef.current) return
@@ -566,6 +629,7 @@ export function useAdminNoteEditor() {
   const slugSaveBlocked = isNew && Boolean(slug.trim()) && slugStatus !== 'available'
 
   const saveDisabled = !isDirty
+    || coverUploading
     || (isPreview && mdxLoading)
     || (isNew && (!hasUserContent || slugSaveBlocked))
 
@@ -604,7 +668,9 @@ export function useAdminNoteEditor() {
       categoryId,
       setCategoryId,
       coverImage,
-      setCoverImage,
+      coverUploading,
+      handleCoverSelect,
+      handleCoverRemove,
       body,
       setBody,
       categories,

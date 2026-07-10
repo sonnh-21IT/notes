@@ -54,7 +54,7 @@ export function validateNoteFields({ slug, title, summary, body, coverImage, pub
 
   const cover = coverImage?.trim()
   if (cover && !isValidCoverUrl(cover)) {
-    errors.coverImage = 'Use a valid URL or a path starting with /.'
+    errors.coverImage = 'Cover image URL is invalid.'
   }
 
   if (publishedAt && !isValidDateString(publishedAt)) {

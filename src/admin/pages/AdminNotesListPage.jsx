@@ -9,7 +9,7 @@ import AdminPageHeader from '@/admin/components/AdminPageHeader'
 import { useAdminToast } from '@/admin/hooks/useAdminToast'
 import { useAdminNotesCatalog } from '@/admin/hooks/useAdminNotesCatalog'
 import { noteFlagsToastMessage } from '@/admin/lib/noteFlags'
-import { getAuthUserId, isSiteOwner, updateNoteFlags } from '@/data/admin'
+import { getAuthUserId, isContentAdmin, updateNoteFlags } from '@/data/admin'
 import { usePaginationState } from '@/hooks/usePaginationState'
 import { formatArticleDate } from '@/utils/formatArticleMeta'
 
@@ -52,12 +52,12 @@ function AdminNotesListPage() {
   useEffect(() => {
     let active = true
 
-    Promise.all([isSiteOwner(), getAuthUserId()])
+    Promise.all([isContentAdmin(), getAuthUserId()])
       .then(([canWrite, userId]) => {
         if (!active || canWrite !== false || !userId) return
         toast.showError(
-          `Signed in as ${userId}, but this account is not the site owner in Supabase. `
-          + 'Update is_site_owner() in the SQL editor with this UUID.',
+          `Signed in as ${userId}, but this account is not the content admin in Supabase. `
+          + 'Update is_content_admin() in the SQL editor with this UUID.',
         )
       })
       .catch(() => {})

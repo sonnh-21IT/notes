@@ -1,5 +1,6 @@
 import { isSupabaseConfigured } from '@/data/supabase/client'
 import * as provider from '@/data/supabase/admin.provider'
+import * as coverImage from '@/data/supabase/coverImage'
 
 function assertSupabaseReady() {
   if (!isSupabaseConfigured()) {
@@ -27,6 +28,8 @@ export const listNotes = guard(provider.adminListNotes)
 export const getNote = guard(provider.adminGetNote)
 export const upsertNote = guard(provider.adminUpsertNote)
 export const updateNoteFlags = guard(provider.adminUpdateNoteFlags)
-export const isSiteOwner = guard(provider.adminIsSiteOwner)
+export const isContentAdmin = guard(provider.adminIsContentAdmin)
 export const getAuthUserId = guard(provider.adminGetAuthUserId)
 export const deleteNote = guard(provider.adminDeleteNote)
+export const uploadCoverImage = guard(coverImage.adminUploadCoverImage)
+export const deleteCoverImage = guard(coverImage.adminDeleteCoverImage)

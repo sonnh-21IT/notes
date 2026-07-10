@@ -10,8 +10,8 @@ async function throwNoteFlagsWriteError(supabase) {
   }
 
   throw new Error(
-    `Write blocked by Supabase RLS. You are signed in as ${userId}, but is_site_owner() does not include this user. `
-    + 'In Supabase → SQL editor, update is_site_owner() with your Auth user UUID (see supabase/schema.sql).',
+    `Write blocked by Supabase RLS. You are signed in as ${userId}, but is_content_admin() does not include this user. `
+    + 'In Supabase → SQL editor, update is_content_admin() with your CMS Auth user UUID (see supabase/schema.sql).',
   )
 }
 
@@ -149,9 +149,9 @@ export async function adminUpsertNote(note) {
   await syncNoteTags(supabase, note.slug, [...new Set(note.tagIds ?? [])])
 }
 
-export async function adminIsSiteOwner() {
+export async function adminIsContentAdmin() {
   const supabase = getSupabaseClient()
-  const { data, error } = await supabase.rpc('is_site_owner')
+  const { data, error } = await supabase.rpc('is_content_admin')
   if (error) return null
   return Boolean(data)
 }
