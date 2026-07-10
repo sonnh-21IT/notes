@@ -27,14 +27,15 @@ src/
 ├── styles/           # CSS layers (foundation → shared → public → admin)
 └── utils/
 supabase/
-└── schema.sql        # Tables, RLS, Storage bucket, content-admin policies
+├── schema.sql                 # Tables, public-read RLS, note-covers bucket
+└── admin.sql    # is_content_admin() UUID + CMS write policies
 ```
 
 ### Components (`ui` vs `shared` vs `mdx`)
 
 | Folder | Put here when… | Examples |
 |--------|----------------|----------|
-| `ui/` | Site shell or generic UI used anywhere | `SiteHeader`, `PageLoading`, `PageMeta`, `ThemeToggle` |
+| `ui/` | Site shell or generic UI used anywhere | `SiteHeader`, page skeletons (DB waits), `PageMeta`, `ThemeToggle` |
 | `shared/` | Domain UI imported by **2+ features** (public + admin) | `NotesFilterBar` |
 | `mdx/` | MDX pipeline and article rendering | `MdxBody`, `CodeBlock`, `ArticleHeader` |
 | `admin/components/` | Admin-only UI | `AdminField`, `AdminCoverImageField` |
@@ -98,25 +99,28 @@ Why: the CMS login only needs to write content tables + cover storage. The proje
 1. Supabase → **Authentication → Users → Add user**
 2. Create with email + password (or magic link — this app uses email/password).
 3. Open the user → copy **User UID** (UUID).
-4. In `supabase/schema.sql`, replace **both** placeholders:
+4. In `supabase/admin.sql`, replace the placeholder UUID once:
 
 ```sql
 select auth.uid() = 'paste-content-admin-uuid-here'::uuid;
 ```
 
-inside `is_content_admin()` (the function appears twice in the file — keep them identical).
+inside `is_content_admin()`.
 
-### 4. Apply schema + Storage
+### 4. Apply schema + content-admin setup
 
-In Supabase → **SQL Editor**, run `supabase/schema.sql`.
+In Supabase → **SQL Editor**:
 
-That creates:
+1. **Fresh project:** run `supabase/schema.sql` (creates tables, public read, bucket, site chrome, and fixed static page rows with empty body).
+2. **Then** run `supabase/admin.sql` (after pasting your UUID).
 
-- Tables + public read RLS
-- `is_content_admin()` gated write policies
+**Existing project** (tables already there): skip `schema.sql` (it drops tables). Only run `admin.sql` after pasting your UUID. Fill page copy via `/admin/content` or `npm run sync:supabase`.
+
+That gives you:
+
+- Tables + public read RLS (from schema)
+- `is_content_admin()` gated write policies (from setup)
 - Public Storage bucket `note-covers` (JPEG/PNG/WebP/GIF, max 5MB)
-
-**Existing project** (tables already there): do **not** re-run the `drop table` block. Run from the comment `-- Upgrade existing DBs` to the end of the file (after pasting your UUID).
 
 Confirm: **Storage** shows bucket `note-covers` (public).
 
@@ -223,6 +227,7 @@ Defense is **RLS in Supabase**, not the `/admin` UI (anyone can load the SPA).
 | **Project owner ≠ CMS login** | Dashboard / billing / service role stay on a separate account |
 | **Public policies** | Anonymous read for published notes + site content |
 | **Sign-up disabled** | No extra Auth users → no one else passes `is_content_admin()` |
+| **Admin session cap** | Auth stored in `sessionStorage` (ends when the browser session closes) and forced sign-out after 8 hours from last sign-in |
 | **Storage `note-covers`** | Public read; upload/update/delete only for content admin |
 | **`isSafeAssetUrl`** | MDX `<img>` and cover URLs limited to `http(s):` or `/…` paths |
 | **Service role** | `SUPABASE_SERVICE_ROLE_KEY` only for local `sync:supabase` — never in `VITE_*` |
@@ -249,11 +254,11 @@ $$;
 grant execute on function public.is_content_admin() to authenticated;
 ```
 
-Or re-run the **Upgrade existing DBs** section at the bottom of `supabase/schema.sql`.
+Or re-run `supabase/admin.sql` after pasting the new UUID.
 
 ### Migrating from `is_site_owner()`
 
-Older installs used `is_site_owner()`. The upgrade block drops that function (`cascade`) and installs `is_content_admin()` plus **Content admin** policies. Paste your CMS user UUID before running.
+Older installs used `is_site_owner()`. Running `admin.sql` drops that function (`cascade`) and installs `is_content_admin()` plus **Content admin** policies. Paste your CMS user UUID before running.
 
 ---
 

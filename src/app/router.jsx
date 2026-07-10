@@ -21,7 +21,8 @@ const AdminNoteEditPage = lazy(() => import('@/admin/pages/AdminNoteEditPage'))
 const AdminNotePreviewPage = lazy(() => import('@/admin/pages/AdminNotePreviewPage'))
 
 function RouteFallback() {
-  return <PageLoading label="Loading page" />
+  // Chunk load only — not a DB wait, so no skeleton chrome
+  return <PageLoading />
 }
 
 function AppRouter() {

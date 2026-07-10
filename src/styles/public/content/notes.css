@@ -119,7 +119,7 @@
 }
 
 .notes-pagination-btn:hover:not(:disabled) {
-  border-color: color-mix(in srgb, var(--accent) 35%, var(--border) 65%);
+  border-color: var(--accent-border);
   color: var(--accent);
 }
 

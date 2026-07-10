@@ -6,6 +6,7 @@ function AdminSelect({
   onChange,
   options,
   invalid = false,
+  disabled = false,
   creatable = false,
   onCreate,
   creating = false,
@@ -43,7 +44,7 @@ function AdminSelect({
   }
 
   useEffect(() => {
-    if (!open) return undefined
+    if (!open || disabled) return undefined
 
     if (creatable) {
       searchRef.current?.focus()
@@ -63,10 +64,10 @@ function AdminSelect({
       document.removeEventListener('pointerdown', onPointerDown)
       document.removeEventListener('keydown', onKeyDown)
     }
-  }, [open, creatable])
+  }, [open, creatable, disabled])
 
   async function handleCreate() {
-    if (!canCreate || creating) return
+    if (!canCreate || creating || disabled) return
 
     try {
       await onCreate(trimmedQuery)
@@ -77,26 +78,33 @@ function AdminSelect({
   }
 
   function selectOption(optionValue) {
+    if (disabled) return
     onChange(optionValue)
     closeMenu()
   }
 
+  const menuOpen = open && !disabled
+
   return (
-    <div ref={wrapRef} className={`admin-select-wrap${open ? ' is-open' : ''}`}>
+    <div ref={wrapRef} className={`admin-select-wrap${menuOpen ? ' is-open' : ''}`}>
       <button
         type="button"
         className={`admin-input admin-select-trigger${invalid ? ' admin-input--invalid' : ''}`}
         aria-haspopup="listbox"
-        aria-expanded={open}
+        aria-expanded={menuOpen}
         aria-controls={listId}
         aria-label={ariaLabel}
-        onClick={() => (open ? closeMenu() : setOpen(true))}
+        disabled={disabled}
+        onClick={() => {
+          if (disabled) return
+          open ? closeMenu() : setOpen(true)
+        }}
       >
         <span className="admin-select-value">{displayLabel}</span>
         <ChevronDown className="admin-select-chevron" size={16} strokeWidth={2} aria-hidden />
       </button>
 
-      {open && (
+      {menuOpen && (
         <ul id={listId} className="admin-select-menu" role="listbox">
           {creatable && (
             <li className="admin-select-search" role="presentation">

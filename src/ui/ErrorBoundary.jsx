@@ -15,7 +15,7 @@ class ErrorBoundary extends Component {
       return (
         <section className="page-stack content content-error">
           <h1 className="content-title">Something went wrong</h1>
-          <p className="content-lead">{this.state.error.message}</p>
+          <p className="content-lead">Something broke on this page. Try again, or come back later.</p>
           <button
             type="button"
             className="admin-button admin-button--ghost"

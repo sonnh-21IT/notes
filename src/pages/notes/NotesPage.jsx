@@ -4,6 +4,8 @@ import NotesList from '@/shared/notes/NotesList'
 import MdxBody from '@/mdx/MdxBody'
 import PageLoadState from '@/ui/PageLoadState'
 import PageMeta from '@/ui/PageMeta'
+import DbLoadingScreen from '@/ui/DbLoadingScreen'
+import { NotesIntroSkeleton, NotesListSectionSkeleton } from '@/ui/skeletons'
 import { useDebouncedValue } from '@/hooks/useDebouncedValue'
 import { usePaginationState } from '@/hooks/usePaginationState'
 import { useCategoriesList, useNotesPage, usePageContent, useTagsList } from '@/hooks/usePageContent'
@@ -29,8 +31,6 @@ function NotesPage() {
     categoryIds: activeCategoryIds,
   })
 
-  const initialLoading = page.loading || tags.loading || categories.loading
-  const initialError = page.error ?? tags.error ?? categories.error
   const notesPageContent = page.data
   const allTags = useMemo(() => tags.data ?? [], [tags.data])
   const allCategories = useMemo(() => categories.data ?? [], [categories.data])
@@ -80,57 +80,70 @@ function NotesPage() {
   }
 
   return (
-    <PageLoadState loading={initialLoading} error={initialError}>
+    <>
       <PageMeta
         title={notesPageContent?.title || 'Notes'}
         path="/notes"
       />
       <section className="page-stack content notes-page">
-        <MdxBody component={notesPageContent?.MdxContent} />
+        <PageLoadState
+          loading={page.isInitialLoading}
+          error={page.error}
+          hasData={Boolean(page.data)}
+          skeleton={<NotesIntroSkeleton />}
+        >
+          <MdxBody component={notesPageContent?.MdxContent} empty="notes" />
+        </PageLoadState>
 
         <section className="content-section notes-list-section" aria-label="Notes list">
-          <div className="notes-list-controls">
-            <div className="notes-toolbar">
-              <div className="notes-search-wrap">
-                <label className="notes-search">
-                  <span className="visually-hidden">Search notes</span>
-                  <input
-                    type="search"
-                    className="notes-search-input"
-                    placeholder="Search notes…"
-                    value={query}
-                    onChange={(event) => setQuery(event.target.value)}
-                  />
-                </label>
-                {query && (
-                  <button
-                    type="button"
-                    className="notes-search-clear"
-                    aria-label="Clear search"
-                    onClick={() => setQuery('')}
-                  >
-                    ×
-                  </button>
-                )}
+          {listError && <p className="notes-empty">Couldn&apos;t load notes right now. Please try again.</p>}
+
+          <DbLoadingScreen loading={list.isInitialLoading} skeleton={<NotesListSectionSkeleton />}>
+            <div className="notes-list-controls">
+              <div className="notes-toolbar">
+                <div className="notes-search-wrap">
+                  <label className="notes-search">
+                    <span className="visually-hidden">Search notes</span>
+                    <input
+                      type="search"
+                      className="notes-search-input"
+                      placeholder="Search notes…"
+                      value={query}
+                      onChange={(event) => setQuery(event.target.value)}
+                    />
+                  </label>
+                  {query && (
+                    <button
+                      type="button"
+                      className="notes-search-clear"
+                      aria-label="Clear search"
+                      onClick={() => setQuery('')}
+                    >
+                      ×
+                    </button>
+                  )}
+                </div>
+
+                <NotesFilterOptions filterOptions={filterOptions} onSelect={selectFilter} />
               </div>
 
-              <NotesFilterOptions filterOptions={filterOptions} onSelect={selectFilter} />
+              <NotesActiveFilters
+                selectedCategories={selectedCategories}
+                selectedTags={selectedTags}
+                onRemove={removeFilter}
+              />
             </div>
 
-            <NotesActiveFilters
-              selectedCategories={selectedCategories}
-              selectedTags={selectedTags}
-              onRemove={removeFilter}
-            />
-          </div>
-
-          {listError && <p className="notes-empty">{listError.message}</p>}
-
-          {!listError && notes.length === 0 && !list.loading ? (
-            <p className="notes-empty">No notes match your search.</p>
-          ) : (
-            <NotesList notes={notes} loading={list.loading} />
-          )}
+            {!listError && notes.length === 0 && !list.loading ? (
+              <p className="notes-empty">
+                {debouncedQuery || activeTagIds.length || activeCategoryIds.length
+                  ? 'No notes match your search.'
+                  : 'No notes published yet. Check back soon.'}
+              </p>
+            ) : (
+              <NotesList notes={notes} loading={list.isValidating && !list.isInitialLoading} />
+            )}
+          </DbLoadingScreen>
 
           {!listError && pageCount >= 1 && (
             <nav className="notes-pagination" aria-label="Notes pagination">
@@ -158,7 +171,7 @@ function NotesPage() {
           )}
         </section>
       </section>
-    </PageLoadState>
+    </>
   )
 }
 

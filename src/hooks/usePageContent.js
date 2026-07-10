@@ -10,12 +10,16 @@ import {
 } from '@/data/content'
 import { useAsyncResource } from '@/hooks/useAsyncResource'
 
-function withMdxReady({ loading, data, error }, { isCurrent = null } = {}) {
+function withMdxReady(resource, { isCurrent = null } = {}) {
+  const { loading, data, error, isInitialLoading, isValidating } = resource
   const waitingForMdx = data != null && !isMdxContentReady(data)
   const waitingForMatch = data != null && isCurrent != null && !isCurrent(data)
+  const waiting = waitingForMdx || waitingForMatch
 
   return {
-    loading: loading || waitingForMdx || waitingForMatch,
+    loading: loading || waiting,
+    isInitialLoading: isInitialLoading || (waiting && data == null),
+    isValidating: isValidating || waiting,
     data,
     error,
   }
@@ -23,7 +27,7 @@ function withMdxReady({ loading, data, error }, { isCurrent = null } = {}) {
 
 export function usePageContent(slug) {
   const loader = useCallback(() => loadPageContent(slug), [slug])
-  return withMdxReady(useAsyncResource(loader, [slug]))
+  return withMdxReady(useAsyncResource(loader, [slug], { keepPreviousData: false }))
 }
 
 export function useTagsList() {
@@ -42,17 +46,19 @@ export function useNotesPage({ page, pageSize = 10, query = '', tagIds = [], cat
     [page, pageSize, query, tagIds, categoryIds],
   )
 
-  return useAsyncResource(loader, [page, pageSize, query, tagIds, categoryIds])
+  return useAsyncResource(loader, [page, pageSize, query, tagIds, categoryIds], {
+    keepPreviousData: true,
+  })
 }
 
 export function usePinnedNotes({ limit = 5 } = {}) {
   const loader = useCallback(() => loadPinnedNotes({ limit }), [limit])
-  return useAsyncResource(loader, [limit])
+  return useAsyncResource(loader, [limit], { keepPreviousData: true })
 }
 
 export function useNote(slug) {
   const loader = useCallback(() => loadNoteBySlug(slug), [slug])
-  return withMdxReady(useAsyncResource(loader, [slug]), {
+  return withMdxReady(useAsyncResource(loader, [slug], { keepPreviousData: false }), {
     isCurrent: (note) => note.slug === slug,
   })
 }

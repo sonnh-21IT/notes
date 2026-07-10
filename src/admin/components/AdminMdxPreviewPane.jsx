@@ -1,18 +1,19 @@
 import AdminFlash from '@/admin/components/AdminFlash'
 import MdxBody from '@/mdx/MdxBody'
-import PageLoading from '@/ui/PageLoading'
 
 function AdminMdxPreviewPane({ loading, error, MdxContent, articleClassName, hint, header }) {
   return (
     <div className="admin-preview-pane">
       {hint}
       {loading ? (
-        <PageLoading label="Rendering preview" />
+        <p className="admin-preview-rendering" role="status" aria-live="polite">
+          Rendering preview…
+        </p>
       ) : (
         <article className={articleClassName}>
           {header}
           {error ? (
-            <AdminFlash type="error">MDX error: {error}</AdminFlash>
+            <AdminFlash type="error">Couldn&apos;t render the preview. Check the formatting and try again.</AdminFlash>
           ) : (
             <MdxBody component={MdxContent} />
           )}

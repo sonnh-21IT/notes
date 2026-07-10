@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom'
-import PageLoading from '@/ui/PageLoading'
+import DbLoadingScreen from '@/ui/DbLoadingScreen'
+import { AdminContentEditSkeleton } from '@/ui/skeletons'
 import AdminConfirmPanel from '@/admin/components/AdminConfirmPanel'
 import AdminEditorToolbar from '@/admin/components/AdminEditorToolbar'
 import AdminField from '@/admin/components/AdminField'
@@ -31,14 +32,18 @@ function AdminContentEditPage() {
     handleShowPreview,
   } = editor
 
-  if (loading) return <PageLoading label="Loading page" />
+  const pageLabel = title.trim() || (!loading ? slug : '')
 
   return (
     <div className="admin-page admin-page--editor">
       <p className="admin-breadcrumb">
         <Link to="/admin/content">Content</Link>
-        <span aria-hidden="true"> / </span>
-        {slug}
+        {pageLabel ? (
+          <>
+            <span aria-hidden="true"> / </span>
+            {pageLabel}
+          </>
+        ) : null}
         {isPreview && (
           <>
             <span aria-hidden="true"> / </span>
@@ -48,8 +53,8 @@ function AdminContentEditPage() {
       </p>
 
       <AdminPageHeader
-        title={title || slug}
-        description={isPreview ? 'Preview how this page will look on the site.' : 'Edit MDX body.'}
+        title={pageLabel}
+        description={isPreview ? 'Preview how this page will look on the site.' : 'Edit the page content.'}
       />
 
       {isPreview && (
@@ -58,43 +63,45 @@ function AdminContentEditPage() {
         </div>
       )}
 
-      {view === 'edit' ? (
-        <form
-          className="admin-form-body"
-          onSubmit={(event) => {
-            event.preventDefault()
-            requestSave()
-          }}
-        >
-          <section className="admin-section">
-            <AdminField label="Body (MDX)" error={fieldErrors.body}>
-              <textarea
-                className={fieldClassName('admin-textarea admin-textarea--code', fieldErrors.body)}
-                rows={22}
-                value={body}
-                onChange={(e) => {
-                  setBody(e.target.value)
-                  if (fieldErrors.body) clearFieldError('body')
-                }}
-              />
-            </AdminField>
-          </section>
+      <DbLoadingScreen loading={loading} skeleton={<AdminContentEditSkeleton />}>
+        {view === 'edit' ? (
+          <form
+            className="admin-form-body"
+            onSubmit={(event) => {
+              event.preventDefault()
+              requestSave()
+            }}
+          >
+            <section className="admin-section">
+              <AdminField label="Page content" error={fieldErrors.body}>
+                <textarea
+                  className={fieldClassName('admin-textarea admin-textarea--code', fieldErrors.body)}
+                  rows={22}
+                  value={body}
+                  onChange={(e) => {
+                    setBody(e.target.value)
+                    if (fieldErrors.body) clearFieldError('body')
+                  }}
+                />
+              </AdminField>
+            </section>
 
-          <AdminValidationSummary errors={fieldErrors} />
-        </form>
-      ) : (
-        <AdminMdxPreviewPane
-          loading={mdxPreview.loading}
-          error={mdxPreview.error}
-          MdxContent={mdxPreview.MdxContent}
-          articleClassName={contentPreviewClassName(slug)}
-          hint={slug === 'notes' && (
-            <p className="admin-field-hint admin-preview-hint">
-              Only the notes intro is shown here. The notes list below it on the live site is unchanged.
-            </p>
-          )}
-        />
-      )}
+            <AdminValidationSummary errors={fieldErrors} />
+          </form>
+        ) : (
+          <AdminMdxPreviewPane
+            loading={mdxPreview.loading}
+            error={mdxPreview.error}
+            MdxContent={mdxPreview.MdxContent}
+            articleClassName={contentPreviewClassName(slug)}
+            hint={slug === 'notes' && (
+              <p className="admin-field-hint admin-preview-hint">
+                Only the notes intro is shown here. The notes list below it on the live site is unchanged.
+              </p>
+            )}
+          />
+        )}
+      </DbLoadingScreen>
 
       {confirm && (
         <AdminConfirmPanel
@@ -117,8 +124,8 @@ function AdminContentEditPage() {
         }}
         onSave={requestSave}
         saveLabel="Save page"
-        disabled={Boolean(confirm)}
-        saveDisabled={!isDirty || (isPreview && mdxPreview.loading)}
+        disabled={Boolean(confirm) || loading}
+        saveDisabled={!isDirty || loading || (isPreview && mdxPreview.loading)}
       />
     </div>
   )

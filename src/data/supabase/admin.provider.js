@@ -3,15 +3,13 @@ import { getSupabaseClient } from '@/data/supabase/client'
 
 async function throwNoteFlagsWriteError(supabase) {
   const { data: { session } } = await supabase.auth.getSession()
-  const userId = session?.user?.id
 
-  if (!userId) {
+  if (!session?.user?.id) {
     throw new Error('Not signed in.')
   }
 
   throw new Error(
-    `Write blocked by Supabase RLS. You are signed in as ${userId}, but is_content_admin() does not include this user. `
-    + 'In Supabase → SQL editor, update is_content_admin() with your CMS Auth user UUID (see supabase/schema.sql).',
+    'You\'re signed in, but this account can\'t edit content. Ask the site owner to grant access.',
   )
 }
 
@@ -169,7 +167,7 @@ export async function adminUpdateNoteFlags({ slug, published, pinned }) {
     const { data, error } = await supabase.from('notes').select('body').eq('slug', slug).maybeSingle()
     if (error) throw error
     if (!data?.body?.trim()) {
-      throw new Error('Body is required to publish a note.')
+      throw new Error('Add article text before publishing.')
     }
   }
 

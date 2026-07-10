@@ -207,7 +207,7 @@
 
 .admin-status-chip.is-active {
   color: var(--accent);
-  background: color-mix(in srgb, var(--accent) 14%, var(--bg-spot) 86%);
+  background: var(--accent-fill);
 }
 
 .admin-list-pagination {

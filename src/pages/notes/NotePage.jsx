@@ -3,6 +3,7 @@ import ArticleHeader from '@/mdx/components/ArticleHeader'
 import MdxBody from '@/mdx/MdxBody'
 import PageLoadState from '@/ui/PageLoadState'
 import PageMeta from '@/ui/PageMeta'
+import { NotePageSkeleton } from '@/ui/skeletons'
 import { useNote } from '@/hooks/usePageContent'
 
 function NotePage() {
@@ -13,14 +14,19 @@ function NotePage() {
     return (
       <section className="page-stack content">
         <PageMeta title="Note not found" path={`/notes/${slug}`} />
-        <p className="content-label">Missing content</p>
-        <h1 className="content-title">Note not found</h1>
+        <p className="content-label">Not found</p>
+        <h1 className="content-title">This note isn&apos;t available</h1>
       </section>
     )
   }
 
   return (
-    <PageLoadState loading={loading} error={error}>
+    <PageLoadState
+      loading={loading}
+      error={error}
+      hasData={Boolean(note)}
+      skeleton={<NotePageSkeleton />}
+    >
       {note && (
         <>
           <PageMeta

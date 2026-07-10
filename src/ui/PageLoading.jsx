@@ -1,11 +1,8 @@
-import ContentStatusIndicator from '@/ui/ContentStatusIndicator'
+import PageSkeletonSlot from '@/ui/PageSkeletonSlot'
 
-function PageLoading({ label = 'Loading content' }) {
-  return (
-    <div className="page-loading">
-      <ContentStatusIndicator label={label} />
-    </div>
-  )
+/** Non-DB waits (auth, route chunks) — blank hold, no skeleton chrome. */
+function PageLoading() {
+  return <PageSkeletonSlot quiet />
 }
 
 export default PageLoading

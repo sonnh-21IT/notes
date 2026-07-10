@@ -2,8 +2,8 @@
   display: grid;
   gap: 14px;
   font-size: clamp(18px, 1.2vw, 20px);
-  line-height: 1.72;
-  color: var(--text);
+  line-height: 1.75;
+  color: var(--text-body);
 }
 
 .prose h1 {
@@ -201,7 +201,7 @@
 .prose mark {
   padding: 0 2px;
   border-radius: 2px;
-  background: color-mix(in srgb, var(--accent) 22%, var(--bg-spot) 78%);
+  background: var(--accent-fill-strong);
   color: var(--text);
 }
 

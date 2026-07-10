@@ -10,6 +10,7 @@ function AdminTagSection({
   allTags,
   visibleTags,
   selectedTagIds,
+  disabled = false,
   onTagQueryChange,
   onTagInputKeyDown,
   onCreateTag,
@@ -18,7 +19,7 @@ function AdminTagSection({
   onAttachExisting,
 }) {
   return (
-    <div className="admin-note-tags">
+    <div className={`admin-note-tags${disabled ? ' is-disabled' : ''}`}>
       <span className="admin-label">Tags</span>
 
       {selectedTags.length > 0 && (
@@ -30,6 +31,7 @@ function AdminTagSection({
                 type="button"
                 className="admin-tag-chip-remove"
                 aria-label={`Remove ${tag.name}`}
+                disabled={disabled}
                 onClick={() => onRemoveTag(tag.id)}
               >
                 <X size={14} aria-hidden="true" />
@@ -46,14 +48,14 @@ function AdminTagSection({
           value={tagQuery}
           onChange={onTagQueryChange}
           onKeyDown={onTagInputKeyDown}
-          disabled={creatingTag}
+          disabled={disabled || creatingTag}
         />
         <button
           type="button"
           className="admin-tag-composer-btn"
-          aria-label="Add tag to library"
-          title="Add tag to library"
-          disabled={!canCreateTag || creatingTag}
+          aria-label="Create tag"
+          title="Create tag"
+          disabled={disabled || !canCreateTag || creatingTag}
           onClick={onCreateTag}
         >
           <Plus size={18} aria-hidden="true" />
@@ -64,7 +66,12 @@ function AdminTagSection({
         <p className="admin-field-hint">
           “{matchedExistingTag.name}” already exists —
           {' '}
-          <button type="button" className="admin-inline-link" onClick={onAttachExisting}>
+          <button
+            type="button"
+            className="admin-inline-link"
+            disabled={disabled}
+            onClick={onAttachExisting}
+          >
             attach to this note
           </button>
         </p>
@@ -86,6 +93,7 @@ function AdminTagSection({
                 type="button"
                 className={`admin-tag-option${selected ? ' active' : ''}`}
                 aria-pressed={selected}
+                disabled={disabled}
                 onClick={() => onToggleTag(tag.id)}
               >
                 {tag.name}
@@ -97,7 +105,9 @@ function AdminTagSection({
           )}
         </div>
       ) : (
-        <p className="admin-field-hint">No tags yet. Create one above.</p>
+        <p className="admin-field-hint">
+          {disabled ? 'Tags are unavailable right now.' : 'No tags yet. Create one above.'}
+        </p>
       )}
     </div>
   )

@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 
-export function useAsyncResource(loader, deps) {
+export function useAsyncResource(loader, deps, { keepPreviousData = true } = {}) {
   const depsKey = JSON.stringify(deps)
 
   const [state, setState] = useState({
@@ -36,11 +36,20 @@ export function useAsyncResource(loader, deps) {
   }, [depsKey, loader])
 
   if (stale) {
-    return { loading: true, data: state.data, error: null }
+    const data = keepPreviousData ? state.data : null
+    return {
+      loading: true,
+      isInitialLoading: data == null,
+      isValidating: true,
+      data,
+      error: null,
+    }
   }
 
   return {
     loading: state.loading,
+    isInitialLoading: state.loading && state.data == null,
+    isValidating: state.loading,
     data: state.data,
     error: state.error,
   }

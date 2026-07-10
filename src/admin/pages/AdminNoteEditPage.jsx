@@ -1,6 +1,7 @@
 import { Link, useParams } from 'react-router-dom'
 import ArticleHeader from '@/mdx/components/ArticleHeader'
-import PageLoading from '@/ui/PageLoading'
+import DbLoadingScreen from '@/ui/DbLoadingScreen'
+import { AdminNoteEditSkeleton } from '@/ui/skeletons'
 import AdminConfirmPanel from '@/admin/components/AdminConfirmPanel'
 import AdminEditorToolbar from '@/admin/components/AdminEditorToolbar'
 import AdminMdxPreviewPane from '@/admin/components/AdminMdxPreviewPane'
@@ -12,7 +13,7 @@ import { todayIsoDate } from '@/utils/dates'
 const headerDescriptions = {
   preview: 'Preview how this note will look on the site.',
   new: 'Create a new article.',
-  edit: 'Edit metadata and MDX body.',
+  edit: 'Edit details and article content.',
 }
 
 function AdminNoteEditPage() {
@@ -39,8 +40,6 @@ function AdminNoteEditPageView() {
     handleShowPreview,
     handleDelete,
   } = editor
-
-  if (loading) return <PageLoading label="Loading note" />
 
   const headerMode = isPreview ? 'preview' : isNew ? 'new' : 'edit'
 
@@ -69,25 +68,27 @@ function AdminNoteEditPageView() {
         </div>
       )}
 
-      {view === 'edit' ? (
-        <AdminNoteForm form={form} onSubmit={requestSave} />
-      ) : (
-        <AdminMdxPreviewPane
-          loading={mdxPreview.loading}
-          error={mdxPreview.error}
-          MdxContent={mdxPreview.MdxContent}
-          articleClassName="page-stack content note-page admin-preview-article"
-          header={(
-            <ArticleHeader
-              title={preview.title.trim() || 'Untitled'}
-              publishedAt={preview.publishedAt || todayIsoDate()}
-              category={preview.categoryName}
-              coverImage={preview.coverImage || null}
-              tags={preview.selectedTags.map((tag) => tag.name)}
-            />
-          )}
-        />
-      )}
+      <DbLoadingScreen loading={loading} skeleton={<AdminNoteEditSkeleton />}>
+        {view === 'edit' ? (
+          <AdminNoteForm form={form} onSubmit={requestSave} />
+        ) : (
+          <AdminMdxPreviewPane
+            loading={mdxPreview.loading}
+            error={mdxPreview.error}
+            MdxContent={mdxPreview.MdxContent}
+            articleClassName="page-stack content note-page admin-preview-article"
+            header={(
+              <ArticleHeader
+                title={preview.title.trim() || 'Untitled'}
+                publishedAt={preview.publishedAt || todayIsoDate()}
+                category={preview.categoryName}
+                coverImage={preview.coverImage || null}
+                tags={preview.selectedTags.map((tag) => tag.name)}
+              />
+            )}
+          />
+        )}
+      </DbLoadingScreen>
 
       {confirm && (
         <AdminConfirmPanel
@@ -110,15 +111,15 @@ function AdminNoteEditPageView() {
         }}
         onSave={requestSave}
         saveLabel="Save note"
-        disabled={Boolean(confirm)}
-        saveDisabled={saveDisabled}
+        disabled={Boolean(confirm) || loading}
+        saveDisabled={saveDisabled || loading}
         extra={
           view === 'edit' && !isNew ? (
             <button
               type="button"
               className="admin-button admin-button--danger"
               onClick={handleDelete}
-              disabled={Boolean(confirm)}
+              disabled={Boolean(confirm) || loading}
             >
               Delete
             </button>

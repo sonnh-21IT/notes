@@ -77,7 +77,7 @@ export function useAdminSettings() {
   const requestRemoveLink = useCallback((index) => {
     setConfirm({
       title: 'Remove social link?',
-      description: 'This removes the row from settings. Save changes to apply it publicly.',
+      description: 'This removes the link. Save changes to update the public site.',
       tone: 'warn',
       confirmLabel: 'Remove',
       onConfirm: () => {

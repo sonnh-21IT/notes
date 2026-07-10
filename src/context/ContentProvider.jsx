@@ -26,11 +26,11 @@ export function ContentProvider({ children }) {
       })
       .catch((error) => {
         if (active) {
-          setState({
-            status: 'error',
-            data: {},
+          setState((current) => ({
+            status: Object.keys(current.data || {}).length ? 'ready' : 'error',
+            data: current.data || {},
             error: error instanceof Error ? error : new Error(String(error)),
-          })
+          }))
         }
       })
 

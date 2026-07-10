@@ -112,6 +112,10 @@ export function useAdminNoteEditor() {
   const initialFields = readInitialNoteFields(routeSlug, location.state)
 
   const [loading, setLoading] = useState(() => routeSlug !== 'new')
+  const [categoriesLoading, setCategoriesLoading] = useState(true)
+  const [categoriesFailed, setCategoriesFailed] = useState(false)
+  const [tagsLoading, setTagsLoading] = useState(true)
+  const [tagsFailed, setTagsFailed] = useState(false)
   const [view, setView] = useState(() => (location.state?.view === 'preview' ? 'preview' : 'edit'))
   const [creatingTag, setCreatingTag] = useState(false)
   const [creatingCategory, setCreatingCategory] = useState(false)
@@ -187,41 +191,65 @@ export function useAdminNoteEditor() {
   )
 
   useEffect(() => {
-    if (!isNew) return
-
     let active = true
+    setCategoriesLoading(true)
+    setCategoriesFailed(false)
 
-    Promise.all([listCategories(), listTags()])
-      .then(([categoryRows, tagRows]) => {
+    listCategories()
+      .then((categoryRows) => {
         if (!active) return
         setCategories(categoryRows)
-        setAllTags(tagRows)
+        setCategoriesFailed(false)
       })
       .catch((err) => {
-        if (active) toast.showError(err instanceof Error ? err.message : String(err))
+        if (!active) return
+        setCategoriesFailed(true)
+        toast.showError(err instanceof Error ? err.message : String(err))
+      })
+      .finally(() => {
+        if (active) setCategoriesLoading(false)
       })
 
     return () => {
       active = false
     }
-  }, [isNew, routeSlug, location.state?.draft, toast])
+  }, [routeSlug, toast])
+
+  useEffect(() => {
+    let active = true
+    setTagsLoading(true)
+    setTagsFailed(false)
+
+    listTags()
+      .then((tagRows) => {
+        if (!active) return
+        setAllTags(tagRows)
+        setTagsFailed(false)
+      })
+      .catch((err) => {
+        if (!active) return
+        setTagsFailed(true)
+        toast.showError(err instanceof Error ? err.message : String(err))
+      })
+      .finally(() => {
+        if (active) setTagsLoading(false)
+      })
+
+    return () => {
+      active = false
+    }
+  }, [routeSlug, toast])
 
   useEffect(() => {
     if (isNew) return
 
     let active = true
     const draft = location.state?.draft
+    setLoading(true)
 
-    Promise.all([
-      listCategories(),
-      listTags(),
-      getNote(routeSlug),
-    ])
-      .then(([categoryRows, tagRows, note]) => {
+    getNote(routeSlug)
+      .then((note) => {
         if (!active) return
-
-        setCategories(categoryRows)
-        setAllTags(tagRows)
 
         if (draft?.editSlug === routeSlug) {
           const fields = draftToFields(draft)
@@ -541,7 +569,7 @@ export function useAdminNoteEditor() {
     setConfirm(null)
 
     if (view === 'preview' && mdxError) {
-      toast.showError('Fix MDX errors before saving.')
+      toast.showError('Fix the formatting errors in the preview before saving.')
       return
     }
 
@@ -565,7 +593,7 @@ export function useAdminNoteEditor() {
     setConfirm({
       kind: 'delete',
       title: `Delete "${title.trim() || slug}"?`,
-      description: 'This permanently removes the note from the database. This cannot be undone.',
+      description: 'This permanently deletes the note. This cannot be undone.',
       tone: 'danger',
       confirmLabel: 'Delete note',
       onConfirm: performDelete,
@@ -674,6 +702,7 @@ export function useAdminNoteEditor() {
       body,
       setBody,
       categories,
+      categoriesDisabled: categoriesLoading || categoriesFailed,
       categoryFieldError,
       setCategoryFieldError,
       creatingCategory,
@@ -681,6 +710,7 @@ export function useAdminNoteEditor() {
       fieldErrors,
       clearFieldError,
       selectedTags,
+      tagsDisabled: tagsLoading || tagsFailed,
       tagQuery,
       setTagQuery,
       tagFieldError,

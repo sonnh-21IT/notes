@@ -1,4 +1,5 @@
 import { Helmet } from 'react-helmet-async'
+import { resolveSiteBrand } from '@/data/siteDefaults'
 import { useSiteContent } from '@/hooks/useSiteContent'
 import { withAppBase } from '@/utils/appBase'
 
@@ -15,11 +16,12 @@ function PageMeta({
   image,
 }) {
   const { siteContent } = useSiteContent()
-  const siteName = siteContent?.header?.title?.trim() || 'Portfolio'
-  const tagline = siteContent?.header?.tagline?.trim() || ''
+  const brand = resolveSiteBrand(siteContent?.header)
   const pageTitle = title?.trim()
-  const fullTitle = pageTitle ? `${pageTitle} · ${siteName}` : (tagline ? `${siteName} · ${tagline}` : siteName)
-  const metaDescription = description?.trim() || tagline || undefined
+  const fullTitle = pageTitle
+    ? `${pageTitle} · ${brand.title}`
+    : (brand.tagline ? `${brand.title} · ${brand.tagline}` : brand.title)
+  const metaDescription = description?.trim() || brand.tagline || undefined
   const origin = resolveSiteOrigin()
   const canonicalUrl = path && origin ? `${origin}${withAppBase(path)}` : undefined
   const imageUrl = image?.startsWith('http') ? image : (image && origin ? `${origin}${withAppBase(image)}` : undefined)

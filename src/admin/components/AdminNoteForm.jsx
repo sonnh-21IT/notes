@@ -30,6 +30,7 @@ function AdminNoteForm({ form, onSubmit }) {
     body,
     setBody,
     categories,
+    categoriesDisabled,
     categoryFieldError,
     setCategoryFieldError,
     creatingCategory,
@@ -37,6 +38,7 @@ function AdminNoteForm({ form, onSubmit }) {
     fieldErrors,
     clearFieldError,
     selectedTags,
+    tagsDisabled,
     tagQuery,
     setTagQuery,
     tagFieldError,
@@ -97,7 +99,7 @@ function AdminNoteForm({ form, onSubmit }) {
 
           <div className="admin-slug-category-row">
             <label className="admin-field admin-slug-field">
-              <span className="admin-label">Slug</span>
+              <span className="admin-label">URL name</span>
               <div className={`admin-slug-input-wrap${isNew ? ' admin-slug-input-wrap--affixed' : ''}`}>
                 <input
                   className={fieldClassName('admin-input', slugInvalid)}
@@ -112,8 +114,8 @@ function AdminNoteForm({ form, onSubmit }) {
                     <button
                       type="button"
                       className="admin-slug-refresh"
-                      aria-label="Regenerate slug from title"
-                      title="Regenerate from title"
+                      aria-label="Update URL name from title"
+                      title="Update from title"
                       onClick={refreshSlugFromTitle}
                     >
                       <RefreshCw size={12} strokeWidth={2.25} aria-hidden="true" />
@@ -140,6 +142,7 @@ function AdminNoteForm({ form, onSubmit }) {
                   })),
                 ]}
                 creatable
+                disabled={categoriesDisabled}
                 onCreate={handleCreateCategory}
                 creating={creatingCategory}
                 createError={categoryFieldError}
@@ -151,28 +154,29 @@ function AdminNoteForm({ form, onSubmit }) {
 
         <div className="admin-note-taxonomy">
           <AdminTagSection
-          selectedTags={selectedTags}
-          tagQuery={tagQuery}
-          tagFieldError={tagFieldError}
-          matchedExistingTag={matchedExistingTag}
-          canCreateTag={canCreateTag}
-          creatingTag={creatingTag}
-          allTags={allTags}
-          visibleTags={visibleTags}
-          selectedTagIds={selectedTagIds}
-          onTagQueryChange={(e) => {
-            setTagQuery(e.target.value)
-            setTagFieldError('')
-          }}
-          onTagInputKeyDown={handleTagInputKeyDown}
-          onCreateTag={handleCreateTag}
-          onRemoveTag={removeTag}
-          onToggleTag={toggleTag}
-          onAttachExisting={() => {
-            selectTag(matchedExistingTag.id)
-            setTagQuery('')
-          }}
-        />
+            selectedTags={selectedTags}
+            tagQuery={tagQuery}
+            tagFieldError={tagFieldError}
+            matchedExistingTag={matchedExistingTag}
+            canCreateTag={canCreateTag}
+            creatingTag={creatingTag}
+            allTags={allTags}
+            visibleTags={visibleTags}
+            selectedTagIds={selectedTagIds}
+            disabled={tagsDisabled}
+            onTagQueryChange={(e) => {
+              setTagQuery(e.target.value)
+              setTagFieldError('')
+            }}
+            onTagInputKeyDown={handleTagInputKeyDown}
+            onCreateTag={handleCreateTag}
+            onRemoveTag={removeTag}
+            onToggleTag={toggleTag}
+            onAttachExisting={() => {
+              selectTag(matchedExistingTag.id)
+              setTagQuery('')
+            }}
+          />
         </div>
 
         <div className="admin-note-meta">
@@ -201,7 +205,7 @@ function AdminNoteForm({ form, onSubmit }) {
         </div>
       </div>
 
-      <AdminField label="Body (MDX)" error={fieldErrors.body} className="admin-note-body">
+      <AdminField label="Article content" error={fieldErrors.body} className="admin-note-body">
         <textarea
           className={fieldClassName('admin-textarea admin-textarea--code', fieldErrors.body)}
           rows={20}

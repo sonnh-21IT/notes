@@ -2,12 +2,17 @@ import { useDeferredValue, useEffect, useMemo, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { Plus } from 'lucide-react'
 import { NotesActiveFilters, NotesFilterOptions } from '@/shared/notes/NotesFilterBar'
-import PageLoading from '@/ui/PageLoading'
+import DbLoadingScreen from '@/ui/DbLoadingScreen'
+import { AdminNotesListSkeleton } from '@/ui/skeletons'
 import AdminEmptyState from '@/admin/components/AdminEmptyState'
 import AdminNoteListItem from '@/admin/components/AdminNoteListItem'
 import AdminPageHeader from '@/admin/components/AdminPageHeader'
 import { useAdminToast } from '@/admin/hooks/useAdminToast'
-import { useAdminNotesCatalog } from '@/admin/hooks/useAdminNotesCatalog'
+import {
+  useAdminCategoriesList,
+  useAdminNotesList,
+  useAdminTagsList,
+} from '@/admin/hooks/useAdminNotesCatalog'
 import { noteFlagsToastMessage } from '@/admin/lib/noteFlags'
 import { getAuthUserId, isContentAdmin, updateNoteFlags } from '@/data/admin'
 import { usePaginationState } from '@/hooks/usePaginationState'
@@ -32,15 +37,17 @@ function noteMeta(note) {
 function AdminNotesListPage() {
   const toast = useAdminToast()
   const togglingRef = useRef(false)
-  const { loading, error, data } = useAdminNotesCatalog()
-  const catalogNotes = useMemo(() => data?.notes ?? [], [data?.notes])
+  const notesResource = useAdminNotesList()
+  const tagsResource = useAdminTagsList()
+  const categoriesResource = useAdminCategoriesList()
+  const catalogNotes = useMemo(() => notesResource.data ?? [], [notesResource.data])
   const [overrides, setOverrides] = useState({})
   const notes = useMemo(
     () => catalogNotes.map((note) => ({ ...note, ...overrides[note.slug] })),
     [catalogNotes, overrides],
   )
-  const categories = useMemo(() => data?.categories ?? [], [data?.categories])
-  const tags = useMemo(() => data?.tags ?? [], [data?.tags])
+  const categories = useMemo(() => categoriesResource.data ?? [], [categoriesResource.data])
+  const tags = useMemo(() => tagsResource.data ?? [], [tagsResource.data])
   const [query, setQuery] = useState('')
   const deferredQuery = useDeferredValue(query)
   const [listFilter, setListFilter] = useState('all')
@@ -56,8 +63,7 @@ function AdminNotesListPage() {
       .then(([canWrite, userId]) => {
         if (!active || canWrite !== false || !userId) return
         toast.showError(
-          `Signed in as ${userId}, but this account is not the content admin in Supabase. `
-          + 'Update is_content_admin() in the SQL editor with this UUID.',
+          'You\'re signed in, but this account can\'t edit content. Ask the site owner to grant access.',
         )
       })
       .catch(() => {})
@@ -68,8 +74,11 @@ function AdminNotesListPage() {
   }, [toast])
 
   useEffect(() => {
-    if (error?.message) toast.showError(error.message)
-  }, [error, toast])
+    const message = notesResource.error?.message
+      || tagsResource.error?.message
+      || categoriesResource.error?.message
+    if (message) toast.showError(message)
+  }, [notesResource.error, tagsResource.error, categoriesResource.error, toast])
 
   const publishedCount = notes.filter((note) => note.published).length
   const pinnedCount = notes.filter((note) => note.pinned).length
@@ -173,15 +182,13 @@ function AdminNotesListPage() {
     patchNoteFlags(note.slug, { pinned: !note.pinned })
   }
 
-  if (loading) return <PageLoading label="Loading notes" />
-
   return (
     <div className="admin-page">
       <AdminPageHeader
         eyebrow="Notes"
         title="Articles"
         description={
-          notes.length
+          !notesResource.isInitialLoading && notes.length
             ? `${notes.length} total · ${publishedCount} published · ${pinnedCount} pinned`
             : 'Write and publish blog posts.'
         }
@@ -193,99 +200,97 @@ function AdminNotesListPage() {
         )}
       />
 
-      {notes.length === 0 ? (
-        <AdminEmptyState
-          title="No notes yet"
-          description="Create your first article, preview it, then save when ready."
-          action={(
-            <Link className="admin-button admin-button--primary" to="/admin/notes/new">
-              <Plus size={16} aria-hidden="true" />
-              New note
-            </Link>
-          )}
-        />
-      ) : (
-        <>
-          <div className="admin-list-controls">
-            <div className="admin-list-toolbar" role="search" aria-busy={query !== deferredQuery}>
-              <label className="admin-list-search">
-                <span className="visually-hidden">Search notes</span>
-                <input
-                  type="search"
-                  className="admin-input"
-                  placeholder="Search notes..."
-                  value={query}
-                  onChange={(event) => setQuery(event.target.value)}
-                />
-              </label>
-
-              <div className="admin-status-filter" role="group" aria-label="Filter notes">
-                {listFilterOptions.map((option) => (
-                  <button
-                    key={option.value}
-                    type="button"
-                    className={`admin-status-chip${listFilter === option.value ? ' is-active' : ''}`}
-                    onClick={() => setListFilter(option.value)}
-                  >
-                    {option.label}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            <NotesFilterOptions filterOptions={filterOptions} onSelect={selectFilter} />
-
-            <NotesActiveFilters
-              selectedCategories={selectedCategories}
-              selectedTags={selectedTags}
-              onRemove={removeFilter}
+      <div className="admin-list-controls">
+        <div className="admin-list-toolbar" role="search" aria-busy={query !== deferredQuery}>
+          <label className="admin-list-search">
+            <span className="visually-hidden">Search notes</span>
+            <input
+              type="search"
+              className="admin-input"
+              placeholder="Search notes..."
+              value={query}
+              onChange={(event) => setQuery(event.target.value)}
             />
+          </label>
+
+          <div className="admin-status-filter" role="group" aria-label="Filter notes">
+            {listFilterOptions.map((option) => (
+              <button
+                key={option.value}
+                type="button"
+                className={`admin-status-chip${listFilter === option.value ? ' is-active' : ''}`}
+                onClick={() => setListFilter(option.value)}
+              >
+                {option.label}
+              </button>
+            ))}
           </div>
+        </div>
 
-          {filteredNotes.length === 0 ? (
-            <AdminEmptyState
-              title="No notes match your filters"
-              description="Try a different search keyword or reset filters."
-            />
-          ) : (
-            <>
-              <ul className="admin-list">
-                {pagedNotes.map((note) => (
-                  <AdminNoteListItem
-                    key={note.slug}
-                    note={note}
-                    meta={noteMeta(note)}
-                    onTogglePublished={togglePublished}
-                    onTogglePinned={togglePinned}
-                  />
-                ))}
-              </ul>
-              <div className="admin-list-pagination" aria-label="Notes pagination">
-                <button
-                  type="button"
-                  className="admin-button admin-button--ghost admin-button--sm"
-                  disabled={safePageNumber <= 1}
-                  onClick={() => setPageNumber((current) => current - 1)}
-                >
-                  Previous
-                </button>
-                <span className="admin-list-pagination-status">
-                  Page {safePageNumber} of {pageCount}
-                  {filteredNotes.length > 0 && ` (${filteredNotes.length} notes)`}
-                </span>
-                <button
-                  type="button"
-                  className="admin-button admin-button--ghost admin-button--sm"
-                  disabled={safePageNumber >= pageCount}
-                  onClick={() => setPageNumber((current) => current + 1)}
-                >
-                  Next
-                </button>
-              </div>
-            </>
-          )}
-        </>
-      )}
+        <NotesFilterOptions filterOptions={filterOptions} onSelect={selectFilter} />
+
+        <NotesActiveFilters
+          selectedCategories={selectedCategories}
+          selectedTags={selectedTags}
+          onRemove={removeFilter}
+        />
+      </div>
+
+      <DbLoadingScreen loading={notesResource.isInitialLoading} skeleton={<AdminNotesListSkeleton />}>
+        {notes.length === 0 ? (
+          <AdminEmptyState
+            title="No notes yet"
+            description="Create your first article, preview it, then save when ready."
+            action={(
+              <Link className="admin-button admin-button--primary" to="/admin/notes/new">
+                <Plus size={16} aria-hidden="true" />
+                New note
+              </Link>
+            )}
+          />
+        ) : filteredNotes.length === 0 ? (
+          <AdminEmptyState
+            title="No notes match your filters"
+            description="Try a different search keyword or reset filters."
+          />
+        ) : (
+          <>
+            <ul className="admin-list">
+              {pagedNotes.map((note) => (
+                <AdminNoteListItem
+                  key={note.slug}
+                  note={note}
+                  meta={noteMeta(note)}
+                  onTogglePublished={togglePublished}
+                  onTogglePinned={togglePinned}
+                />
+              ))}
+            </ul>
+            <div className="admin-list-pagination" aria-label="Notes pagination">
+              <button
+                type="button"
+                className="admin-button admin-button--ghost admin-button--sm"
+                disabled={safePageNumber <= 1}
+                onClick={() => setPageNumber((current) => current - 1)}
+              >
+                Previous
+              </button>
+              <span className="admin-list-pagination-status">
+                Page {safePageNumber} of {pageCount}
+                {filteredNotes.length > 0 && ` (${filteredNotes.length} notes)`}
+              </span>
+              <button
+                type="button"
+                className="admin-button admin-button--ghost admin-button--sm"
+                disabled={safePageNumber >= pageCount}
+                onClick={() => setPageNumber((current) => current + 1)}
+              >
+                Next
+              </button>
+            </div>
+          </>
+        )}
+      </DbLoadingScreen>
     </div>
   )
 }

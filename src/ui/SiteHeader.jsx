@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { NavLink, useLocation } from 'react-router-dom'
 import { Menu, X } from 'lucide-react'
+import SiteBrand from '@/ui/SiteBrand'
 import ThemeToggle from '@/ui/ThemeToggle'
 import { prefetchRoute } from '@/utils/prefetchRoute'
 
@@ -33,7 +34,7 @@ function MainNavigation({ open, onNavigate }) {
   )
 }
 
-function SiteHeaderInner({ title, tagline }) {
+function SiteHeaderInner({ title, tagline, loading = false }) {
   const [menuOpen, setMenuOpen] = useState(false)
   const closeMenu = () => setMenuOpen(false)
 
@@ -41,10 +42,7 @@ function SiteHeaderInner({ title, tagline }) {
     <header className="site-header">
       <div className="site-header-inner">
         <div className="site-header-top">
-          <div className="site-brand">
-            <span className="site-logo">{title || 'Ryan'}</span>
-            {tagline && <span className="site-tagline">{tagline}</span>}
-          </div>
+          <SiteBrand title={title} tagline={tagline} loading={loading} />
           <button
             type="button"
             className="site-menu-btn"

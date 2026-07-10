@@ -39,12 +39,12 @@
   font-weight: 600;
   letter-spacing: 0.02em;
   color: var(--accent);
-  background: color-mix(in srgb, var(--accent) 12%, var(--bg-spot) 88%);
+  background: var(--accent-fill);
 }
 
 .article-meta-tag-icon {
   flex-shrink: 0;
-  opacity: 0.72;
+  opacity: 0.9;
 }
 
 .article-cover {
@@ -84,5 +84,5 @@
   font-weight: 600;
   letter-spacing: 0.02em;
   color: var(--accent);
-  background: color-mix(in srgb, var(--accent) 12%, var(--bg-spot) 88%);
+  background: var(--accent-fill);
 }

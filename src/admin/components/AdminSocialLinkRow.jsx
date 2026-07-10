@@ -10,21 +10,25 @@ function AdminSocialLinkRow({ link, index, fieldErrors, onChange, onRemove }) {
     <div className="admin-link-row">
       <input
         className="admin-input"
-        placeholder="ID"
+        placeholder="github"
         value={link.id}
         onChange={(e) => onChange(index, 'id', e.target.value)}
+        aria-label="Link key"
+        title="Short key for the link, e.g. github"
       />
       <input
         className={fieldClassName('admin-input', labelError)}
         placeholder="Label"
         value={link.label}
         onChange={(e) => onChange(index, 'label', e.target.value)}
+        aria-label="Link label"
       />
       <input
         className={fieldClassName('admin-input admin-input--grow', urlError)}
         placeholder="https://…"
         value={link.url}
         onChange={(e) => onChange(index, 'url', e.target.value)}
+        aria-label="Link URL"
       />
       <button
         type="button"

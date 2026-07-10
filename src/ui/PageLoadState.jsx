@@ -1,20 +1,38 @@
-import PageLoading from '@/ui/PageLoading'
+import { useDeferredLoading } from '@/hooks/useDeferredLoading'
+import PageSkeletonSlot from '@/ui/PageSkeletonSlot'
 
-function PageLoadState({ loading, error, children }) {
-  if (loading) {
-    return <PageLoading />
-  }
+function PageLoadState({
+  loading = false,
+  error = null,
+  hasData = false,
+  skeleton = null,
+  children,
+}) {
+  const waitingFirst = loading && !hasData
+  const showSkeleton = useDeferredLoading(waitingFirst)
 
-  if (error) {
+  if (error && !hasData) {
     return (
       <section className="page-stack content content-error">
-        <h1 className="content-title">Content unavailable</h1>
-        <p className="content-lead">{error.message}</p>
+        <h1 className="content-title">Couldn&apos;t load this page</h1>
+        <p className="content-lead">Please try again in a moment.</p>
       </section>
     )
   }
 
-  return children
+  if (showSkeleton && skeleton) {
+    return <PageSkeletonSlot>{skeleton}</PageSkeletonSlot>
+  }
+
+  if (waitingFirst) {
+    return <PageSkeletonSlot quiet />
+  }
+
+  return (
+    <div className={loading ? 'is-content-validating' : undefined} aria-busy={loading || undefined}>
+      {children}
+    </div>
+  )
 }
 
 export default PageLoadState

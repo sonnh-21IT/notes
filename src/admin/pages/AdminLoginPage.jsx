@@ -17,7 +17,7 @@ function AdminLoginPage() {
       <div className="admin-shell admin-shell--centered">
         <div className="admin-auth-card">
           <h1 className="admin-auth-title">Admin unavailable</h1>
-          <p className="admin-auth-subtitle">Configure Supabase env vars first.</p>
+          <p className="admin-auth-subtitle">Admin isn&apos;t set up yet. Ask the site owner to finish configuration.</p>
           <Link className="admin-text-link" to="/about">Back to site</Link>
         </div>
       </div>
@@ -27,7 +27,7 @@ function AdminLoginPage() {
   if (loading) {
     return (
       <div className="admin-shell admin-shell--centered">
-        <PageLoading label="Checking session" />
+        <PageLoading />
       </div>
     )
   }
@@ -54,7 +54,7 @@ function AdminLoginPage() {
     <div className="admin-shell admin-shell--centered">
       <div className="admin-auth-card">
         <h1 className="admin-auth-title">Sign in</h1>
-        <p className="admin-auth-subtitle">Portfolio admin — use your Supabase account.</p>
+        <p className="admin-auth-subtitle">Sign in with your admin email and password.</p>
 
         <form className="admin-form" onSubmit={handleSubmit}>
           <label className="admin-field">

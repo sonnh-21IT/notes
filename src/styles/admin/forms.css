@@ -16,7 +16,9 @@
 
 .admin-input,
 .admin-textarea {
+  box-sizing: border-box;
   width: 100%;
+  min-width: 0;
   padding: 9px 12px;
   border: 1px solid var(--admin-control-border);
   border-radius: var(--admin-control-radius);
@@ -73,7 +75,7 @@
 
 .admin-link-row {
   display: grid;
-  grid-template-columns: 100px 120px 1fr auto;
+  grid-template-columns: minmax(0, 100px) minmax(0, 120px) minmax(0, 1fr) auto;
   gap: 8px;
   align-items: center;
 }
@@ -224,7 +226,7 @@
 }
 
 .admin-settings-links .admin-link-row {
-  grid-template-columns: 96px 112px 1fr auto;
+  grid-template-columns: minmax(0, 96px) minmax(0, 112px) minmax(0, 1fr) auto;
   gap: 8px;
   padding: 8px;
   border: 1px solid var(--border-chrome);
@@ -580,6 +582,8 @@
 
 .admin-select-wrap {
   position: relative;
+  width: 100%;
+  min-width: 0;
 }
 
 .admin-select-trigger {

@@ -16,6 +16,27 @@
   grid-row: 1;
 }
 
+.site-brand-skeleton {
+  display: block;
+  border-radius: 6px;
+  background: color-mix(in srgb, var(--border) 55%, var(--bg-spot) 45%);
+}
+
+.site-brand-skeleton--title {
+  width: 7.5rem;
+  height: 1.35rem;
+}
+
+.site-brand-skeleton--tagline {
+  width: 11rem;
+  max-width: 100%;
+  height: 0.85rem;
+}
+
+.site-brand--pending {
+  min-height: 2.4rem;
+}
+
 .site-logo {
   display: block;
   color: var(--text);
@@ -125,20 +146,28 @@
 }
 
 .nav-link:focus-visible {
-  outline: 2px solid var(--link);
+  outline: 2px solid var(--accent);
   outline-offset: 3px;
   border-radius: 2px;
+  box-shadow: 0 0 0 4px var(--focus-ring);
 }
 
 .theme-toggle {
+  --tt-knob: 22px;
+  --tt-inset: 3px;
+  --tt-border: 1px;
+  --tt-travel: var(--tt-knob);
+  box-sizing: border-box;
   position: relative;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-width: 64px;
-  height: 34px;
-  padding: 0;
-  border: 1px solid var(--control-border);
+  /* Outer size includes border + inset so the track is exactly 2×knob × knob */
+  width: calc(var(--tt-knob) * 2 + var(--tt-inset) * 2 + var(--tt-border) * 2);
+  height: calc(var(--tt-knob) + var(--tt-inset) * 2 + var(--tt-border) * 2);
+  min-width: 0;
+  padding: var(--tt-inset);
+  border: var(--tt-border) solid var(--control-border);
   background: var(--toggle-bg);
   color: var(--control-text);
   border-radius: 999px;
@@ -158,43 +187,58 @@
 
 .theme-toggle-track {
   position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  width: 58px;
-  height: 28px;
-  padding: 0 7px;
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  border-radius: inherit;
 }
 
 .theme-toggle-glyph {
+  position: absolute;
+  top: 50%;
+  z-index: 0;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 14px;
-  height: 14px;
-  flex: 0 0 14px;
-  transition: opacity 0.18s ease, color 0.18s ease;
+  width: 12px;
+  height: 12px;
+  color: var(--text-subtle);
+  opacity: 0.7;
+  transform: translateY(-50%);
+  transition: opacity 0.18s ease;
+  pointer-events: none;
+}
+
+.theme-toggle-glyph-light {
+  left: 5px;
+}
+
+.theme-toggle-glyph-dark {
+  right: 5px;
 }
 
 .theme-toggle-glyph svg,
 .theme-toggle-knob-icon svg {
-  width: 14px;
-  height: 14px;
+  width: 12px;
+  height: 12px;
   display: block;
 }
 
 .theme-toggle-knob {
   position: absolute;
-  top: 2px;
-  left: 2px;
-  width: 24px;
-  height: 24px;
+  top: 0;
+  left: 0;
+  z-index: 1;
+  width: var(--tt-knob);
+  height: var(--tt-knob);
   border-radius: 50%;
   background: var(--toggle-thumb);
   box-shadow: var(--toggle-knob-shadow);
   display: flex;
   align-items: center;
   justify-content: center;
+  overflow: hidden;
   transition: transform 0.18s ease, background-color 0.18s ease, box-shadow 0.18s ease;
   will-change: transform;
 }
@@ -214,7 +258,7 @@
 }
 
 :root[data-theme='dark'] .theme-toggle-knob {
-  transform: translateX(30px);
+  transform: translateX(var(--tt-travel));
 }
 
 :root[data-theme='dark'] .theme-toggle-knob-sun {
@@ -225,26 +269,10 @@
   opacity: 1;
 }
 
-:root[data-theme='dark'] .theme-toggle-glyph-dark {
-  color: var(--nav-active);
-  opacity: 1;
-}
-
-:root[data-theme='dark'] .theme-toggle-glyph-light {
-  color: var(--text-subtle);
-  opacity: 0.75;
-}
-
+:root[data-theme='dark'] .theme-toggle-glyph-dark,
 :root[data-theme='light'] .theme-toggle-glyph-light,
 :root:not([data-theme='dark']) .theme-toggle-glyph-light {
-  color: var(--nav-active);
-  opacity: 1;
-}
-
-:root[data-theme='light'] .theme-toggle-glyph-dark,
-:root:not([data-theme='dark']) .theme-toggle-glyph-dark {
-  color: var(--text-subtle);
-  opacity: 0.75;
+  opacity: 0;
 }
 
 .site-main {

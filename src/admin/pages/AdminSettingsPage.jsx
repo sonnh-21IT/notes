@@ -1,5 +1,6 @@
 import { Plus } from 'lucide-react'
-import PageLoading from '@/ui/PageLoading'
+import DbLoadingScreen from '@/ui/DbLoadingScreen'
+import { AdminSettingsSkeleton } from '@/ui/skeletons'
 import AdminConfirmPanel from '@/admin/components/AdminConfirmPanel'
 import AdminField from '@/admin/components/AdminField'
 import AdminPageHeader from '@/admin/components/AdminPageHeader'
@@ -32,58 +33,58 @@ function AdminSettingsPage() {
     isDirty,
   } = settings
 
-  if (loading) return <PageLoading label="Loading settings" />
-
   return (
     <div className="admin-page">
       <AdminPageHeader eyebrow="Site" title="Settings" description="Header and footer shown on every page." />
 
       <form className="admin-form-body" onSubmit={handleSave}>
-        <div className="admin-settings-fields">
-          <AdminField label="Title" error={fieldErrors.headerTitle}>
-            <input
-              className={fieldClassName('admin-input', fieldErrors.headerTitle)}
-              value={headerTitle}
-              onChange={(e) => {
-                setHeaderTitle(e.target.value)
-                if (fieldErrors.headerTitle) clearFieldError('headerTitle')
-              }}
-            />
-          </AdminField>
-
-          <AdminField label="Tagline">
-            <input className="admin-input" value={headerTagline} onChange={(e) => setHeaderTagline(e.target.value)} />
-          </AdminField>
-        </div>
-
-        <div className="admin-settings-links">
-          <div className="admin-field-toolbar">
-            <span className="admin-label">Social links</span>
-            <button
-              type="button"
-              className="admin-button admin-button--ghost admin-button--sm"
-              onClick={() => setSocialLinks((links) => [...links, emptyLink()])}
-            >
-              <Plus size={16} aria-hidden="true" />
-              Add
-            </button>
-          </div>
-
-          <div className="admin-stack admin-stack--sm">
-            {socialLinks.map((link, index) => (
-              <AdminSocialLinkRow
-                key={index}
-                link={link}
-                index={index}
-                fieldErrors={fieldErrors}
-                onChange={updateLink}
-                onRemove={requestRemoveLink}
+        <DbLoadingScreen loading={loading} skeleton={<AdminSettingsSkeleton />}>
+          <div className="admin-settings-fields">
+            <AdminField label="Title" error={fieldErrors.headerTitle}>
+              <input
+                className={fieldClassName('admin-input', fieldErrors.headerTitle)}
+                value={headerTitle}
+                onChange={(e) => {
+                  setHeaderTitle(e.target.value)
+                  if (fieldErrors.headerTitle) clearFieldError('headerTitle')
+                }}
               />
-            ))}
-          </div>
-        </div>
+            </AdminField>
 
-        <AdminValidationSummary errors={fieldErrors} />
+            <AdminField label="Tagline">
+              <input className="admin-input" value={headerTagline} onChange={(e) => setHeaderTagline(e.target.value)} />
+            </AdminField>
+          </div>
+
+          <div className="admin-settings-links">
+            <div className="admin-field-toolbar">
+              <span className="admin-label">Social links</span>
+              <button
+                type="button"
+                className="admin-button admin-button--ghost admin-button--sm"
+                onClick={() => setSocialLinks((links) => [...links, emptyLink()])}
+              >
+                <Plus size={16} aria-hidden="true" />
+                Add
+              </button>
+            </div>
+
+            <div className="admin-stack admin-stack--sm">
+              {socialLinks.map((link, index) => (
+                <AdminSocialLinkRow
+                  key={index}
+                  link={link}
+                  index={index}
+                  fieldErrors={fieldErrors}
+                  onChange={updateLink}
+                  onRemove={requestRemoveLink}
+                />
+              ))}
+            </div>
+          </div>
+
+          <AdminValidationSummary errors={fieldErrors} />
+        </DbLoadingScreen>
 
         {confirm && (
           <AdminConfirmPanel
@@ -98,7 +99,11 @@ function AdminSettingsPage() {
         )}
 
         <div className="admin-form-footer admin-form-footer--sticky">
-          <button type="submit" className="admin-button admin-button--primary" disabled={Boolean(confirm) || !isDirty}>
+          <button
+            type="submit"
+            className="admin-button admin-button--primary"
+            disabled={Boolean(confirm) || loading || !isDirty}
+          >
             Save changes
           </button>
         </div>

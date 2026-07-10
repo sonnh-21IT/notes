@@ -19,7 +19,7 @@ export const PUBLIC_CACHE_KEYS = {
 
 function assertSupabaseReady() {
   if (!isSupabaseConfigured()) {
-    throw new Error('Missing VITE_SUPABASE_URL or VITE_SUPABASE_ANON_KEY')
+    throw new Error('Site data isn\'t configured.')
   }
 }
 

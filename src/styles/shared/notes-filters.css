@@ -10,20 +10,20 @@
   align-items: center;
   gap: 6px;
   padding: 4px 8px 4px 10px;
-  border: 1px solid color-mix(in srgb, var(--accent) 35%, var(--border) 65%);
+  border: 1px solid var(--accent-border);
   border-radius: 999px;
   font: inherit;
   font-size: 12px;
   font-weight: 600;
   color: var(--accent);
-  background: color-mix(in srgb, var(--accent) 10%, var(--bg-spot) 90%);
+  background: var(--accent-fill);
   cursor: pointer;
   transition: border-color 0.15s ease, background-color 0.15s ease;
 }
 
 .notes-active-filter:hover {
-  border-color: color-mix(in srgb, var(--accent) 55%, var(--border) 45%);
-  background: color-mix(in srgb, var(--accent) 16%, var(--bg-spot) 84%);
+  border-color: color-mix(in srgb, var(--accent) 70%, var(--border) 30%);
+  background: var(--accent-fill-strong);
 }
 
 .notes-active-filter-remove {
@@ -77,16 +77,16 @@
 .notes-tag-filter-icon,
 .notes-filter-kind-icon {
   flex-shrink: 0;
-  opacity: 0.72;
+  opacity: 0.88;
 }
 
 .notes-tag-filter:hover {
   color: var(--accent);
-  border-color: color-mix(in srgb, var(--accent) 35%, var(--border) 65%);
+  border-color: var(--accent-border);
 }
 
 .notes-tag-filter.active {
   color: var(--accent);
-  border-color: color-mix(in srgb, var(--accent) 45%, var(--border) 55%);
-  background: color-mix(in srgb, var(--accent) 12%, var(--bg-spot) 88%);
+  border-color: color-mix(in srgb, var(--accent) 65%, var(--border) 35%);
+  background: var(--accent-fill);
 }

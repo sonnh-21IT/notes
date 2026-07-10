@@ -138,6 +138,12 @@
   margin-top: -4px;
 }
 
+.admin-preview-rendering {
+  margin: 24px 0;
+  font-size: 14px;
+  color: var(--text-muted);
+}
+
 .admin-flash {
   margin: 0;
   padding: 0 0 0 12px;

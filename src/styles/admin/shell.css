@@ -34,6 +34,7 @@
 }
 
 .admin-sidebar {
+  box-sizing: border-box;
   flex-shrink: 0;
   display: flex;
   flex-direction: column;
@@ -44,6 +45,7 @@
   border-right: 1px solid var(--border-chrome);
   background: var(--bg);
   overflow-y: auto;
+  z-index: 15;
 }
 
 .admin-sidebar--loading {

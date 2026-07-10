@@ -1,6 +1,7 @@
 import { useEffect } from 'react'
 import { AlertTriangle, FileText, Info, StickyNote } from 'lucide-react'
-import PageLoading from '@/ui/PageLoading'
+import DbLoadingScreen from '@/ui/DbLoadingScreen'
+import { AdminContentListSkeleton } from '@/ui/skeletons'
 import AdminListItem from '@/admin/components/AdminListItem'
 import AdminPageHeader from '@/admin/components/AdminPageHeader'
 import { useAdminToast } from '@/admin/hooks/useAdminToast'
@@ -20,30 +21,30 @@ function AdminContentListPage() {
     if (error?.message) toast.showError(error.message)
   }, [error, toast])
 
-  if (loading) return <PageLoading label="Loading content" />
-
   return (
     <div className="admin-page">
       <AdminPageHeader
         eyebrow="Content"
         title="Static pages"
-        description="Site-wide MDX pages — about, notes intro, and 404."
+        description="Pages shown across the site: About, Notes intro, and the not-found page."
       />
 
-      <ul className="admin-list">
-        {(pages ?? []).map((page) => {
-          const Icon = pageIcons[page.slug] ?? FileText
-          return (
-            <AdminListItem
-              key={page.slug}
-              to={`/admin/content/${page.slug}`}
-              icon={Icon}
-              title={page.title || page.slug}
-              meta={`/${page.slug === 'not-found' ? '*' : page.slug}`}
-            />
-          )
-        })}
-      </ul>
+      <DbLoadingScreen loading={loading} skeleton={<AdminContentListSkeleton />}>
+        <ul className="admin-list">
+          {(pages ?? []).map((page) => {
+            const Icon = pageIcons[page.slug] ?? FileText
+            return (
+              <AdminListItem
+                key={page.slug}
+                to={`/admin/content/${page.slug}`}
+                icon={Icon}
+                title={page.title || page.slug}
+                meta={page.slug === 'not-found' ? 'Not found page' : `/${page.slug}`}
+              />
+            )
+          })}
+        </ul>
+      </DbLoadingScreen>
     </div>
   )
 }

@@ -3,7 +3,7 @@ import { Check, X } from 'lucide-react'
 function AdminSlugStatus({ status }) {
   if (status === 'available') {
     return (
-      <span className="admin-slug-status admin-slug-status--ok" aria-label="Slug is available">
+      <span className="admin-slug-status admin-slug-status--ok" aria-label="URL name is available">
         <Check size={12} strokeWidth={2.5} aria-hidden="true" />
       </span>
     )
@@ -11,7 +11,7 @@ function AdminSlugStatus({ status }) {
 
   if (status === 'unavailable') {
     return (
-      <span className="admin-slug-status admin-slug-status--bad" aria-label="Slug is not available">
+      <span className="admin-slug-status admin-slug-status--bad" aria-label="URL name is already taken">
         <X size={12} strokeWidth={2.5} aria-hidden="true" />
       </span>
     )

@@ -4,7 +4,7 @@ import * as coverImage from '@/data/supabase/coverImage'
 
 function assertSupabaseReady() {
   if (!isSupabaseConfigured()) {
-    throw new Error('Missing VITE_SUPABASE_URL or VITE_SUPABASE_ANON_KEY')
+    throw new Error('Admin isn\'t configured yet.')
   }
 }
 

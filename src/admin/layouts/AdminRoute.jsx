@@ -11,7 +11,7 @@ function AdminRoute() {
       <div className="admin-shell admin-shell--centered">
         <div className="admin-auth-card">
           <h1 className="admin-auth-title">Admin unavailable</h1>
-          <p className="admin-auth-subtitle">Configure VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY.</p>
+          <p className="admin-auth-subtitle">Admin isn&apos;t set up yet. Ask the site owner to finish configuration.</p>
         </div>
       </div>
     )
@@ -22,7 +22,7 @@ function AdminRoute() {
       <div className="admin-shell">
         <aside className="admin-sidebar admin-sidebar--loading" aria-hidden="true" />
         <main className="admin-main">
-          <PageLoading label="Checking session" />
+          <PageLoading />
         </main>
       </div>
     )

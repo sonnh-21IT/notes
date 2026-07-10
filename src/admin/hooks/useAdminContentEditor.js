@@ -83,7 +83,7 @@ export function useAdminContentEditor() {
 
   const requestSave = useCallback(() => {
     if (view === 'preview' && mdxError) {
-      toast.showError('Fix MDX errors before saving.')
+      toast.showError('Fix the formatting errors in the preview before saving.')
       return
     }
 

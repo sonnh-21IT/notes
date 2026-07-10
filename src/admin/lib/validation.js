@@ -3,7 +3,7 @@ import { isSafeAssetUrl } from '@/utils/safeUrl'
 const SLUG_RE = /^[a-z0-9]+(?:-[a-z0-9]+)*$/
 const DATE_RE = /^\d{4}-\d{2}-\d{2}$/
 
-export const SLUG_TAKEN_MESSAGE = 'This slug is already in use.'
+export const SLUG_TAKEN_MESSAGE = 'This URL name is already taken.'
 
 export function isValidNoteSlug(slug) {
   const trimmed = slug?.trim() ?? ''
@@ -35,7 +35,7 @@ export function validateNoteFields({ slug, title, summary, body, coverImage, pub
   const trimmedSlug = slug?.trim() ?? ''
 
   if (!trimmedSlug) {
-    errors.slug = 'Slug is required.'
+    errors.slug = 'URL name is required.'
   } else if (!isValidNoteSlug(trimmedSlug)) {
     errors.slug = 'Use lowercase letters, numbers, and hyphens only.'
   }
@@ -49,12 +49,12 @@ export function validateNoteFields({ slug, title, summary, body, coverImage, pub
   }
 
   if (!body?.trim()) {
-    errors.body = 'Body is required.'
+    errors.body = 'Article content is required.'
   }
 
   const cover = coverImage?.trim()
   if (cover && !isValidCoverUrl(cover)) {
-    errors.coverImage = 'Cover image URL is invalid.'
+    errors.coverImage = 'Cover image link is invalid.'
   }
 
   if (publishedAt && !isValidDateString(publishedAt)) {
@@ -67,7 +67,7 @@ export function validateNoteFields({ slug, title, summary, body, coverImage, pub
 export function validateContentBody(body) {
   const errors = {}
   if (!body?.trim()) {
-    errors.body = 'Body cannot be empty.'
+    errors.body = 'Page content can\'t be empty.'
   }
   return { valid: Object.keys(errors).length === 0, errors }
 }
