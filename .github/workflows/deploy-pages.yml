@@ -3,6 +3,10 @@ name: Deploy to GitHub Pages
 on:
   push:
     branches: [main]
+    paths-ignore:
+      - '**.md'
+      - 'LICENSE'
+      - '.gitignore'
   workflow_dispatch:
 
 permissions:
@@ -10,27 +14,50 @@ permissions:
   pages: write
   id-token: write
 
+# Cancel superseded builds on rapid pushes; deploy job still serializes via needs.
 concurrency:
-  group: pages
-  cancel-in-progress: false
+  group: pages-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   build:
     runs-on: ubuntu-latest
-    environment:
-      name: github-pages
     steps:
       - uses: actions/checkout@v5
+        with:
+          fetch-depth: 1
 
       - uses: actions/setup-node@v5
         with:
           node-version: 22
           cache: npm
 
-      - run: npm ci
+      # Prefer offline hits from setup-node's npm cache; skip audit/fund noise.
+      - run: npm ci --prefer-offline --no-audit --no-fund
 
-      - run: npm run lint
-      - run: npm run test
+      - uses: actions/cache@v4
+        with:
+          path: .eslintcache
+          key: eslint-${{ runner.os }}-${{ hashFiles('package-lock.json', 'eslint.config.js') }}
+          restore-keys: |
+            eslint-${{ runner.os }}-
+
+      # One install, lint ∥ test — usually faster than sequential on 2+ vCPU runners.
+      - name: Lint and test
+        run: |
+          set -e
+          npm run lint &
+          lint_pid=$!
+          npm run test &
+          test_pid=$!
+          lint_ec=0
+          test_ec=0
+          wait "$lint_pid" || lint_ec=$?
+          wait "$test_pid" || test_ec=$?
+          if [ "$lint_ec" -ne 0 ] || [ "$test_ec" -ne 0 ]; then
+            echo "lint exit=$lint_ec test exit=$test_ec"
+            exit 1
+          fi
 
       - name: Build
         run: npm run build:pages

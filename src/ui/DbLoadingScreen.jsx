@@ -1,19 +1,19 @@
 import { useDeferredLoading } from '@/hooks/useDeferredLoading'
-import PageSkeletonSlot from '@/ui/PageSkeletonSlot'
+import { usePaintReady } from '@/hooks/usePaintReady'
+import RevealGate from '@/ui/RevealGate'
 
-/** Full-page DB bootstrap: delay + minimum skeleton time, then content. */
+/** Skeleton until load settles, min display time, and children have painted — then crossfade. */
 function DbLoadingScreen({ loading, skeleton, children }) {
-  const showSkeleton = useDeferredLoading(loading)
+  const holdSkeleton = useDeferredLoading(Boolean(loading), { delayMs: 0, minMs: 280 })
+  const hasContent = !loading
+  const paintReady = usePaintReady(hasContent)
+  const pending = Boolean(skeleton) && (loading || holdSkeleton || !paintReady)
 
-  if (showSkeleton && skeleton) {
-    return <PageSkeletonSlot>{skeleton}</PageSkeletonSlot>
-  }
-
-  if (loading || showSkeleton) {
-    return <PageSkeletonSlot quiet />
-  }
-
-  return children
+  return (
+    <RevealGate pending={pending} skeleton={skeleton}>
+      {hasContent ? children : null}
+    </RevealGate>
+  )
 }
 
 export default DbLoadingScreen

@@ -26,6 +26,13 @@ html::-webkit-scrollbar {
 body {
   margin: 0;
   -ms-overflow-style: none;
+  min-height: 100dvh;
+}
+
+#root {
+  display: flex;
+  flex-direction: column;
+  min-height: 100dvh;
 }
 
 a {

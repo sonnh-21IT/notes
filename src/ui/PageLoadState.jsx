@@ -1,6 +1,11 @@
 import { useDeferredLoading } from '@/hooks/useDeferredLoading'
-import PageSkeletonSlot from '@/ui/PageSkeletonSlot'
+import { usePaintReady } from '@/hooks/usePaintReady'
+import RevealGate from '@/ui/RevealGate'
 
+/**
+ * Keeps skeleton up until data exists, min display time elapsed, and content has painted.
+ * Then crossfades skeleton → content.
+ */
 function PageLoadState({
   loading = false,
   error = null,
@@ -8,8 +13,10 @@ function PageLoadState({
   skeleton = null,
   children,
 }) {
-  const waitingFirst = loading && !hasData
-  const showSkeleton = useDeferredLoading(waitingFirst)
+  const bootstrapping = loading && !hasData
+  const holdSkeleton = useDeferredLoading(bootstrapping, { delayMs: 0, minMs: 280 })
+  const paintReady = usePaintReady(hasData && !bootstrapping)
+  const pending = Boolean(skeleton) && (bootstrapping || holdSkeleton || (hasData && !paintReady))
 
   if (error && !hasData) {
     return (
@@ -20,18 +27,19 @@ function PageLoadState({
     )
   }
 
-  if (showSkeleton && skeleton) {
-    return <PageSkeletonSlot>{skeleton}</PageSkeletonSlot>
-  }
-
-  if (waitingFirst) {
-    return <PageSkeletonSlot quiet />
+  if (!skeleton) {
+    if (bootstrapping) return null
+    return (
+      <div className={loading ? 'is-content-validating' : undefined} aria-busy={loading || undefined}>
+        {children}
+      </div>
+    )
   }
 
   return (
-    <div className={loading ? 'is-content-validating' : undefined} aria-busy={loading || undefined}>
-      {children}
-    </div>
+    <RevealGate pending={pending} skeleton={skeleton} busy={loading}>
+      {hasData ? children : null}
+    </RevealGate>
   )
 }
 

@@ -7,6 +7,13 @@
   backdrop-filter: blur(6px);
 }
 
+.site-shell {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 100dvh;
+}
+
 .site-brand {
   display: flex;
   flex-direction: column;
@@ -119,6 +126,10 @@
 }
 
 .site-main .container {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
   color: var(--text-body);
 }
 
@@ -277,5 +288,7 @@
 
 .site-main {
   flex: 1;
+  display: flex;
+  flex-direction: column;
   padding: 48px 0 48px;
 }

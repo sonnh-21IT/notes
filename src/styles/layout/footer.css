@@ -4,6 +4,7 @@
   color: var(--text-chrome);
   font-size: 13px;
   background: transparent;
+  margin-top: auto;
 }
 
 .site-footer-inner {

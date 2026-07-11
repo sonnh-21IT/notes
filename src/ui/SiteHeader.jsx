@@ -21,6 +21,7 @@ function MainNavigation({ open, onNavigate }) {
         <NavLink
           key={item.to}
           to={item.to}
+          viewTransition
           className={({ isActive }) => `nav-link${isActive ? ' active' : ''}`}
           onClick={onNavigate}
           onMouseEnter={item.prefetch}

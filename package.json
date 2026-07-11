@@ -9,7 +9,7 @@
     "build:pages": "VITE_BASE_PATH=/notes/ vite build && cp dist/index.html dist/404.html",
     "test": "vitest run",
     "validate": "npm run lint && npm run test && npm run build",
-    "lint": "eslint .",
+    "lint": "eslint . --cache --cache-location .eslintcache",
     "preview": "vite preview",
     "preview:pages": "VITE_BASE_PATH=/notes/ vite preview",
     "sync:supabase": "node --env-file=.env scripts/sync.js"

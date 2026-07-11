@@ -2,21 +2,80 @@
   display: flex;
   align-items: flex-start;
   justify-content: center;
-  min-height: 40vh;
+  flex: 1;
+  min-height: min(40vh, 20rem);
   padding: 48px 0;
 }
 
 .page-loading--quiet {
-  min-height: 28vh;
+  min-height: min(40vh, 20rem);
+}
+
+.page-load-state {
+  display: grid;
+  align-content: start;
+  width: 100%;
+}
+
+.page-load-state > * {
+  grid-area: 1 / 1;
 }
 
 .page-skeleton-host {
   width: 100%;
+  z-index: 1;
+  opacity: 1;
+  transition: opacity 0.32s ease;
+}
+
+.page-load-state--ready .page-skeleton-host {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.page-load-content {
+  width: 100%;
+  opacity: 0;
+  transform: translateY(6px);
+  transition:
+    opacity 0.36s ease,
+    transform 0.36s ease;
+}
+
+.page-load-state--ready .page-load-content {
+  opacity: 1;
+  transform: none;
 }
 
 .is-content-validating {
-  opacity: 0.72;
-  transition: opacity 0.15s ease;
+  opacity: 0.85;
+  transition: opacity 0.25s ease;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .page-skeleton-host,
+  .page-load-content,
+  .is-content-validating {
+    transition: none;
+    transform: none;
+  }
+
+  .page-load-content {
+    opacity: 1;
+  }
+
+  .page-load-state:not(.page-load-state--ready) .page-load-content {
+    opacity: 0;
+  }
+}
+
+/* Soft route morph when Links use viewTransition */
+@supports (view-transition-name: none) {
+  ::view-transition-old(root),
+  ::view-transition-new(root) {
+    animation-duration: 0.22s;
+    animation-timing-function: ease;
+  }
 }
 
 /* Bone blocks — sized to mirror real typography / controls */

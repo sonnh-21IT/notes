@@ -20,6 +20,7 @@ function NotesList({ notes, className = '', loading = false }) {
             <Link
               className="content-list-link"
               to={`/notes/${note.slug}`}
+              viewTransition
               onMouseEnter={prefetchNotePage}
               onFocus={prefetchNotePage}
             >
