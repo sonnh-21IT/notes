@@ -205,13 +205,14 @@
 .admin-settings-fields {
   display: grid;
   gap: 18px;
-  max-width: 34rem;
+  max-width: 40rem;
 }
 
 .admin-settings-links {
   display: grid;
-  gap: 14px;
-  max-width: 34rem;
+  gap: 12px;
+  max-width: 40rem;
+  min-width: 0;
 }
 
 .admin-field-toolbar {
@@ -219,32 +220,40 @@
   align-items: center;
   justify-content: space-between;
   gap: 12px;
+  min-height: 2rem;
+}
+
+.admin-field-toolbar .admin-label {
+  margin: 0;
 }
 
 .admin-settings-links .admin-stack {
   gap: 10px;
+  min-width: 0;
 }
 
 .admin-settings-links .admin-link-row {
-  grid-template-columns: minmax(0, 96px) minmax(0, 112px) minmax(0, 1fr) auto;
+  grid-template-columns: minmax(5.5rem, 7rem) minmax(6rem, 8.5rem) minmax(0, 1fr) auto;
   gap: 8px;
-  padding: 8px;
-  border: 1px solid var(--border-chrome);
-  border-radius: 12px;
-  background: color-mix(in srgb, var(--bg-spot) 86%, var(--bg) 14%);
-  box-shadow: 0 8px 20px color-mix(in srgb, var(--shadow-strong) 65%, transparent 35%);
+  align-items: center;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
 }
 
 .admin-settings-links .admin-link-row .admin-input {
-  background: color-mix(in srgb, var(--bg) 38%, var(--admin-control-bg) 62%);
+  background: var(--admin-control-bg);
 }
 
 .admin-settings-links .admin-link-row .admin-input:focus {
-  background: var(--bg-spot);
+  background: var(--admin-control-bg);
 }
 
 .admin-settings-links .admin-icon-button {
   color: var(--text-subtle);
+  flex-shrink: 0;
 }
 
 .admin-settings-links .admin-icon-button:hover {
@@ -829,8 +838,13 @@
 }
 
 @media (max-width: 768px) {
-  .admin-link-row {
+  .admin-link-row,
+  .admin-settings-links .admin-link-row {
     grid-template-columns: 1fr;
+  }
+
+  .admin-settings-links .admin-icon-button {
+    justify-self: start;
   }
 
   .admin-note-meta {

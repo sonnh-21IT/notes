@@ -87,6 +87,15 @@
   gap: 24px;
 }
 
+/* RevealGate wraps async form sections — keep the same rhythm as direct form children. */
+.admin-form-body .page-load-state,
+.admin-form-body .page-load-content {
+  display: grid;
+  gap: 24px;
+  width: 100%;
+  min-width: 0;
+}
+
 .admin-section {
   padding: 24px 0;
   border-top: 1px solid var(--border-chrome);
