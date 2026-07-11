@@ -330,3 +330,107 @@
   gap: 10px;
   margin-top: 14px;
 }
+
+.sk--admin-eyebrow {
+  width: 3.5rem;
+  height: 0.7rem;
+}
+
+.sk--admin-title {
+  width: min(14rem, 70%);
+  height: 1.75rem;
+  margin-top: 6px;
+}
+
+.sk--admin-desc {
+  width: min(22rem, 90%);
+  height: 0.85rem;
+  margin-top: 8px;
+}
+
+.sk--admin-button {
+  width: 7rem;
+  height: 2.25rem;
+  border-radius: 999px;
+}
+
+.sk--admin-search {
+  width: min(16rem, 50%);
+  height: 2.4rem;
+  border-radius: var(--admin-control-radius, 8px);
+}
+
+.sk--admin-chip {
+  width: 4.5rem;
+  height: 1.75rem;
+  border-radius: 999px;
+}
+
+.sk--admin-row-title {
+  width: min(16rem, 60%);
+  height: 1rem;
+}
+
+.sk--admin-row-meta {
+  width: 12rem;
+  height: 0.75rem;
+  margin-top: 6px;
+}
+
+.sk--admin-flag {
+  width: 2rem;
+  height: 2rem;
+  border-radius: 8px;
+}
+
+.sk--admin-label {
+  width: 5rem;
+  height: 0.8rem;
+}
+
+.sk--admin-input {
+  width: 100%;
+  height: 2.5rem;
+  margin-top: 6px;
+  border-radius: var(--admin-control-radius, 8px);
+}
+
+.sk--admin-input-grow {
+  flex: 1;
+  min-width: 0;
+}
+
+.sk--admin-textarea {
+  width: 100%;
+  height: 4.5rem;
+  margin-top: 6px;
+  border-radius: var(--admin-control-radius, 8px);
+}
+
+.sk--admin-cover {
+  width: min(100%, 320px);
+  aspect-ratio: 16 / 9;
+  margin-top: 6px;
+  border-radius: var(--admin-control-radius, 8px);
+}
+
+.sk--admin-body {
+  width: 100%;
+  height: 16rem;
+  margin-top: 6px;
+  border-radius: var(--admin-control-radius, 8px);
+}
+
+.sk--admin-crumb {
+  width: 10rem;
+  height: 0.85rem;
+}
+
+.admin-list-row--skeleton {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 14px 2px;
+  border-bottom: 1px solid var(--border-chrome);
+}

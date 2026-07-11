@@ -3,6 +3,7 @@ import { useMemo } from 'react'
 import AdminCoverImageField from '@/admin/components/AdminCoverImageField'
 import AdminField from '@/admin/components/AdminField'
 import AdminFieldError from '@/admin/components/AdminFieldError'
+import AdminMdxBodyField from '@/admin/components/AdminMdxBodyField'
 import AdminNoteFlags from '@/admin/components/AdminNoteFlags'
 import AdminSelect from '@/admin/components/AdminSelect'
 import AdminSlugStatus from '@/admin/components/AdminSlugStatus'
@@ -76,6 +77,8 @@ function AdminNoteForm({ form, onSubmit }) {
       className="admin-form-body"
       onSubmit={(event) => {
         event.preventDefault()
+        // Flush body draft before save (blur may already have done this).
+        event.currentTarget.querySelector('textarea.admin-textarea--code')?.blur()
         onSubmit()
       }}
     >
@@ -205,17 +208,13 @@ function AdminNoteForm({ form, onSubmit }) {
         </div>
       </div>
 
-      <AdminField label="Article content" error={fieldErrors.body} className="admin-note-body">
-        <textarea
-          className={fieldClassName('admin-textarea admin-textarea--code', fieldErrors.body)}
-          rows={20}
-          value={body}
-          onChange={(e) => {
-            setBody(e.target.value)
-            clearFieldError('body')
-          }}
-        />
-      </AdminField>
+      <AdminMdxBodyField
+        value={body}
+        onCommit={setBody}
+        error={fieldErrors.body}
+        onClearError={() => clearFieldError('body')}
+        className="admin-note-body"
+      />
 
       <AdminValidationSummary errors={summaryErrors} />
     </form>

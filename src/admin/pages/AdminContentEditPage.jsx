@@ -3,12 +3,11 @@ import DbLoadingScreen from '@/ui/DbLoadingScreen'
 import { AdminContentEditSkeleton } from '@/ui/skeletons'
 import AdminConfirmPanel from '@/admin/components/AdminConfirmPanel'
 import AdminEditorToolbar from '@/admin/components/AdminEditorToolbar'
-import AdminField from '@/admin/components/AdminField'
+import AdminMdxBodyField from '@/admin/components/AdminMdxBodyField'
 import AdminMdxPreviewPane from '@/admin/components/AdminMdxPreviewPane'
 import AdminPageHeader from '@/admin/components/AdminPageHeader'
 import AdminValidationSummary from '@/admin/components/AdminValidationSummary'
 import { useAdminContentEditor } from '@/admin/hooks/useAdminContentEditor'
-import { fieldClassName } from '@/admin/lib/validation'
 import { contentPreviewClassName } from '@/admin/lib/contentDraft'
 
 function AdminContentEditPage() {
@@ -69,21 +68,19 @@ function AdminContentEditPage() {
             className="admin-form-body"
             onSubmit={(event) => {
               event.preventDefault()
+              event.currentTarget.querySelector('textarea.admin-textarea--code')?.blur()
               requestSave()
             }}
           >
             <section className="admin-section">
-              <AdminField label="Page content" error={fieldErrors.body}>
-                <textarea
-                  className={fieldClassName('admin-textarea admin-textarea--code', fieldErrors.body)}
-                  rows={22}
-                  value={body}
-                  onChange={(e) => {
-                    setBody(e.target.value)
-                    if (fieldErrors.body) clearFieldError('body')
-                  }}
-                />
-              </AdminField>
+              <AdminMdxBodyField
+                label="Page content"
+                value={body}
+                onCommit={setBody}
+                error={fieldErrors.body}
+                onClearError={() => clearFieldError('body')}
+                rows={22}
+              />
             </section>
 
             <AdminValidationSummary errors={fieldErrors} />

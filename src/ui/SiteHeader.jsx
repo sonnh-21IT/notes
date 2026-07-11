@@ -34,9 +34,16 @@ function MainNavigation({ open, onNavigate }) {
   )
 }
 
-function SiteHeaderInner({ title, tagline, loading = false }) {
+function SiteHeader({ title, tagline, loading = false }) {
+  const { pathname } = useLocation()
   const [menuOpen, setMenuOpen] = useState(false)
-  const closeMenu = () => setMenuOpen(false)
+  const [menuPath, setMenuPath] = useState(pathname)
+
+  // Close mobile menu on navigate without remounting ThemeToggle.
+  if (menuPath !== pathname) {
+    setMenuPath(pathname)
+    setMenuOpen(false)
+  }
 
   return (
     <header className="site-header">
@@ -54,15 +61,10 @@ function SiteHeaderInner({ title, tagline, loading = false }) {
             {menuOpen ? <X size={22} strokeWidth={2} /> : <Menu size={22} strokeWidth={2} />}
           </button>
         </div>
-        <MainNavigation open={menuOpen} onNavigate={closeMenu} />
+        <MainNavigation open={menuOpen} onNavigate={() => setMenuOpen(false)} />
       </div>
     </header>
   )
-}
-
-function SiteHeader(props) {
-  const { pathname } = useLocation()
-  return <SiteHeaderInner key={pathname} {...props} />
 }
 
 export default SiteHeader

@@ -20,7 +20,6 @@ function ZoomableImage({ src, alt = '', title, className }) {
 
   useEffect(() => {
     if (!open) return undefined
-    setScale(1)
     const prev = document.body.style.overflow
     document.body.style.overflow = 'hidden'
     window.addEventListener('keydown', onKey)
@@ -29,6 +28,11 @@ function ZoomableImage({ src, alt = '', title, className }) {
       window.removeEventListener('keydown', onKey)
     }
   }, [open])
+
+  const openLightbox = () => {
+    setScale(1)
+    setOpen(true)
+  }
 
   const zoomBy = (delta) => {
     setScale((s) => Math.min(MAX_SCALE, Math.max(MIN_SCALE, Number((s + delta).toFixed(2)))))
@@ -44,11 +48,11 @@ function ZoomableImage({ src, alt = '', title, className }) {
         loading="lazy"
         role="button"
         tabIndex={0}
-        onClick={() => setOpen(true)}
+        onClick={openLightbox}
         onKeyDown={(event) => {
           if (event.key === 'Enter' || event.key === ' ') {
             event.preventDefault()
-            setOpen(true)
+            openLightbox()
           }
         }}
       />

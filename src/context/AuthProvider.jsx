@@ -1,4 +1,5 @@
 import { createContext, useContext, useEffect, useMemo, useState } from 'react'
+import { useLocation } from 'react-router-dom'
 import {
   getSupabaseClient,
   isAdminSessionExpired,
@@ -25,11 +26,20 @@ async function enforceSessionLimit(supabase, nextSession, setSession) {
 
 export function AuthProvider({ children }) {
   const configured = isSupabaseConfigured()
+  const { pathname } = useLocation()
+  const needsAuth = configured && pathname.startsWith('/admin')
   const [session, setSession] = useState(null)
-  const [loading, setLoading] = useState(configured)
+  const [ready, setReady] = useState(!needsAuth)
+  const [watchedNeedsAuth, setWatchedNeedsAuth] = useState(needsAuth)
+
+  // React-allowed: reset gate when leaving/entering /admin without an effect setState.
+  if (watchedNeedsAuth !== needsAuth) {
+    setWatchedNeedsAuth(needsAuth)
+    setReady(!needsAuth)
+  }
 
   useEffect(() => {
-    if (!configured) return undefined
+    if (!needsAuth) return undefined
 
     const supabase = getSupabaseClient()
     let active = true
@@ -37,14 +47,13 @@ export function AuthProvider({ children }) {
     supabase.auth.getSession().then(async ({ data }) => {
       if (!active) return
       await enforceSessionLimit(supabase, data.session, setSession)
-      if (active) setLoading(false)
+      if (active) setReady(true)
     })
 
     const { data: subscription } = supabase.auth.onAuthStateChange((_event, nextSession) => {
       if (!active) return
-      // Fire-and-forget; signOut inside may re-enter this handler with null
       enforceSessionLimit(supabase, nextSession, setSession).finally(() => {
-        if (active) setLoading(false)
+        if (active) setReady(true)
       })
     })
 
@@ -62,7 +71,9 @@ export function AuthProvider({ children }) {
       window.clearInterval(timer)
       subscription.subscription.unsubscribe()
     }
-  }, [configured])
+  }, [needsAuth])
+
+  const loading = needsAuth && !ready
 
   const value = useMemo(
     () => ({

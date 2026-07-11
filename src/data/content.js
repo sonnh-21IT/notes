@@ -8,13 +8,14 @@ import {
   loadSupabaseSiteContent,
   loadSupabaseTagsList,
 } from '@/data/supabase/content.provider'
-import { withBodyMdx } from '@/mdx/compileMdx'
 import { clearAsyncCache, withCache } from '@/utils/asyncCache'
 
 export const PUBLIC_CACHE_KEYS = {
   site: 'site-content',
   tags: 'tags-list',
   categories: 'categories-list',
+  page: (slug) => `page:${slug}`,
+  note: (slug) => `note:${slug}`,
 }
 
 function assertSupabaseReady() {
@@ -47,6 +48,14 @@ export function invalidateCategoriesList() {
   invalidatePublicCache(PUBLIC_CACHE_KEYS.categories)
 }
 
+export function invalidatePageContent(slug) {
+  if (slug) invalidatePublicCache(PUBLIC_CACHE_KEYS.page(slug))
+}
+
+export function invalidateNoteContent(slug) {
+  if (slug) invalidatePublicCache(PUBLIC_CACHE_KEYS.note(slug))
+}
+
 const cachedSiteContent = withCache(
   () => loadSupabaseSiteContent(),
   () => PUBLIC_CACHE_KEYS.site,
@@ -62,15 +71,32 @@ const cachedCategoriesList = withCache(
   () => PUBLIC_CACHE_KEYS.categories,
 )
 
+const cachedPageContent = withCache(
+  async (slug) => {
+    const page = await loadSupabasePageContent(slug)
+    const { withBodyMdx } = await import('@/mdx/compileMdx')
+    return withBodyMdx(page)
+  },
+  (slug) => PUBLIC_CACHE_KEYS.page(slug),
+)
+
+const cachedNoteBySlug = withCache(
+  async (slug) => {
+    const note = await loadSupabaseNoteBySlug(slug)
+    const { withBodyMdx } = await import('@/mdx/compileMdx')
+    return withBodyMdx(note)
+  },
+  (slug) => PUBLIC_CACHE_KEYS.note(slug),
+)
+
 export function loadSiteContent() {
   assertSupabaseReady()
   return cachedSiteContent()
 }
 
-export async function loadPageContent(slug) {
+export function loadPageContent(slug) {
   assertSupabaseReady()
-  const page = await loadSupabasePageContent(slug)
-  return withBodyMdx(page)
+  return cachedPageContent(slug)
 }
 
 export function loadNotesPage(options) {
@@ -93,8 +119,7 @@ export function loadCategoriesList() {
   return cachedCategoriesList()
 }
 
-export async function loadNoteBySlug(slug) {
+export function loadNoteBySlug(slug) {
   assertSupabaseReady()
-  const note = await loadSupabaseNoteBySlug(slug)
-  return withBodyMdx(note)
+  return cachedNoteBySlug(slug)
 }

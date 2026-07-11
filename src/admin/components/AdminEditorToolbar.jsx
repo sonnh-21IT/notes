@@ -1,4 +1,12 @@
+import { memo } from 'react'
 import { ArrowLeft, Eye } from 'lucide-react'
+
+function flushActiveMdxBody() {
+  const el = document.activeElement
+  if (el instanceof HTMLTextAreaElement && el.classList.contains('admin-textarea--code')) {
+    el.blur()
+  }
+}
 
 function AdminEditorToolbar({
   mode,
@@ -11,7 +19,7 @@ function AdminEditorToolbar({
   extra,
 }) {
   return (
-    <div className="admin-form-footer admin-preview-actions">
+    <div className="admin-form-footer admin-preview-actions" onMouseDown={flushActiveMdxBody}>
       {mode === 'preview' ? (
         <button type="button" className="admin-button admin-button--ghost" onClick={onBackToEdit} disabled={disabled}>
           <ArrowLeft size={16} aria-hidden="true" />
@@ -36,4 +44,4 @@ function AdminEditorToolbar({
   )
 }
 
-export default AdminEditorToolbar
+export default memo(AdminEditorToolbar)

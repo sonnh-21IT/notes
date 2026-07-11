@@ -1,7 +1,7 @@
-/* Layer order: foundation → layout → shared → public → responsive → admin */
+/* Layer order: foundation → layout → shared → public → responsive
+   Admin CSS loads only from admin routes (AdminLayout / AdminLoginPage). */
 @import './foundation/index.css';
 @import './layout/index.css';
 @import './shared/index.css';
 @import './public/index.css';
 @import './responsive/index.css';
-@import './admin/index.css';

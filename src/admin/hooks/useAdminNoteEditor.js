@@ -18,7 +18,7 @@ import {
   upsertNote,
   upsertTag,
 } from '@/data/admin'
-import { invalidateCategoriesList, invalidateTagsList } from '@/data/content'
+import { invalidateCategoriesList, invalidateNoteContent, invalidateTagsList } from '@/data/content'
 import { useDebouncedValue } from '@/hooks/useDebouncedValue'
 
 import { todayIsoDate } from '@/utils/dates'
@@ -519,6 +519,11 @@ export function useAdminNoteEditor() {
       const payload = notePayload()
       await upsertNote(payload)
 
+      invalidateNoteContent(payload.slug)
+      if (!isNew && slug.trim() && slug.trim() !== payload.slug) {
+        invalidateNoteContent(slug.trim())
+      }
+
       if (previousCover && previousCover !== payload.coverImage) {
         await deleteCoverImage(previousCover).catch(() => {})
       }
@@ -540,7 +545,7 @@ export function useAdminNoteEditor() {
     } finally {
       saveInFlightRef.current = false
     }
-  }, [notePayload, currentSnapshot, baseline, isNew, navigate, toast, validateSlugAvailable])
+  }, [notePayload, currentSnapshot, baseline, isNew, slug, navigate, toast, validateSlugAvailable])
 
   const performDelete = useCallback(async () => {
     if (saveInFlightRef.current) return
@@ -549,6 +554,7 @@ export function useAdminNoteEditor() {
 
     try {
       await deleteNote(slug)
+      invalidateNoteContent(slug)
       navigate('/admin/notes', { replace: true })
     } catch (err) {
       toast.showError(err instanceof Error ? err.message : String(err))
@@ -613,6 +619,7 @@ export function useAdminNoteEditor() {
       const result = await updateNoteFlags({ slug: slug.trim(), ...patch })
       setPublished(result.published)
       setPinned(result.pinned)
+      invalidateNoteContent(slug.trim())
       toast.showSuccess(noteFlagsToastMessage(patch))
     } catch (err) {
       setPublished(previous.published)

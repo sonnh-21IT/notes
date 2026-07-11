@@ -1,3 +1,4 @@
+import '@/styles/admin/index.css'
 import { Navigate, Outlet } from 'react-router-dom'
 import { isSupabaseConfigured } from '@/data/supabase/client'
 import PageLoading from '@/ui/PageLoading'

@@ -1,4 +1,4 @@
-import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react'
+import { createContext, useCallback, useContext, useEffect, useState } from 'react'
 import { loadSiteContent, onSiteContentInvalidate } from '@/data/content'
 
 const SiteContentContext = createContext(null)
@@ -39,9 +39,7 @@ export function ContentProvider({ children }) {
     }
   }, [reloadTick])
 
-  const value = useMemo(() => state, [state])
-
-  return <SiteContentContext.Provider value={value}>{children}</SiteContentContext.Provider>
+  return <SiteContentContext.Provider value={state}>{children}</SiteContentContext.Provider>
 }
 
 export function useSiteContentState() {

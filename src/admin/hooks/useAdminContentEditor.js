@@ -6,15 +6,18 @@ import { contentPageSnapshot, snapshotEquals } from '@/admin/lib/formDirty'
 import { clearContentDraft } from '@/admin/lib/contentDraft'
 import { validateContentBody } from '@/admin/lib/validation'
 import { getContent, updateContentBody } from '@/data/admin'
+import { invalidatePageContent } from '@/data/content'
 
 export function useAdminContentEditor() {
   const { slug } = useParams()
   const location = useLocation()
   const toast = useAdminToast()
   const saveInFlightRef = useRef(false)
+  const draft = location.state?.draft
+  const initialView = location.state?.view
 
   const [loading, setLoading] = useState(true)
-  const [view, setView] = useState(() => (location.state?.view === 'preview' ? 'preview' : 'edit'))
+  const [view, setView] = useState(() => (initialView === 'preview' ? 'preview' : 'edit'))
   const [title, setTitle] = useState('')
   const [body, setBody] = useState('')
   const [fieldErrors, setFieldErrors] = useState({})
@@ -29,7 +32,6 @@ export function useAdminContentEditor() {
 
   useEffect(() => {
     let active = true
-    const draft = location.state?.draft
 
     getContent(slug)
       .then((page) => {
@@ -41,7 +43,7 @@ export function useAdminContentEditor() {
         setBody(nextBody)
         setBaseline(contentPageSnapshot({ body: page.body ?? '' }))
 
-        if (location.state?.view === 'preview') {
+        if (initialView === 'preview') {
           setView('preview')
         }
       })
@@ -55,7 +57,7 @@ export function useAdminContentEditor() {
     return () => {
       active = false
     }
-  }, [slug, location.state, toast])
+  }, [slug, draft, initialView, toast])
 
   const runValidation = useCallback(() => {
     const result = validateContentBody(body)
@@ -71,6 +73,7 @@ export function useAdminContentEditor() {
     try {
       await updateContentBody({ slug, body })
       clearContentDraft()
+      invalidatePageContent(slug)
       setBaseline(currentSnapshot)
       toast.showSuccess('Page saved.')
       setView('edit')

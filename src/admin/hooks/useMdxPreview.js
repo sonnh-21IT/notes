@@ -9,25 +9,27 @@ function useMdxPreview(body, enabled = true) {
     error: '',
   })
 
-  const ready = Boolean(body) && state.sourceBody === body && state.MdxContent != null
+  // Only track body while preview is open — avoid effect churn on every keystroke in edit mode.
+  const previewBody = enabled ? body : ''
+  const ready = Boolean(previewBody) && state.sourceBody === previewBody && state.MdxContent != null
 
   useEffect(() => {
-    if (!body || !enabled || ready) return undefined
+    if (!previewBody || ready) return undefined
 
     let active = true
     const loadingTimer = window.setTimeout(() => {
       if (active) setState((current) => ({ ...current, loading: true, error: '' }))
     }, 120)
 
-    compileMdx(body)
+    compileMdx(previewBody)
       .then((MdxContent) => {
         if (!active) return
-        setState({ sourceBody: body, MdxContent, loading: false, error: '' })
+        setState({ sourceBody: previewBody, MdxContent, loading: false, error: '' })
       })
       .catch((err) => {
         if (!active) return
         setState({
-          sourceBody: body,
+          sourceBody: previewBody,
           MdxContent: null,
           loading: false,
           error: err instanceof Error ? err.message : String(err),
@@ -41,7 +43,7 @@ function useMdxPreview(body, enabled = true) {
       active = false
       window.clearTimeout(loadingTimer)
     }
-  }, [body, enabled, ready])
+  }, [previewBody, ready])
 
   if (!body) return { MdxContent: null, loading: false, error: '' }
 

@@ -1,5 +1,5 @@
 import { useCallback } from 'react'
-import { isMdxContentReady } from '@/mdx/compileMdx'
+import { isMdxContentReady } from '@/mdx/isMdxContentReady'
 import {
   loadCategoriesList,
   loadNoteBySlug,

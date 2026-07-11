@@ -1,35 +1,53 @@
 import { lazy, Suspense } from 'react'
-import { Accordion, Accordions } from '@/mdx/components/Accordion'
 import Badge, { Badges } from '@/mdx/components/Badge'
-import Banner from '@/mdx/components/Banner'
 import Button from '@/mdx/components/Button'
-import Callout from '@/mdx/components/Callout'
-import { Card, Cards } from '@/mdx/components/Cards'
 import { getLanguage, getRawCode } from '@/mdx/components/codeBlockUtils'
-import { Column, Columns } from '@/mdx/components/Columns'
-import { Compare, CompareItem } from '@/mdx/components/Compare'
-import Endpoint, { Params, RequestBody, Response, Responses } from '@/mdx/components/Endpoint'
-import { Field, Fields } from '@/mdx/components/Fields'
-import { File, Files, Folder } from '@/mdx/components/Files'
-import Figure from '@/mdx/components/Figure'
-import Frame from '@/mdx/components/Frame'
 import Kbd from '@/mdx/components/Kbd'
 import MdxLink from '@/mdx/components/MdxLink'
-import Option from '@/mdx/components/Option'
-import Output from '@/mdx/components/Output'
-import Repo from '@/mdx/components/Repo'
-import { Step, Steps } from '@/mdx/components/Steps'
-import { Tab, Tabs } from '@/mdx/components/Tabs'
-import Terminal from '@/mdx/components/Terminal'
-import { Timeline, TimelineItem } from '@/mdx/components/Timeline'
-import Tweet from '@/mdx/components/Tweet'
-import Video from '@/mdx/components/Video'
-import Window from '@/mdx/components/Window'
-import YouTube from '@/mdx/components/YouTube'
 import ZoomableImage from '@/mdx/components/ZoomableImage'
 import { isSafeAssetUrl } from '@/utils/safeUrl'
 
+function lazyNamed(loader, exportName) {
+  return lazy(() => loader().then((mod) => ({ default: mod[exportName] })))
+}
+
 const CodeBlock = lazy(() => import('@/mdx/components/CodeBlock'))
+const Callout = lazy(() => import('@/mdx/components/Callout'))
+const Banner = lazy(() => import('@/mdx/components/Banner'))
+const Accordion = lazyNamed(() => import('@/mdx/components/Accordion'), 'Accordion')
+const Accordions = lazyNamed(() => import('@/mdx/components/Accordion'), 'Accordions')
+const Card = lazyNamed(() => import('@/mdx/components/Cards'), 'Card')
+const Cards = lazyNamed(() => import('@/mdx/components/Cards'), 'Cards')
+const Column = lazyNamed(() => import('@/mdx/components/Columns'), 'Column')
+const Columns = lazyNamed(() => import('@/mdx/components/Columns'), 'Columns')
+const Compare = lazyNamed(() => import('@/mdx/components/Compare'), 'Compare')
+const CompareItem = lazyNamed(() => import('@/mdx/components/Compare'), 'CompareItem')
+const Endpoint = lazy(() => import('@/mdx/components/Endpoint'))
+const Params = lazyNamed(() => import('@/mdx/components/Endpoint'), 'Params')
+const RequestBody = lazyNamed(() => import('@/mdx/components/Endpoint'), 'RequestBody')
+const Response = lazyNamed(() => import('@/mdx/components/Endpoint'), 'Response')
+const Responses = lazyNamed(() => import('@/mdx/components/Endpoint'), 'Responses')
+const Field = lazyNamed(() => import('@/mdx/components/Fields'), 'Field')
+const Fields = lazyNamed(() => import('@/mdx/components/Fields'), 'Fields')
+const File = lazyNamed(() => import('@/mdx/components/Files'), 'File')
+const Files = lazyNamed(() => import('@/mdx/components/Files'), 'Files')
+const Folder = lazyNamed(() => import('@/mdx/components/Files'), 'Folder')
+const Figure = lazy(() => import('@/mdx/components/Figure'))
+const Frame = lazy(() => import('@/mdx/components/Frame'))
+const Option = lazy(() => import('@/mdx/components/Option'))
+const Output = lazy(() => import('@/mdx/components/Output'))
+const Repo = lazy(() => import('@/mdx/components/Repo'))
+const Step = lazyNamed(() => import('@/mdx/components/Steps'), 'Step')
+const Steps = lazyNamed(() => import('@/mdx/components/Steps'), 'Steps')
+const Tab = lazyNamed(() => import('@/mdx/components/Tabs'), 'Tab')
+const Tabs = lazyNamed(() => import('@/mdx/components/Tabs'), 'Tabs')
+const Terminal = lazy(() => import('@/mdx/components/Terminal'))
+const Timeline = lazyNamed(() => import('@/mdx/components/Timeline'), 'Timeline')
+const TimelineItem = lazyNamed(() => import('@/mdx/components/Timeline'), 'TimelineItem')
+const Tweet = lazy(() => import('@/mdx/components/Tweet'))
+const Video = lazy(() => import('@/mdx/components/Video'))
+const Window = lazy(() => import('@/mdx/components/Window'))
+const YouTube = lazy(() => import('@/mdx/components/YouTube'))
 
 function PlainCodeBlock({ children, className = '', ...props }) {
   const language = getLanguage(children, className)
@@ -51,6 +69,7 @@ function MdxImage({ alt = '', src, title }) {
 }
 
 // ponytail: only override what differs from plain HTML — styling lives in .prose CSS
+// Heavy MDX widgets are lazy; Suspense lives in MdxBody.
 export const mdxComponents = {
   wrapper: ({ children }) => <div className="prose">{children}</div>,
   a: MdxLink,

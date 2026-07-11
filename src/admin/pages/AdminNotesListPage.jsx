@@ -15,6 +15,7 @@ import {
 } from '@/admin/hooks/useAdminNotesCatalog'
 import { noteFlagsToastMessage } from '@/admin/lib/noteFlags'
 import { getAuthUserId, isContentAdmin, updateNoteFlags } from '@/data/admin'
+import { invalidateNoteContent } from '@/data/content'
 import { usePaginationState } from '@/hooks/usePaginationState'
 import { formatArticleDate } from '@/utils/formatArticleMeta'
 
@@ -159,6 +160,7 @@ function AdminNotesListPage() {
         ...current,
         [slug]: { ...current[slug], published: result.published, pinned: result.pinned },
       }))
+      invalidateNoteContent(slug)
       toast.showSuccess(noteFlagsToastMessage(patch))
     } catch (err) {
       setOverrides((current) => {

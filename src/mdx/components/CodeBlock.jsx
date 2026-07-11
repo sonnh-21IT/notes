@@ -3,12 +3,15 @@ import { getLanguage, getRawCode } from '@/mdx/components/codeBlockUtils'
 
 function CodeBlock({ children, className = '', ...props }) {
   const shellRef = useRef(null)
+  const copyTimerRef = useRef(0)
   const [copied, setCopied] = useState(false)
   const [highlight, setHighlight] = useState({ key: '', html: '' })
   const language = getLanguage(children, className)
   const rawCode = useMemo(() => getRawCode(children), [children])
   const sourceKey = `${language}\0${rawCode}`
   const highlightedHtml = highlight.key === sourceKey ? highlight.html : ''
+
+  useEffect(() => () => window.clearTimeout(copyTimerRef.current), [])
 
   useEffect(() => {
     if (!rawCode) return undefined
@@ -55,7 +58,8 @@ function CodeBlock({ children, className = '', ...props }) {
     try {
       await navigator.clipboard.writeText(rawCode)
       setCopied(true)
-      window.setTimeout(() => setCopied(false), 1200)
+      window.clearTimeout(copyTimerRef.current)
+      copyTimerRef.current = window.setTimeout(() => setCopied(false), 1200)
     } catch {
       setCopied(false)
     }

@@ -16,11 +16,7 @@ class ErrorBoundary extends Component {
         <section className="page-stack content content-error">
           <h1 className="content-title">Something went wrong</h1>
           <p className="content-lead">Something broke on this page. Try again, or come back later.</p>
-          <button
-            type="button"
-            className="admin-button admin-button--ghost"
-            onClick={() => this.setState({ error: null })}
-          >
+          <button type="button" className="text-button" onClick={() => this.setState({ error: null })}>
             Try again
           </button>
         </section>

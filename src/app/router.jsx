@@ -1,8 +1,7 @@
 import { lazy, Suspense } from 'react'
 import { Navigate, Route, Routes } from 'react-router-dom'
+import { ContentProvider } from '@/context/ContentProvider'
 import MainLayout from '@/layouts/MainLayout'
-import AdminRoute from '@/admin/layouts/AdminRoute'
-import AdminLayout from '@/admin/layouts/AdminLayout'
 import PageLoading from '@/ui/PageLoading'
 import RouteErrorPage from '@/ui/RouteErrorPage'
 
@@ -11,6 +10,9 @@ const NotesPage = lazy(() => import('@/pages/notes/NotesPage'))
 const NotePage = lazy(() => import('@/pages/notes/NotePage'))
 const NotFoundPage = lazy(() => import('@/pages/not-found/NotFoundPage'))
 
+const AdminProviders = lazy(() => import('@/admin/layouts/AdminProviders'))
+const AdminRoute = lazy(() => import('@/admin/layouts/AdminRoute'))
+const AdminLayout = lazy(() => import('@/admin/layouts/AdminLayout'))
 const AdminLoginPage = lazy(() => import('@/admin/pages/AdminLoginPage'))
 const AdminSettingsPage = lazy(() => import('@/admin/pages/AdminSettingsPage'))
 const AdminContentListPage = lazy(() => import('@/admin/pages/AdminContentListPage'))
@@ -25,25 +27,35 @@ function RouteFallback() {
   return <PageLoading />
 }
 
+function PublicLayout() {
+  return (
+    <ContentProvider>
+      <MainLayout />
+    </ContentProvider>
+  )
+}
+
 function AppRouter() {
   return (
     <Suspense fallback={<RouteFallback />}>
       <Routes>
-        <Route path="/admin/login" element={<AdminLoginPage />} errorElement={<RouteErrorPage />} />
-        <Route path="/admin" element={<AdminRoute />} errorElement={<RouteErrorPage />}>
-          <Route element={<AdminLayout />}>
-            <Route index element={<Navigate to="/admin/settings" replace />} />
-            <Route path="settings" element={<AdminSettingsPage />} />
-            <Route path="content" element={<AdminContentListPage />} />
-            <Route path="content/:slug/preview" element={<AdminContentPreviewPage />} />
-            <Route path="content/:slug" element={<AdminContentEditPage />} />
-            <Route path="notes" element={<AdminNotesListPage />} />
-            <Route path="notes/:slug/preview" element={<AdminNotePreviewPage />} />
-            <Route path="notes/:slug" element={<AdminNoteEditPage />} />
+        <Route element={<AdminProviders />} errorElement={<RouteErrorPage />}>
+          <Route path="/admin/login" element={<AdminLoginPage />} />
+          <Route path="/admin" element={<AdminRoute />}>
+            <Route element={<AdminLayout />}>
+              <Route index element={<Navigate to="/admin/settings" replace />} />
+              <Route path="settings" element={<AdminSettingsPage />} />
+              <Route path="content" element={<AdminContentListPage />} />
+              <Route path="content/:slug/preview" element={<AdminContentPreviewPage />} />
+              <Route path="content/:slug" element={<AdminContentEditPage />} />
+              <Route path="notes" element={<AdminNotesListPage />} />
+              <Route path="notes/:slug/preview" element={<AdminNotePreviewPage />} />
+              <Route path="notes/:slug" element={<AdminNoteEditPage />} />
+            </Route>
           </Route>
         </Route>
 
-        <Route element={<MainLayout />} errorElement={<RouteErrorPage />}>
+        <Route element={<PublicLayout />} errorElement={<RouteErrorPage />}>
           <Route index element={<Navigate to="/about" replace />} />
           <Route path="/about" element={<AboutPage />} />
           <Route path="/notes" element={<NotesPage />} />

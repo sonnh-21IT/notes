@@ -1,4 +1,5 @@
 import '@/styles/public/mdx/empty-state.css'
+import { Suspense } from 'react'
 import { MDXProvider } from '@mdx-js/react'
 import { mdxComponents } from '@/mdx/mdxComponents'
 
@@ -39,7 +40,9 @@ function MdxBody({ component: Component, empty = 'default' }) {
 
   return (
     <MDXProvider components={mdxComponents}>
-      <Component components={mdxComponents} />
+      <Suspense fallback={null}>
+        <Component components={mdxComponents} />
+      </Suspense>
     </MDXProvider>
   )
 }
