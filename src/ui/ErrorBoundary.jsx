@@ -1,4 +1,5 @@
 import { Component } from 'react'
+import ContentError from '@/ui/ContentError'
 
 class ErrorBoundary extends Component {
   constructor(props) {
@@ -13,13 +14,21 @@ class ErrorBoundary extends Component {
   render() {
     if (this.state.error) {
       return (
-        <section className="page-stack content content-error">
-          <h1 className="content-title">Something went wrong</h1>
-          <p className="content-lead">Something broke on this page. Try again, or come back later.</p>
-          <button type="button" className="text-button" onClick={() => this.setState({ error: null })}>
-            Try again
-          </button>
-        </section>
+        <div className="content-error-shell site-shell">
+          <main className="site-main">
+            <div className="container">
+              <ContentError
+                label="Interrupted"
+                title="This page hit a snag"
+                description="Something broke while rendering. You can try again, or head back to a safer page."
+                actionLabel="Try again"
+                onAction={() => this.setState({ error: null })}
+                secondaryTo="/about"
+                secondaryLabel="Back to About"
+              />
+            </div>
+          </main>
+        </div>
       )
     }
 

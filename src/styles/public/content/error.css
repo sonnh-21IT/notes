@@ -1,0 +1,123 @@
+.content-error {
+  display: grid;
+  gap: 12px;
+  justify-items: start;
+  width: 100%;
+  max-width: 36rem;
+  margin: 12px 0 8px;
+  padding: 28px 28px 26px;
+  border: 1px solid var(--border-chrome);
+  border-radius: 14px;
+  background:
+    linear-gradient(
+      160deg,
+      color-mix(in srgb, var(--bg-spot) 88%, var(--accent) 12%) 0%,
+      var(--bg-spot) 55%,
+      var(--bg) 100%
+    );
+  box-shadow: 0 1px 0 color-mix(in srgb, var(--shadow-strong, #000) 6%, transparent);
+}
+
+.content-error-label {
+  margin: 0;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-subtle);
+}
+
+.content-error-title {
+  margin: 0;
+  font-size: clamp(26px, 3.4vw, 40px);
+  font-weight: 700;
+  line-height: 1.2;
+  letter-spacing: -0.03em;
+  color: var(--text);
+  max-width: 18ch;
+}
+
+.content-error-lead {
+  margin: 2px 0 0;
+  color: var(--text-muted);
+  font-size: clamp(16px, 1.15vw, 18px);
+  line-height: 1.65;
+  max-width: 34ch;
+}
+
+.content-error-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 14px;
+  align-items: center;
+  margin-top: 10px;
+}
+
+.content-error-button {
+  appearance: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 2.55rem;
+  padding: 0.55rem 1.15rem;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  background: var(--accent);
+  color: #fff;
+  font: inherit;
+  font-size: 0.95rem;
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+  transition: filter 0.15s ease, transform 0.15s ease;
+}
+
+.content-error-button:hover {
+  filter: brightness(1.06);
+}
+
+.content-error-button:active {
+  transform: translateY(1px);
+}
+
+.content-error-button:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+  box-shadow: 0 0 0 4px var(--focus-ring);
+}
+
+.content-error-link {
+  color: var(--link);
+  font-weight: 500;
+  font-size: 0.95rem;
+  text-decoration: none;
+}
+
+.content-error-link:hover {
+  color: var(--link-hover);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.content-error-link:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+  border-radius: 2px;
+}
+
+.content-error-shell {
+  display: flex;
+  flex-direction: column;
+  min-height: 100dvh;
+}
+
+.content-error-shell .site-main {
+  display: flex;
+  align-items: center;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .content-error-button {
+    transition: none;
+  }
+}

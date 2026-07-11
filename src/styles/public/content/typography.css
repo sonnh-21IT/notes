@@ -93,26 +93,3 @@
   display: grid;
   gap: 12px;
 }
-
-.text-button {
-  appearance: none;
-  margin-top: 4px;
-  padding: 0.55rem 0.95rem;
-  border: 1px solid var(--border-chrome);
-  border-radius: 6px;
-  background: transparent;
-  color: var(--text);
-  font: inherit;
-  font-size: 0.95rem;
-  cursor: pointer;
-}
-
-.text-button:hover {
-  border-color: var(--text-muted);
-}
-
-.text-button:focus-visible {
-  outline: 2px solid var(--accent);
-  outline-offset: 3px;
-  box-shadow: 0 0 0 4px var(--focus-ring);
-}

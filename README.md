@@ -312,7 +312,7 @@ Workflow: `.github/workflows/deploy-pages.yml` — on every push to `main` (and 
    - `.github/workflows/deploy-pages.yml` (build `env`)
    - `package.json` scripts `build:pages` / `preview:pages` (optional, for local preview)
 
-2. **Add repository secrets**
+2. **Add repository secrets** (or **Environment** secrets for `github-pages`)
 
    GitHub → repo → **Settings → Secrets and variables → Actions → New repository secret**:
 
@@ -320,6 +320,8 @@ Workflow: `.github/workflows/deploy-pages.yml` — on every push to `main` (and 
    |--------|--------|
    | `VITE_SUPABASE_URL` | Same as local `.env` |
    | `VITE_SUPABASE_ANON_KEY` | Same as local `.env` (anon key only) |
+
+   The build job uses the `github-pages` environment so **Environment** secrets under that name also work. Empty secrets produce a deploy that shows “Site data isn't configured.”
 
    Do **not** add `SUPABASE_SERVICE_ROLE_KEY` to GitHub Actions for this workflow.
 

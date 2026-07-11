@@ -1,15 +1,14 @@
-import { Link } from 'react-router-dom'
+import ContentError from '@/ui/ContentError'
 
 function RouteErrorPage() {
   return (
-    <section className="page-stack content">
-      <p className="content-label">Oops</p>
-      <h1 className="content-title">Something went wrong</h1>
-      <p className="content-lead">We hit a problem loading this page.</p>
-      <p>
-        <Link className="content-link" to="/about">Back to site</Link>
-      </p>
-    </section>
+    <ContentError
+      label="Interrupted"
+      title="This page hit a snag"
+      description="We couldn’t finish loading this route. Go back to the site and try another path."
+      secondaryTo="/about"
+      secondaryLabel="Back to About"
+    />
   )
 }
 

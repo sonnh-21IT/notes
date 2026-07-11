@@ -1,5 +1,6 @@
 import { useDeferredLoading } from '@/hooks/useDeferredLoading'
 import { usePaintReady } from '@/hooks/usePaintReady'
+import ContentError from '@/ui/ContentError'
 import RevealGate from '@/ui/RevealGate'
 
 /**
@@ -20,10 +21,15 @@ function PageLoadState({
 
   if (error && !hasData) {
     return (
-      <section className="page-stack content content-error">
-        <h1 className="content-title">Couldn&apos;t load this page</h1>
-        <p className="content-lead">Please try again in a moment.</p>
-      </section>
+      <ContentError
+        label="Couldn’t load"
+        title="This page isn’t available right now"
+        description="The content didn’t come through. Wait a moment, then refresh — or browse another page."
+        actionLabel="Refresh"
+        onAction={() => window.location.reload()}
+        secondaryTo="/about"
+        secondaryLabel="Back to About"
+      />
     )
   }
 
