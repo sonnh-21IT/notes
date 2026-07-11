@@ -1,0 +1,130 @@
+.mdx-steps {
+  position: relative;
+  display: grid;
+  gap: 0;
+  margin: 1.6em 0;
+  padding: 0;
+  border: 0;
+  counter-reset: mdx-step;
+}
+
+/* One continuous rail — avoids gaps from per-block border-left */
+.mdx-steps::before {
+  content: '';
+  position: absolute;
+  left: calc(1.85rem / 2);
+  top: 1.85rem;
+  bottom: 0.25rem;
+  width: 1px;
+  background: color-mix(in srgb, var(--accent) 22%, var(--border));
+  transform: translateX(-50%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.mdx-steps > h2,
+.mdx-steps > h3,
+.mdx-steps > h4,
+.mdx-step > h2,
+.mdx-step > h3,
+.mdx-step > h4 {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: 1.85rem minmax(0, 1fr);
+  column-gap: 14px;
+  align-items: center;
+  margin: 0;
+  padding: 0;
+  font-size: 1.05em;
+  font-weight: 650;
+  line-height: 1.35;
+  color: var(--text);
+  counter-increment: mdx-step;
+}
+
+.mdx-steps > h2::before,
+.mdx-steps > h3::before,
+.mdx-steps > h4::before,
+.mdx-step > h2::before,
+.mdx-step > h3::before,
+.mdx-step > h4::before {
+  content: counter(mdx-step);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.85rem;
+  height: 1.85rem;
+  border: 1px solid color-mix(in srgb, var(--accent) 35%, var(--border));
+  border-radius: 999px;
+  font-size: 0.78em;
+  font-weight: 650;
+  color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 12%, var(--bg-spot));
+  box-shadow: 0 0 0 4px var(--bg-spot);
+}
+
+.mdx-steps > :not(h2):not(h3):not(h4):not(.mdx-step),
+.mdx-step > :not(h2):not(h3):not(h4) {
+  position: relative;
+  z-index: 1;
+  box-sizing: border-box;
+  justify-self: stretch;
+  width: 100%;
+  max-width: 100%;
+  margin: 0;
+  padding: 0.55em 0 0.75em 2.75rem;
+  border: 0;
+  color: var(--text-muted);
+  line-height: 1.65;
+}
+
+.mdx-steps > h2 + :not(h2):not(h3):not(h4):not(.mdx-step),
+.mdx-steps > h3 + :not(h2):not(h3):not(h4):not(.mdx-step),
+.mdx-steps > h4 + :not(h2):not(h3):not(h4):not(.mdx-step),
+.mdx-step > h2 + :not(h2):not(h3):not(h4),
+.mdx-step > h3 + :not(h2):not(h3):not(h4),
+.mdx-step > h4 + :not(h2):not(h3):not(h4) {
+  padding-top: 0.55em;
+}
+
+.mdx-steps > :not(h2):not(h3):not(h4):not(.mdx-step):last-child,
+.mdx-step:last-child > :not(h2):not(h3):not(h4):last-child {
+  padding-bottom: 0;
+}
+
+/* Lone badge must not shrink the rail column / stretch as a full pill bar */
+.mdx-steps > .mdx-badge,
+.mdx-step > .mdx-badge {
+  width: max-content;
+  max-width: 100%;
+}
+
+.mdx-steps > .mdx-files,
+.mdx-steps > .mdx-badges,
+.mdx-steps > .mdx-callout,
+.mdx-steps > .mdx-option,
+.mdx-steps > .mdx-button,
+.mdx-step > .mdx-files,
+.mdx-step > .mdx-badges,
+.mdx-step > .mdx-callout,
+.mdx-step > .mdx-option,
+.mdx-step > .mdx-button {
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
+.mdx-step {
+  display: contents;
+}
+
+/* Inside tabs, match punch-out to tab panel surface */
+.tab-panel .mdx-steps > h2::before,
+.tab-panel .mdx-steps > h3::before,
+.tab-panel .mdx-steps > h4::before,
+.tab-panel .mdx-step > h2::before,
+.tab-panel .mdx-step > h3::before,
+.tab-panel .mdx-step > h4::before {
+  box-shadow: 0 0 0 4px var(--code-bg-bottom);
+  background: color-mix(in srgb, var(--accent) 12%, var(--code-bg-bottom));
+}

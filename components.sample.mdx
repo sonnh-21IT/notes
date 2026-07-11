@@ -1,0 +1,867 @@
+---
+title: MDX component gallery
+description: Sample of every custom MDX tag registered in this site. Paste into admin preview or a draft note.
+---
+
+# MDX component gallery
+
+Không cần `import`. File này là mẫu toàn bộ tag custom mà runtime MDX của site hỗ trợ.
+
+
+## Callout
+
+<Callout type="info">
+Info callout — chỉ có vạch trái, không label tự động.
+</Callout>
+
+<Callout type="warn" title="Warning">
+Warn callout với `title` tùy chọn.
+</Callout>
+
+<Callout type="danger" title="Danger">
+Danger / error tone.
+</Callout>
+
+<Callout type="success" title="Success">
+Success tone.
+</Callout>
+
+
+## Banner
+
+<Banner>Banner ngắn — cùng ngôn ngữ với Callout.</Banner>
+
+<Banner type="warn">Banner cảnh báo.</Banner>
+
+
+## Badge / Badges
+
+<Badge>Kubernetes</Badge>
+<Badge>Linux</Badge>
+<Badge color="green">Ready</Badge>
+<Badge color="yellow">WIP</Badge>
+<Badge color="red">Deprecated</Badge>
+
+
+## Kbd
+
+Nhấn <Kbd>Ctrl</Kbd> + <Kbd>K</Kbd> để mở palette. Trên macOS dùng <Kbd>⌘</Kbd> + <Kbd>K</Kbd>.
+
+
+## Button
+
+<Button href="/notes">Xem notes</Button>
+<Button href="https://example.com" variant="secondary">External link</Button>
+
+
+## Cards / Card
+
+<Cards>
+  <Card title="Backend">
+
+  - REST API
+  - FastAPI
+  - Workers
+
+  </Card>
+  <Card title="Infrastructure" description="Runtime & host">
+
+  - Linux
+  - Docker
+  - Reverse proxy
+
+  </Card>
+  <Card title="AI" href="/notes">
+
+  - RAG
+  - Agents
+
+  </Card>
+  <Card title="Productivity">
+
+  - CI/CD
+  - Automation
+
+  </Card>
+</Cards>
+
+
+## Steps / Step
+
+<Steps>
+
+### Clarify
+
+Định nghĩa bài toán và chia nhỏ.
+
+### Build
+
+API, data model, workers.
+
+### Ship
+
+Deploy, monitor, iterate.
+
+</Steps>
+
+
+## Tabs / Tab
+
+<Tabs>
+  <Tab title="npm">
+
+  ```bash
+  npm install && npm run dev
+  ```
+
+  </Tab>
+  <Tab title="pnpm">
+
+  ```bash
+  pnpm install && pnpm dev
+  ```
+
+  </Tab>
+  <Tab title="Notes">
+
+  Tab có thể chứa prose bình thường, không chỉ code.
+
+  </Tab>
+</Tabs>
+
+
+## Accordions / Accordion
+
+<Accordions>
+  <Accordion title="MDX là gì?" defaultOpen>
+  Markdown cho prose, JSX khi cần cấu trúc.
+  </Accordion>
+  <Accordion title="Content lưu ở đâu?">
+  Supabase tables `content` / `notes`, compile lúc runtime.
+  </Accordion>
+</Accordions>
+
+
+## Files / Folder / File
+
+<Files>
+  <Folder name="src">
+    <Folder name="mdx">
+      <File name="compileMdx.js" />
+      <File name="mdxComponents.jsx" href="/notes" />
+    </Folder>
+    <File name="main.jsx" />
+  </Folder>
+  <File name="package.json" />
+  <File name="components.md" href="https://github.com" />
+</Files>
+
+
+## Columns / Column
+
+<Columns>
+  <Column>
+
+  ### Pros
+
+  - Ship nhanh
+  - Ít abstraction
+
+  </Column>
+  <Column>
+
+  ### Cons
+
+  - Tự maintain CSS
+  - Không có Mermaid built-in
+
+  </Column>
+</Columns>
+
+
+## Terminal
+
+<Terminal title="shell">
+
+```bash
+curl -sS https://api.example.com/health | jq .
+```
+
+</Terminal>
+
+
+## Output
+
+<Output title="response">
+
+```text
+{
+  "status": "ok",
+  "uptime": 12840
+}
+```
+
+</Output>
+
+
+## Endpoint
+
+<Endpoint method="GET" path="/v1/notes/:slug" />
+<Endpoint method="POST" path="/v1/notes" />
+<Endpoint method="PUT" path="/v1/notes/:slug" />
+<Endpoint method="PATCH" path="/v1/notes/:slug" />
+<Endpoint method="DELETE" path="/v1/notes/:slug" />
+<Endpoint method="HEAD" path="/v1/notes/:slug" />
+<Endpoint method="OPTIONS" path="/v1/notes" />
+
+<Endpoint method="POST" path="/v1/notes" summary="Create a draft note">
+
+Tạo note mới. Body là JSON.
+
+<Params>
+  <Field name="Authorization" type="header" required>Bearer token</Field>
+  <Field name="dry_run" type="query">Nếu true thì không ghi DB.</Field>
+</Params>
+
+<RequestBody type="application/json">
+  <Fields>
+    <Field name="title" type="string" required>Tiêu đề.</Field>
+    <Field name="body" type="string" required>MDX source.</Field>
+  </Fields>
+</RequestBody>
+
+<Responses>
+  <Response status="201" description="Created" />
+  <Response status="400" description="Validation error">
+
+```json
+{ "error": "invalid_slug" }
+```
+
+  </Response>
+</Responses>
+
+</Endpoint>
+
+
+## Fields / Field
+
+<Fields>
+  <Field name="slug" type="string" required>
+  URL segment, kebab-case.
+  </Field>
+  <Field name="title" type="string" required>
+  Tiêu đề hiển thị.
+  </Field>
+  <Field name="published" type="boolean">
+  `true` thì hiện trên site public.
+  </Field>
+</Fields>
+
+
+## Option
+
+<Option flag="--port" type="number">
+Listen port. Default `5173`.
+</Option>
+
+<Option flag="--dry-run">
+Chỉ in kế hoạch, không ghi thay đổi.
+</Option>
+
+
+## Timeline / TimelineItem
+
+<Timeline>
+  <TimelineItem date="2024-03" title="First deploy">
+  VPS + Caddy, static build.
+  </TimelineItem>
+  <TimelineItem date="2025-01" title="Supabase CMS">
+  Auth + RLS cho admin.
+  </TimelineItem>
+  <TimelineItem date="2025-07" title="MDX component set">
+  Mirror docs tags cho notes kỹ thuật.
+  </TimelineItem>
+</Timeline>
+
+
+## Compare / CompareItem
+
+<Compare>
+  <CompareItem label="Before">
+
+  Cron trên monolith, khó scale.
+
+  </CompareItem>
+  <CompareItem label="After">
+
+  Queue + workers, retry rõ ràng.
+
+  </CompareItem>
+</Compare>
+
+
+## Figure
+
+<Figure
+  src="/favicon.svg"
+  alt="Site mark"
+  caption="Figure: ảnh + caption (đổi src sang asset thật khi dùng)."
+/>
+
+
+## Frame
+
+<Frame caption="Frame quanh media">
+
+![Site mark](/favicon.svg)
+
+</Frame>
+
+
+## Window
+
+<Window title="preview — about">
+
+![About chrome](/favicon.svg)
+
+</Window>
+
+
+## Video
+
+{/* Đổi src sang file mp4/webm thật khi demo */}
+
+<Video
+  src="/media/demo.mp4"
+  poster="/favicon.svg"
+  caption="Video file (bỏ qua nếu asset chưa có)."
+/>
+
+
+## YouTube
+
+{/* id mẫu — thay bằng video thật */}
+
+<YouTube url="https://www.youtube.com/watch?v=7dp4FqpMHu0&list=RD7dp4FqpMHu0&start_radio=1" title="Sample YouTube" />
+
+
+## Tweet
+
+{/* id mẫu — thay bằng tweet thật; embed có thể bị chặn bởi network */}
+
+<Tweet id="20" title="Sample tweet embed" />
+
+
+## Repo
+
+<Repo
+  href="https://github.com"
+  title="example/repo"
+  description="Repo link card — title + short description."
+/>
+
+<Repo href="/notes" title="Internal: Notes" description="Link nội bộ qua React Router." />
+
+
+## Markdown vẫn dùng bình thường
+
+Paragraph với **bold**, *italic*, `inline code`, và [link](/about).
+
+> Blockquote — hairline trái, giống Callout.
+
+| Method | Path | Auth | Status | Latency | Notes |
+| --- | --- | --- | --- | --- | --- |
+| GET | `/v1/notes` | public | 200 | 42ms | List published |
+| GET | `/v1/notes/:slug` | public | 200 | 38ms | Single note |
+| POST | `/v1/notes` | bearer | 201 | 95ms | Create draft |
+| PATCH | `/v1/notes/:slug` | bearer | 200 | 71ms | Partial update |
+| DELETE | `/v1/notes/:slug` | bearer | 204 | 55ms | Soft delete |
+| OPTIONS | `/v1/notes` | — | 204 | 12ms | CORS preflight |
+
+```js
+// Fenced code → Shiki
+export function hello(name = 'world') {
+  return `hello ${name}`
+}
+```
+
+- [x] Task list
+- [ ] Still open
+
+
+## Combinations
+
+Kiểm tra lồng component — layout, spacing, và chrome không đụng nhau.
+
+### Tabs + Terminal + Output + Callout
+
+<Tabs>
+  <Tab title="Install">
+
+  <Callout type="info" title="Node 20+">
+  Dùng LTS. Nhấn <Kbd>Ctrl</Kbd> + <Kbd>C</Kbd> để dừng dev server.
+  </Callout>
+
+  <Terminal title="setup">
+
+```bash
+npm install
+npm run dev
+```
+
+  </Terminal>
+
+  </Tab>
+  <Tab title="Health check">
+
+  <Terminal title="curl">
+
+```bash
+curl -sS http://localhost:5173/api/health
+```
+
+  </Terminal>
+
+  <Output title="stdout">
+
+```json
+{ "ok": true }
+```
+
+  </Output>
+
+  </Tab>
+  <Tab title="Notes">
+
+  <Banner>Tab này chỉ prose + CTA.</Banner>
+
+  <Button href="/notes">Mở notes</Button>
+  <Button href="https://example.com" variant="secondary">Docs ngoài</Button>
+
+  </Tab>
+</Tabs>
+
+
+### Steps + Callout + Badges + Files
+
+<Steps>
+
+### Scaffold
+
+<Badge>Vite</Badge>
+<Badge color="green">React</Badge>
+
+Tạo app, thêm MDX runtime.
+
+<Files>
+  <Folder name="src">
+    <File name="main.jsx" />
+    <Folder name="mdx" defaultOpen>
+      <File name="compileMdx.js" />
+    </Folder>
+  </Folder>
+</Files>
+
+### Wire content
+
+<Callout type="warn" title="RLS">
+Public chỉ đọc `published = true`.
+</Callout>
+
+### Ship
+
+<Option flag="--dry-run">Preview deploy trước khi ghi.</Option>
+
+</Steps>
+
+
+### Accordion + Endpoint + Fields + Repo
+
+<Accordions>
+  <Accordion title="API: tạo note" defaultOpen>
+
+  <Endpoint method="POST" path="/v1/notes" summary="Create note" defaultOpen>
+
+  Body JSON. Cần Bearer.
+
+  <Params>
+    <Field name="Authorization" type="header" required>Bearer token</Field>
+  </Params>
+
+  <RequestBody type="application/json">
+    <Fields>
+      <Field name="title" type="string" required>Tiêu đề.</Field>
+      <Field name="slug" type="string" required>kebab-case.</Field>
+    </Fields>
+  </RequestBody>
+
+  <Responses>
+    <Response status="201" description="Created" />
+    <Response status="401" description="Unauthorized" />
+  </Responses>
+
+  </Endpoint>
+
+  <Repo href="/notes" title="Internal notes" description="Xem list sau khi tạo." />
+
+  </Accordion>
+  <Accordion title="Tree + Window preview">
+
+  <Columns>
+    <Column>
+
+    <Files>
+      <Folder name="public" defaultOpen>
+        <File name="favicon.svg" />
+        <File name="robots.txt" />
+        <Folder name="media">
+          <File name="demo.mp4" />
+        </Folder>
+      </Folder>
+      <File name="index.html" />
+    </Files>
+
+    </Column>
+    <Column>
+
+    <Window title="favicon.svg">
+
+    ![mark](/favicon.svg)
+
+    </Window>
+
+    </Column>
+  </Columns>
+
+  </Accordion>
+</Accordions>
+
+
+### Columns + Cards + Compare + Timeline
+
+<Columns>
+  <Column>
+
+  ### Stack
+
+  <Cards>
+    <Card title="Runtime">
+
+    - Linux
+    - Caddy
+
+    </Card>
+    <Card title="Data" description="Xem notes liên quan" href="/notes">
+
+    - Postgres
+    - Storage
+
+    </Card>
+  </Cards>
+
+  </Column>
+  <Column>
+
+  ### Trade-offs
+
+  <Compare>
+    <CompareItem label="Monolith">
+
+    Ít moving parts. Deploy một artifact.
+
+    </CompareItem>
+    <CompareItem label="Workers">
+
+    Scale độc lập. Cần queue + observability.
+
+    </CompareItem>
+  </Compare>
+
+  </Column>
+</Columns>
+
+<Timeline>
+  <TimelineItem date="Week 1" title="MVP">
+
+  <Callout type="success">About + Notes đọc được.</Callout>
+
+  </TimelineItem>
+  <TimelineItem date="Week 2" title="MDX chrome">
+
+  Endpoint, Terminal, Window — gallery này.
+
+  - [x] Compact components
+  - [x] Combinations section
+  - [ ] Mermaid (out of scope)
+
+  </TimelineItem>
+</Timeline>
+
+
+### Callout + Frame + Figure + Kbd
+
+<Callout type="info" title="Media nest">
+
+Caption vẫn nằm ngoài chrome. Focus bằng <Kbd>Tab</Kbd>.
+
+<Frame caption="Frame trong Callout">
+
+![Site mark](/favicon.svg)
+
+</Frame>
+
+<Figure
+  src="/favicon.svg"
+  alt="mark"
+  caption="Figure cạnh Frame trong cùng Callout."
+/>
+
+</Callout>
+
+
+### Card rich body
+
+<Cards>
+  <Card title="Playbook" description="Một card đủ loại inline">
+
+  Nhấn <Kbd>⌘</Kbd> + <Kbd>K</Kbd>.
+
+  <Banner type="warn">Đừng commit `.env`.</Banner>
+
+  ```bash
+  npm run build
+  ```
+
+  <Button href="/about">About</Button>
+
+  </Card>
+  <Card title="Links">
+
+  <Repo href="https://github.com" title="upstream" description="External repo." />
+
+  </Card>
+</Cards>
+
+
+### Tabs + Steps + Endpoint + Table
+
+<Tabs>
+  <Tab title="Flow">
+
+  <Steps>
+
+  ### Draft
+
+  Viết body MDX trong admin.
+
+  <Badges>
+  <Badge color="yellow">WIP</Badge>
+  </Badges>
+
+  ### Preview
+
+  <Callout type="info">
+  Preview dùng cùng `compileMdx` với public.
+  </Callout>
+
+  ### Publish
+
+  Bật Published → hiện trên <Button href="/notes">/notes</Button>.
+
+  </Steps>
+
+  </Tab>
+  <Tab title="API surface">
+
+  <Endpoint method="GET" path="/v1/notes" summary="List notes" />
+  <Endpoint method="GET" path="/v1/notes/:slug" summary="Get one" />
+  <Endpoint method="DELETE" path="/v1/notes/:slug" summary="Remove" />
+
+  | Method | Path | Auth | Cache |
+  | --- | --- | --- | --- |
+  | GET | `/v1/notes` | public | 60s |
+  | DELETE | `/v1/notes/:slug` | bearer | no |
+
+  </Tab>
+  <Tab title="Ops">
+
+  <Terminal title="deploy">
+
+```bash
+npm run build && rsync -a dist/ host:/var/www/
+```
+
+  </Terminal>
+
+  <Output title="log">
+
+```text
+building...
+done in 4.2s
+```
+
+  </Output>
+
+  <Option flag="--skip-cache" type="boolean">Bỏ CDN cache sau deploy.</Option>
+
+  </Tab>
+</Tabs>
+
+
+### Compare + Terminal + Output + Fields
+
+<Compare>
+  <CompareItem label="Local">
+
+  <Terminal title="dev">
+
+```bash
+npm run dev -- --host
+```
+
+  </Terminal>
+
+  <Fields>
+    <Field name="PORT" type="number">Mặc định `5173`.</Field>
+    <Field name="VITE_SUPABASE_URL" type="string" required>Project URL.</Field>
+  </Fields>
+
+  </CompareItem>
+  <CompareItem label="Production">
+
+  <Output title="env check">
+
+```text
+NODE_ENV=production
+ok
+```
+
+  </Output>
+
+  <Callout type="danger" title="Secrets">
+  Không nhúng service role key vào bundle.
+  </Callout>
+
+  </CompareItem>
+</Compare>
+
+
+### Timeline + Media + Repo + Kbd
+
+<Timeline>
+  <TimelineItem date="Design" title="Chrome">
+
+  <Window title="hero.png">
+
+  ![hero](/favicon.svg)
+
+  </Window>
+
+  Zoom ảnh bằng click. Phím tắt docs: <Kbd>?</Kbd>.
+
+  </TimelineItem>
+  <TimelineItem date="Embeds" title="YouTube + Tweet">
+
+  <YouTube url="https://www.youtube.com/watch?v=7dp4FqpMHu0&list=RD7dp4FqpMHu0&start_radio=1" title="Sample YouTube" />
+
+  <Repo href="https://github.com" title="sample/repo" description="Nguồn demo embed." />
+
+  </TimelineItem>
+  <TimelineItem date="Ship" title="Checklist">
+
+  - [x] Lightbox ảnh
+  - [x] Endpoint collapse
+  - [x] Combinations gallery
+  - [ ] Accessibility pass
+
+  <Banner type="success">Đủ để paste vào About draft.</Banner>
+
+  </TimelineItem>
+</Timeline>
+
+
+### Accordion + Columns + Cards + Option
+
+<Accordions>
+  <Accordion title="Config matrix" defaultOpen>
+
+  <Columns>
+    <Column>
+
+    ### Client
+
+    <Cards>
+      <Card title="Public">
+
+      - Anon key
+      - RLS read
+
+      </Card>
+      <Card title="Admin" href="/notes">
+
+      - Cookie session
+      - Write policies
+
+      </Card>
+    </Cards>
+
+    </Column>
+    <Column>
+
+    ### Flags
+
+    <Option flag="--port" type="number">Listen port.</Option>
+    <Option flag="--strict">Fail on MDX compile errors.</Option>
+
+    <Files>
+      <Folder name="env" defaultOpen>
+        <File name=".env.example" />
+        <File name=".env.local" />
+      </Folder>
+    </Files>
+
+    </Column>
+  </Columns>
+
+  </Accordion>
+  <Accordion title="Figure + Video + Frame">
+
+  <Figure src="/favicon.svg" alt="mark" caption="Figure 16:9" />
+
+  <Frame caption="Frame 16:9">
+
+  ![mark](/favicon.svg)
+
+  </Frame>
+
+  <Video src="/media/demo.mp4" poster="/favicon.svg" caption="Video 16:9 (asset có thể thiếu)." />
+
+  </Accordion>
+</Accordions>
+
+
+### Callout stack + Badges + Button + Table
+
+<Callout type="warn" title="Breaking">
+API `slug` đổi sang bắt buộc unique toàn cục.
+</Callout>
+
+<Callout type="success" title="Migration">
+Chạy SQL upgrade trong `admin.sql` một lần.
+</Callout>
+
+<Badge>postgres</Badge>
+<Badge color="blue">rls</Badge>
+<Badge color="green">ready</Badge>
+
+| Env | DB | Storage | Auth | CDN | Notes |
+| --- | --- | --- | --- | --- | --- |
+| local | Docker | local | GoTrue | off | hot reload |
+| staging | Supabase | bucket | email | Cloudflare | shared |
+| prod | Supabase | bucket | email | Cloudflare | RLS on |
+
+<Button href="/about">Về About</Button>
+<Button href="https://example.com" variant="secondary">Runbook</Button>
+
+Hết gallery.

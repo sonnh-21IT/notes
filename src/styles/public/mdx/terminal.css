@@ -1,0 +1,89 @@
+.mdx-terminal {
+  margin: 1.5em 0;
+  border: 1px solid var(--code-border);
+  border-radius: 4px;
+  overflow: hidden;
+  background: var(--code-bg-bottom);
+  font-family: var(--font-mono);
+  font-size: 0.88em;
+  line-height: 1.55;
+}
+
+.mdx-terminal-title {
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--code-border);
+  background: color-mix(in srgb, var(--code-bg-top) 82%, var(--bg-elev) 18%);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--text-subtle);
+}
+
+.mdx-terminal-body {
+  position: relative;
+  padding: 0;
+  color: var(--text-body);
+  overflow-x: auto;
+}
+
+.mdx-terminal-body > :first-child {
+  margin-top: 0;
+}
+
+.mdx-terminal-body > :last-child {
+  margin-bottom: 0;
+}
+
+/* Merge nested code panel into the terminal chrome */
+.mdx-terminal-body .code-block-shell {
+  margin: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+}
+
+.mdx-terminal-body .code-block-toolbar {
+  position: absolute;
+  top: 10px;
+  right: 12px;
+  z-index: 2;
+  display: block;
+  width: auto;
+  min-height: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+}
+
+.mdx-terminal-body .code-language {
+  display: none;
+}
+
+.mdx-terminal-body .copy-button {
+  opacity: 0.55;
+  background: color-mix(in srgb, var(--bg-elev) 75%, transparent);
+  backdrop-filter: blur(4px);
+}
+
+.mdx-terminal-body .code-block-shell:hover .copy-button,
+.mdx-terminal-body .copy-button:focus-visible {
+  opacity: 1;
+}
+
+.mdx-terminal-body .code-block {
+  padding: 14px 16px;
+  padding-right: 52px;
+  background: transparent;
+}
+
+:root[data-theme='dark'] .mdx-terminal-body .code-block {
+  background: transparent;
+}
+
+.mdx-terminal-body pre:not(.code-block) {
+  margin: 0;
+  padding: 14px 16px;
+  border: 0;
+  background: transparent;
+}

@@ -1,3 +1,4 @@
+import '@/styles/public/mdx/embed.css'
 import { parseTweetId, tweetPermalink } from '@/utils/embedIds'
 
 function Tweet({ id, url, title = 'Embedded post on X' }) {

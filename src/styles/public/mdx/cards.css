@@ -1,0 +1,113 @@
+.mdx-cards {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 14px;
+  margin: 1.5em 0;
+  width: 100%;
+  min-width: 0;
+}
+
+@media (min-width: 640px) {
+  .mdx-cards {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    column-gap: 20px;
+    row-gap: 14px;
+  }
+}
+
+.mdx-card {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  box-sizing: border-box;
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  color: inherit;
+  overflow: visible;
+}
+
+.prose h3.mdx-card-title,
+.prose .mdx-card-title,
+.mdx-card-title {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 650;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  line-height: 1.35;
+  color: var(--text);
+}
+
+.prose a.mdx-card-title--link,
+.mdx-card-title--link {
+  color: var(--text);
+  font: inherit;
+  letter-spacing: inherit;
+  text-transform: inherit;
+  text-decoration: none !important;
+}
+
+.prose a.mdx-card-title--link:hover,
+.mdx-card-title--link:hover {
+  color: var(--link-hover);
+  text-decoration: underline !important;
+  text-underline-offset: 3px;
+  text-decoration-thickness: 1px;
+}
+
+.prose a.mdx-card-title--link:focus-visible,
+.mdx-card-title--link:focus-visible {
+  outline: 2px solid var(--link);
+  outline-offset: 3px;
+  border-radius: 2px;
+}
+
+.mdx-card-description {
+  margin: 0;
+  color: var(--text-muted);
+  font-size: 0.92em;
+  line-height: 1.55;
+}
+
+.mdx-card-body {
+  color: var(--text-body);
+  font-size: 0.95em;
+  line-height: 1.55;
+  min-width: 0;
+}
+
+.mdx-card-body > :first-child {
+  margin-top: 0;
+}
+
+.mdx-card-body > :last-child {
+  margin-bottom: 0;
+}
+
+.mdx-card-body ul,
+.mdx-card-body ol {
+  margin: 0;
+  padding-left: 1.1em;
+}
+
+.prose .mdx-card-body li,
+.mdx-card-body li {
+  margin: 0.15em 0;
+  color: var(--text-body);
+}
+
+/* Nested in Columns: stack, don’t make a sparse 2×2 */
+.mdx-column .mdx-cards {
+  margin: 0.15em 0 0;
+  gap: 12px;
+}
+
+@media (min-width: 640px) {
+  .mdx-column .mdx-cards {
+    grid-template-columns: 1fr;
+  }
+}

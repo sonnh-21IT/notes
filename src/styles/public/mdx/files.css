@@ -1,0 +1,88 @@
+.mdx-files {
+  margin: 0.85em 0;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  font-family: var(--font-mono);
+  font-size: 0.86em;
+  line-height: 1.35;
+}
+
+/* Beat .prose li margins — they made the tree look sparse */
+.prose .mdx-files li,
+.mdx-files li {
+  margin: 0;
+  color: inherit;
+}
+
+.mdx-files-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.mdx-files-list .mdx-files-list {
+  margin: 0;
+  padding-left: 0.85rem;
+  border-left: 1px solid color-mix(in srgb, var(--border) 70%, transparent);
+  margin-left: 0.45rem;
+}
+
+.mdx-file-item {
+  margin: 0;
+}
+
+.mdx-file-row {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  width: 100%;
+  margin: 0;
+  padding: 2px 5px;
+  border: 0;
+  border-radius: 4px;
+  background: transparent;
+  color: var(--text);
+  font: inherit;
+  text-align: left;
+  text-decoration: none !important;
+  cursor: default;
+}
+
+button.mdx-file-row,
+a.mdx-file-row {
+  cursor: pointer;
+}
+
+.mdx-file-row:hover,
+.mdx-file-row:focus-visible {
+  background: color-mix(in srgb, var(--accent) 10%, transparent);
+  outline: none;
+}
+
+.prose a.mdx-file-row,
+.prose a.mdx-file-row:hover {
+  color: var(--text);
+  text-decoration: none !important;
+}
+
+.mdx-file-icon {
+  flex: 0 0 auto;
+  color: var(--text-muted);
+}
+
+.mdx-file-folder > .mdx-file-row .mdx-file-icon {
+  color: var(--accent);
+}
+
+.mdx-file-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.mdx-column .mdx-files,
+.mdx-accordion-body .mdx-files {
+  margin: 0;
+}

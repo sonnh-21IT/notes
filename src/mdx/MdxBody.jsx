@@ -1,3 +1,4 @@
+import '@/styles/public/mdx/empty-state.css'
 import { MDXProvider } from '@mdx-js/react'
 import { mdxComponents } from '@/mdx/mdxComponents'
 

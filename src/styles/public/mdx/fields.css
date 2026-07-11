@@ -1,0 +1,57 @@
+.mdx-fields {
+  display: grid;
+  gap: 14px;
+  margin: 1.4em 0;
+  border: 0;
+}
+
+.mdx-field {
+  padding: 0;
+  border: 0;
+}
+
+.mdx-field-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 8px 10px;
+}
+
+.mdx-field-name {
+  font-family: var(--font-mono);
+  font-size: 0.9em;
+  font-weight: 600;
+  color: var(--text);
+  background: transparent;
+  border: 0;
+  padding: 0;
+}
+
+.mdx-field-type {
+  font-family: var(--font-mono);
+  font-size: 0.8em;
+  color: var(--text-muted);
+}
+
+.mdx-field-required {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
+.mdx-field-body {
+  margin-top: 6px;
+  color: var(--text-muted);
+  font-size: 0.95em;
+  line-height: 1.6;
+}
+
+.mdx-field-body > :first-child {
+  margin-top: 0;
+}
+
+.mdx-field-body > :last-child {
+  margin-bottom: 0;
+}

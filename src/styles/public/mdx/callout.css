@@ -1,0 +1,68 @@
+/* Same language as .prose blockquote — hairline, no fill */
+.callout {
+  --callout-tone: var(--border);
+  margin: 0.5em 0;
+  padding: 0 0 0 16px;
+  border: 0;
+  border-left: 2px solid var(--callout-tone);
+  border-radius: 0;
+  background: transparent;
+}
+
+.callout-info {
+  --callout-tone: var(--text-muted);
+}
+
+.callout-warn,
+.callout-warning {
+  --callout-tone: #d97706;
+}
+
+.callout-danger,
+.callout-error {
+  --callout-tone: #dc2626;
+}
+
+.callout-success {
+  --callout-tone: #059669;
+}
+
+:root[data-theme='dark'] .callout-warn,
+:root[data-theme='dark'] .callout-warning {
+  --callout-tone: #fbbf24;
+}
+
+:root[data-theme='dark'] .callout-danger,
+:root[data-theme='dark'] .callout-error {
+  --callout-tone: #f87171;
+}
+
+:root[data-theme='dark'] .callout-success {
+  --callout-tone: #34d399;
+}
+
+.callout-title {
+  display: block;
+  margin-bottom: 6px;
+  font-size: 0.92em;
+  font-weight: 650;
+  letter-spacing: 0.01em;
+  color: var(--text);
+}
+
+.callout-body {
+  color: var(--text);
+  line-height: 1.65;
+}
+
+.callout-body > :first-child {
+  margin-top: 0;
+}
+
+.callout-body > :last-child {
+  margin-bottom: 0;
+}
+
+.callout-body p {
+  margin: 0 0 8px;
+}

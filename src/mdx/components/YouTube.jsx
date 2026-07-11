@@ -1,3 +1,4 @@
+import '@/styles/public/mdx/embed.css'
 import { parseYouTubeId, youTubeWatchUrl } from '@/utils/embedIds'
 
 function YouTube({ id, url, title = 'YouTube video' }) {

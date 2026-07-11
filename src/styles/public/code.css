@@ -10,10 +10,11 @@
 }
 
 .code-block-shell {
-  margin: 28px 0;
+  margin: 1.5em 0;
   border: 1px solid var(--code-border);
-  border-radius: 8px;
+  border-radius: 4px;
   overflow: hidden;
+  background: var(--code-bg-bottom);
 }
 
 .code-block-toolbar {
@@ -21,7 +22,7 @@
   justify-content: space-between;
   align-items: center;
   gap: 12px;
-  padding: 10px 16px;
+  padding: 8px 12px;
   border-bottom: 1px solid var(--code-border);
   background: color-mix(in srgb, var(--code-bg-top) 82%, var(--bg-elev) 18%);
   color: var(--text-muted);
@@ -41,18 +42,18 @@
   align-items: center;
   justify-content: center;
   border: 1px solid var(--control-border);
-  border-radius: 6px;
+  border-radius: 4px;
   background: var(--bg-elev);
   color: var(--control-text);
-  padding: 6px;
+  padding: 5px;
   font: inherit;
   cursor: pointer;
   transition: color 120ms ease, border-color 120ms ease, background-color 120ms ease;
 }
 
 .copy-button svg {
-  width: 16px;
-  height: 16px;
+  width: 15px;
+  height: 15px;
   display: block;
 }
 
@@ -69,7 +70,7 @@
 
 .code-block {
   margin: 0;
-  padding: 14px 18px;
+  padding: 14px 16px;
   overflow-x: auto;
   border: 0;
   border-radius: 0;
@@ -86,23 +87,23 @@
 .code-block code {
   display: block;
   font-family: var(--font-mono);
-  font-size: clamp(15px, 0.9em, 16px);
+  font-size: clamp(14px, 0.88em, 15px);
   font-weight: 500;
-  line-height: 1;
-  letter-spacing: 0.015em;
+  line-height: 1.35;
+  letter-spacing: 0.01em;
   font-variant-ligatures: none;
   background: none;
 }
 
 .code-block .line {
   display: block;
-  line-height: 1;
+  line-height: 1.35;
   margin: 0;
   padding: 0;
 }
 
 .code-block .line:empty {
-  display: none;
+  height: 1.35em;
 }
 
 .code-block.shiki code span {

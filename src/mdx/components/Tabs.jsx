@@ -1,3 +1,4 @@
+import '@/styles/public/mdx/tabs.css'
 import { Children, cloneElement, useState } from 'react'
 
 function Tabs({ children }) {

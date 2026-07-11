@@ -1,0 +1,50 @@
+/* Banner = same language as Callout (no box fill) */
+.mdx-banner {
+  margin: 0.5em 0;
+  padding: 0 0 0 16px;
+  border: 0;
+  border-left: 2px solid var(--text-muted);
+  border-radius: 0;
+  background: transparent;
+}
+
+.mdx-banner--warn,
+.mdx-banner--warning {
+  border-left-color: #d97706;
+}
+
+.mdx-banner--danger,
+.mdx-banner--error {
+  border-left-color: #dc2626;
+}
+
+.mdx-banner--success {
+  border-left-color: #059669;
+}
+
+:root[data-theme='dark'] .mdx-banner--warn,
+:root[data-theme='dark'] .mdx-banner--warning {
+  border-left-color: #fbbf24;
+}
+
+:root[data-theme='dark'] .mdx-banner--danger,
+:root[data-theme='dark'] .mdx-banner--error {
+  border-left-color: #f87171;
+}
+
+:root[data-theme='dark'] .mdx-banner--success {
+  border-left-color: #34d399;
+}
+
+.mdx-banner-body {
+  color: var(--text);
+  line-height: 1.65;
+}
+
+.mdx-banner-body > :first-child {
+  margin-top: 0;
+}
+
+.mdx-banner-body > :last-child {
+  margin-bottom: 0;
+}

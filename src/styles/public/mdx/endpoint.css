@@ -1,0 +1,347 @@
+.mdx-endpoint {
+  margin: 0.35em 0;
+  border: 1px solid var(--code-border);
+  border-radius: 4px;
+  overflow: hidden;
+  background: var(--code-bg-bottom);
+}
+
+/* .prose is grid+gap — pull stacked endpoints closer */
+.prose > .mdx-endpoint + .mdx-endpoint {
+  margin-top: -6px;
+}
+
+.mdx-endpoint-bar {
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 12px;
+  font-family: var(--font-mono);
+  line-height: 1.25;
+  list-style: none;
+}
+
+.mdx-endpoint > summary.mdx-endpoint-bar {
+  display: flex;
+  cursor: pointer;
+  user-select: none;
+}
+
+.mdx-endpoint > summary.mdx-endpoint-bar::-webkit-details-marker,
+.mdx-endpoint > summary.mdx-endpoint-bar::marker {
+  display: none;
+  content: '';
+}
+
+.mdx-endpoint-method {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  min-width: 3.75rem;
+  height: 1.5rem;
+  padding: 0 8px;
+  border: 1px solid transparent;
+  border-radius: 4px;
+  font-family: var(--font-sans);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  line-height: 1;
+  text-transform: uppercase;
+}
+
+/* Swagger-style method colors */
+.mdx-endpoint-method--get {
+  color: #1d4ed8;
+  border-color: color-mix(in srgb, #3b82f6 40%, var(--border));
+  background: color-mix(in srgb, #3b82f6 14%, transparent);
+}
+
+.mdx-endpoint-method--post {
+  color: #047857;
+  border-color: color-mix(in srgb, #10b981 40%, var(--border));
+  background: color-mix(in srgb, #10b981 14%, transparent);
+}
+
+.mdx-endpoint-method--put {
+  color: #c2410c;
+  border-color: color-mix(in srgb, #f97316 42%, var(--border));
+  background: color-mix(in srgb, #f97316 14%, transparent);
+}
+
+.mdx-endpoint-method--patch {
+  color: #0f766e;
+  border-color: color-mix(in srgb, #14b8a6 40%, var(--border));
+  background: color-mix(in srgb, #14b8a6 14%, transparent);
+}
+
+.mdx-endpoint-method--delete {
+  color: #b91c1c;
+  border-color: color-mix(in srgb, #ef4444 40%, var(--border));
+  background: color-mix(in srgb, #ef4444 12%, transparent);
+}
+
+.mdx-endpoint-method--head {
+  color: #6d28d9;
+  border-color: color-mix(in srgb, #8b5cf6 40%, var(--border));
+  background: color-mix(in srgb, #8b5cf6 14%, transparent);
+}
+
+.mdx-endpoint-method--options {
+  color: #1e40af;
+  border-color: color-mix(in srgb, #6366f1 40%, var(--border));
+  background: color-mix(in srgb, #6366f1 14%, transparent);
+}
+
+:root[data-theme='dark'] .mdx-endpoint-method--get {
+  color: #93c5fd;
+  border-color: color-mix(in srgb, #60a5fa 45%, var(--border));
+  background: color-mix(in srgb, #3b82f6 18%, transparent);
+}
+
+:root[data-theme='dark'] .mdx-endpoint-method--post {
+  color: #6ee7b7;
+  border-color: color-mix(in srgb, #34d399 45%, var(--border));
+  background: color-mix(in srgb, #10b981 18%, transparent);
+}
+
+:root[data-theme='dark'] .mdx-endpoint-method--put {
+  color: #fdba74;
+  border-color: color-mix(in srgb, #fb923c 45%, var(--border));
+  background: color-mix(in srgb, #f97316 18%, transparent);
+}
+
+:root[data-theme='dark'] .mdx-endpoint-method--patch {
+  color: #5eead4;
+  border-color: color-mix(in srgb, #2dd4bf 45%, var(--border));
+  background: color-mix(in srgb, #14b8a6 18%, transparent);
+}
+
+:root[data-theme='dark'] .mdx-endpoint-method--delete {
+  color: #fca5a5;
+  border-color: color-mix(in srgb, #f87171 45%, var(--border));
+  background: color-mix(in srgb, #ef4444 16%, transparent);
+}
+
+:root[data-theme='dark'] .mdx-endpoint-method--head {
+  color: #c4b5fd;
+  border-color: color-mix(in srgb, #a78bfa 45%, var(--border));
+  background: color-mix(in srgb, #8b5cf6 18%, transparent);
+}
+
+:root[data-theme='dark'] .mdx-endpoint-method--options {
+  color: #a5b4fc;
+  border-color: color-mix(in srgb, #818cf8 45%, var(--border));
+  background: color-mix(in srgb, #6366f1 18%, transparent);
+}
+
+.mdx-endpoint-path {
+  flex: 0 1 auto;
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  font-family: var(--font-mono);
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 1.25;
+  color: var(--text);
+  background: transparent;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.mdx-endpoint-summary {
+  flex: 0 1 auto;
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  font-family: var(--font-sans);
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 1.25;
+  color: var(--text-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.mdx-endpoint-toggle {
+  flex: 0 0 auto;
+  display: block;
+  width: 0.4rem;
+  height: 0.4rem;
+  margin-left: auto;
+  border-right: 1.5px solid var(--text-muted);
+  border-bottom: 1.5px solid var(--text-muted);
+  transform: rotate(45deg);
+  transition: transform 0.15s ease;
+}
+
+.mdx-endpoint[open] > .mdx-endpoint-bar .mdx-endpoint-toggle {
+  transform: rotate(225deg);
+}
+
+.mdx-endpoint-body {
+  margin: 0;
+  padding: 12px 14px 14px;
+  border-top: 1px solid var(--code-border);
+  color: var(--text-body);
+  font-size: 0.95em;
+  line-height: 1.65;
+  background: color-mix(in srgb, var(--bg-spot) 55%, transparent);
+}
+
+.mdx-endpoint-body > :first-child {
+  margin-top: 0;
+}
+
+.mdx-endpoint-body > :last-child {
+  margin-bottom: 0;
+}
+
+/* Swagger-lite sections */
+.mdx-endpoint-section {
+  margin: 1.1em 0 0;
+  padding: 0;
+  border: 0;
+}
+
+.mdx-endpoint-section:first-child {
+  margin-top: 0.35em;
+}
+
+.mdx-endpoint-section-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 8px 12px;
+  margin-bottom: 8px;
+}
+
+.mdx-endpoint-section-title {
+  margin: 0 0 8px;
+  padding: 0;
+  border: 0;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-subtle);
+}
+
+.mdx-endpoint-section-head .mdx-endpoint-section-title {
+  margin-bottom: 0;
+}
+
+.mdx-endpoint-content-type {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  font-family: var(--font-mono);
+  font-size: 0.8em;
+  font-weight: 500;
+  color: var(--text-muted);
+  background: transparent;
+}
+
+.mdx-endpoint-section-body > :first-child {
+  margin-top: 0;
+}
+
+.mdx-endpoint-section-body > :last-child {
+  margin-bottom: 0;
+}
+
+.mdx-endpoint-section .mdx-fields,
+.mdx-endpoint-params {
+  margin: 0;
+  gap: 12px;
+}
+
+.mdx-endpoint-responses {
+  display: grid;
+  gap: 8px;
+}
+
+.mdx-endpoint-response {
+  border: 1px solid var(--code-border);
+  border-radius: 4px;
+  overflow: hidden;
+  background: color-mix(in srgb, var(--bg-elev) 40%, transparent);
+}
+
+.mdx-endpoint-response-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 8px 12px;
+  padding: 8px 10px;
+}
+
+.mdx-endpoint-status {
+  flex: 0 0 auto;
+  min-width: 2.75rem;
+  font-family: var(--font-mono);
+  font-size: 0.85em;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: var(--text-muted);
+}
+
+.mdx-endpoint-response--success .mdx-endpoint-status {
+  color: var(--accent);
+}
+
+.mdx-endpoint-response--redirect .mdx-endpoint-status {
+  color: #2563eb;
+}
+
+:root[data-theme='dark'] .mdx-endpoint-response--redirect .mdx-endpoint-status {
+  color: #60a5fa;
+}
+
+.mdx-endpoint-response--client .mdx-endpoint-status {
+  color: #d97706;
+}
+
+:root[data-theme='dark'] .mdx-endpoint-response--client .mdx-endpoint-status {
+  color: #fbbf24;
+}
+
+.mdx-endpoint-response--server .mdx-endpoint-status {
+  color: #dc2626;
+}
+
+:root[data-theme='dark'] .mdx-endpoint-response--server .mdx-endpoint-status {
+  color: #f87171;
+}
+
+.mdx-endpoint-response-desc {
+  min-width: 0;
+  font-size: 0.92em;
+  color: var(--text-body);
+}
+
+.mdx-endpoint-response-body {
+  padding: 0 10px 10px;
+  border-top: 1px solid var(--code-border);
+  padding-top: 10px;
+}
+
+.mdx-endpoint-response-body > :first-child {
+  margin-top: 0;
+}
+
+.mdx-endpoint-response-body > :last-child {
+  margin-bottom: 0;
+}
+
+/* Code blocks inside endpoint stay tight */
+.mdx-endpoint .code-block-shell {
+  margin: 0.75em 0 0;
+}

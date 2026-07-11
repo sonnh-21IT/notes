@@ -1,0 +1,66 @@
+.mdx-compare {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 14px;
+  margin: 1.4em 0;
+  border: 0;
+}
+
+@media (min-width: 640px) {
+  .mdx-compare {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    column-gap: 20px;
+  }
+}
+
+.mdx-compare-item {
+  min-width: 0;
+  padding: 0 0 0 12px;
+  border-left: 2px solid var(--border);
+}
+
+.mdx-compare-label {
+  margin: 0 0 6px;
+  font-size: 12px;
+  font-weight: 650;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--text);
+}
+
+.mdx-compare-body {
+  color: var(--text-body);
+  font-size: 0.95em;
+  line-height: 1.55;
+}
+
+.mdx-compare-body > :first-child {
+  margin-top: 0;
+}
+
+.mdx-compare-body > :last-child {
+  margin-bottom: 0;
+}
+
+.prose .mdx-compare-body h2,
+.prose .mdx-compare-body h3,
+.prose .mdx-compare-body h4 {
+  margin-top: 0;
+  font-size: 1em;
+}
+
+.mdx-column .mdx-compare {
+  margin: 0.15em 0 0;
+  gap: 12px;
+}
+
+@media (min-width: 640px) {
+  .mdx-column .mdx-compare {
+    grid-template-columns: 1fr;
+  }
+}
+
+.mdx-column .mdx-compare-item {
+  padding-left: 0;
+  border-left: 0;
+}

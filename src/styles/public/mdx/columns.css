@@ -1,0 +1,86 @@
+.mdx-columns {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.25rem;
+  margin: 1.5em 0;
+  width: 100%;
+  min-width: 0;
+}
+
+@media (min-width: 640px) {
+  .mdx-columns {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1.25rem 1.5rem;
+    align-items: start;
+  }
+}
+
+.mdx-column {
+  min-width: 0;
+  padding: 0 0 0 14px;
+  border: 0;
+  border-left: 2px solid var(--border);
+}
+
+.prose .mdx-column > :first-child,
+.mdx-column > :first-child {
+  margin-top: 0;
+}
+
+.prose .mdx-column > :last-child,
+.mdx-column > :last-child {
+  margin-bottom: 0;
+}
+
+/* Column headings read as section labels */
+.prose .mdx-column > h2:first-child,
+.prose .mdx-column > h3:first-child,
+.prose .mdx-column > h4:first-child {
+  margin: 0 0 10px;
+  font-size: 12px;
+  font-weight: 650;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  line-height: 1.35;
+  color: var(--text-subtle);
+}
+
+.prose .mdx-column h2,
+.prose .mdx-column h3,
+.prose .mdx-column h4 {
+  margin-top: 0.85em;
+  font-size: 1em;
+  font-weight: 650;
+  letter-spacing: normal;
+  text-transform: none;
+  color: var(--text);
+}
+
+.prose .mdx-column ul,
+.prose .mdx-column ol {
+  margin: 0;
+}
+
+.prose .mdx-column li {
+  margin: 0.25em 0;
+  color: var(--text-body);
+}
+
+.mdx-column .mdx-cards,
+.mdx-column .mdx-compare,
+.mdx-column .mdx-files,
+.mdx-column .mdx-window {
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
+/* Tree + preview: less chrome collision */
+.mdx-accordion-body > .mdx-columns {
+  margin: 0.35em 0 0;
+  gap: 0.85rem 1rem;
+}
+
+.mdx-accordion-body .mdx-column {
+  padding-left: 10px;
+}
+

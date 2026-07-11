@@ -79,11 +79,11 @@
 
 .prose table {
   width: 100%;
+  max-width: 100%;
+  margin: 0.25em 0;
   border-collapse: collapse;
   font-size: 0.94em;
-  display: block;
-  overflow-x: auto;
-  -webkit-overflow-scrolling: touch;
+  line-height: 1.5;
 }
 
 .prose th,
@@ -91,6 +91,7 @@
   padding: 10px 12px;
   border: 1px solid var(--border);
   text-align: left;
+  vertical-align: top;
 }
 
 .prose th {
@@ -101,10 +102,14 @@
 
 .prose td {
   color: var(--text);
+  background: transparent;
+}
+
+.prose thead th {
+  border-bottom-color: var(--border);
 }
 
 .prose input[type='checkbox'] {
-  margin-right: 8px;
   accent-color: var(--accent);
 }
 
@@ -176,22 +181,31 @@
   margin-top: 8px;
 }
 
-/* GFM task lists */
+/* GFM task lists — remark wraps checkbox + label in <p> */
 .prose ul.contains-task-list {
   list-style: none;
   padding-left: 0;
 }
 
 .prose li.task-list-item {
-  display: flex;
-  align-items: flex-start;
-  gap: 8px;
   list-style: none;
+  margin: 6px 0;
 }
 
-.prose li.task-list-item > input[type='checkbox'] {
-  margin: 0.35em 0 0;
-  flex-shrink: 0;
+.prose li.task-list-item > p {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.85em;
+  margin: 0;
+}
+
+.prose li.task-list-item input[type='checkbox'] {
+  flex: 0 0 auto;
+  width: 1em;
+  height: 1em;
+  margin: calc((1em * 1.75 - 1em) / 2) 0.15em 0 0;
+  padding: 0;
+  accent-color: var(--accent);
 }
 
 .prose em {
@@ -228,11 +242,11 @@
 }
 
 .prose pre:not(.code-block) {
-  margin: 0;
-  padding: 14px 18px;
+  margin: 1.5em 0;
+  padding: 14px 16px;
   overflow-x: auto;
   border: 1px solid var(--code-border);
-  border-radius: 8px;
+  border-radius: 4px;
   background: var(--code-bg-bottom);
   font-family: var(--font-mono);
   font-size: 0.9em;

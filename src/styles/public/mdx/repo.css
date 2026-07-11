@@ -1,0 +1,37 @@
+.mdx-repo {
+  display: grid;
+  gap: 2px;
+  margin: 0.35em 0;
+  padding: 0;
+  border: 0;
+  color: inherit;
+  text-decoration: none !important;
+}
+
+/* .prose is grid+gap — pull stacked repos closer */
+.prose > .mdx-repo + .mdx-repo {
+  margin-top: -6px;
+}
+
+.prose a.mdx-repo,
+.prose a.mdx-repo:hover {
+  color: inherit;
+  text-decoration: none !important;
+}
+
+.mdx-repo-title {
+  font-weight: 650;
+  color: var(--link);
+}
+
+.mdx-repo:hover .mdx-repo-title {
+  color: var(--link-hover);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.mdx-repo-desc {
+  color: var(--text-muted);
+  font-size: 0.95em;
+  line-height: 1.55;
+}

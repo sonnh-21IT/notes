@@ -38,6 +38,8 @@ supabase/
 | `ui/` | Site shell or generic UI used anywhere | `SiteHeader`, page skeletons (DB waits), `PageMeta`, `ThemeToggle` |
 | `shared/` | Domain UI imported by **2+ features** (public + admin) | `NotesFilterBar` |
 | `mdx/` | MDX pipeline and article rendering | `MdxBody`, `CodeBlock`, `ArticleHeader` |
+
+MDX UI tags (`Callout`, `Cards`, `Steps`, …): see [components.md](components.md).
 | `admin/components/` | Admin-only UI | `AdminField`, `AdminCoverImageField` |
 
 Matching CSS for `shared/` components lives in `styles/shared/` (not under `public/`).
@@ -192,7 +194,7 @@ GitHub Actions needs repository secrets: `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANO
 ## Code quality
 
 - **Lint:** ESLint 10 flat config with React Hooks rules
-- **Tests:** Vitest on pure logic (`validation`, `formDirty`, `slugify`, cover helpers) — no component harness
+- **Tests:** Vitest under `tests/` (mdx, utils, admin, data) — no component harness
 - **CI:** GitHub Actions runs lint + test before every Pages deploy
 - **Patterns:** Data facades, editor hooks (`useAdmin*Editor`, `useAdminSettings`), lazy routes, route `errorElement`
 

@@ -1,0 +1,21 @@
+.mdx-empty-state {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+}
+
+.mdx-empty-state .content-label {
+  margin: 0;
+}
+
+.mdx-empty-state .content-title {
+  margin: 0;
+}
+
+.mdx-empty-state .content-lead {
+  margin: 0;
+  max-width: 36rem;
+}

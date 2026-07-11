@@ -1,0 +1,13 @@
+.mdx-kbd {
+  display: inline-block;
+  padding: 1px 6px;
+  border: 1px solid var(--border);
+  border-bottom-width: 2px;
+  border-radius: 0;
+  font-family: var(--font-mono, ui-monospace, SFMono-Regular, Menlo, monospace);
+  font-size: 0.82em;
+  line-height: 1.35;
+  color: var(--text-muted);
+  background: transparent;
+  white-space: nowrap;
+}

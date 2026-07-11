@@ -1,0 +1,64 @@
+.mdx-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 0.35em 0 1em;
+}
+
+.mdx-badge {
+  display: inline-flex;
+  align-items: center;
+  width: max-content;
+  max-width: 100%;
+  margin: 0;
+  padding: 6px 14px;
+  border: 0;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  line-height: 1.35;
+  color: var(--accent);
+  background: var(--accent-fill);
+  vertical-align: middle;
+  justify-self: start;
+}
+
+.mdx-badge--green,
+.mdx-badge--success {
+  color: #059669;
+  background: color-mix(in srgb, #059669 14%, transparent);
+}
+
+.mdx-badge--red,
+.mdx-badge--danger {
+  color: #dc2626;
+  background: color-mix(in srgb, #dc2626 14%, transparent);
+}
+
+.mdx-badge--yellow,
+.mdx-badge--warning {
+  color: #b45309;
+  background: color-mix(in srgb, #d97706 14%, transparent);
+}
+
+.mdx-badge--blue,
+.mdx-badge--info {
+  color: var(--accent);
+  background: var(--accent-fill);
+}
+
+:root[data-theme='dark'] .mdx-badge--green,
+:root[data-theme='dark'] .mdx-badge--success {
+  color: #34d399;
+}
+
+:root[data-theme='dark'] .mdx-badge--red,
+:root[data-theme='dark'] .mdx-badge--danger {
+  color: #f87171;
+}
+
+:root[data-theme='dark'] .mdx-badge--yellow,
+:root[data-theme='dark'] .mdx-badge--warning {
+  color: #fbbf24;
+}
