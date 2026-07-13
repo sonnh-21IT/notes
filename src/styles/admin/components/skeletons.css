@@ -1,18 +1,18 @@
 /* Admin skeletons */
 .sk--admin-eyebrow {
   width: 3.5rem;
-  height: 0.7rem;
+  height: 0.85rem;
 }
 
 .sk--admin-title {
   width: min(14rem, 70%);
-  height: 1.75rem;
+  height: 1.9rem;
   margin-top: 6px;
 }
 
 .sk--admin-desc {
   width: min(22rem, 90%);
-  height: 0.85rem;
+  height: 1rem;
   margin-top: 8px;
 }
 
@@ -36,12 +36,12 @@
 
 .sk--admin-row-title {
   width: min(16rem, 60%);
-  height: 1rem;
+  height: 1.2rem;
 }
 
 .sk--admin-row-meta {
   width: 12rem;
-  height: 0.75rem;
+  height: 0.95rem;
   margin-top: 6px;
 }
 
@@ -53,7 +53,7 @@
 
 .sk--admin-label {
   width: 5rem;
-  height: 0.8rem;
+  height: 0.95rem;
 }
 
 .sk--admin-input {
@@ -91,7 +91,7 @@
 
 .sk--admin-crumb {
   width: 10rem;
-  height: 0.85rem;
+  height: 1rem;
 }
 
 .admin-list-row--skeleton {

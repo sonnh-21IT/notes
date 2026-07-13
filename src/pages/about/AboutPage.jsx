@@ -4,12 +4,19 @@ import PageLoadState from '@/ui/PageLoadState'
 import PageMeta from '@/ui/PageMeta'
 import DbLoadingScreen from '@/ui/DbLoadingScreen'
 import { AboutPageSkeleton, AboutPinnedSkeleton } from '@/ui/skeletons'
+import { useSyncedReveal } from '@/hooks/useSyncedReveal'
 import { usePageContent, usePinnedNotes } from '@/hooks/usePageContent'
 
 function AboutPage() {
-  const { loading, error, data: aboutContent } = usePageContent('about')
+  const {
+    loading,
+    error,
+    data: aboutContent,
+    isInitialLoading: aboutLoading,
+  } = usePageContent('about')
   const pinned = usePinnedNotes({ limit: 5 })
   const pinnedNotes = pinned.data ?? []
+  const revealReady = useSyncedReveal(aboutLoading, pinned.isInitialLoading)
 
   return (
     <>
@@ -23,11 +30,16 @@ function AboutPage() {
           error={error}
           hasData={Boolean(aboutContent)}
           skeleton={<AboutPageSkeleton />}
+          ready={revealReady}
         >
           <MdxBody component={aboutContent?.MdxContent} empty="about" />
         </PageLoadState>
 
-        <DbLoadingScreen loading={pinned.isInitialLoading} skeleton={<AboutPinnedSkeleton />}>
+        <DbLoadingScreen
+          loading={pinned.isInitialLoading}
+          skeleton={<AboutPinnedSkeleton />}
+          ready={revealReady}
+        >
           {pinnedNotes.length > 0 ? (
             <section className="content-section about-pinned-notes" aria-label="Pinned notes">
               <h2 className="content-section-title">Pinned notes</h2>

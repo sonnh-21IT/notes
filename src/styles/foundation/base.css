@@ -89,20 +89,20 @@
 .sk--content-title,
 .sk--prose-h1 {
   width: min(85%, 28rem);
-  height: clamp(1.6rem, 3.2vw, 2.6rem);
+  height: clamp(1.85rem, 3.4vw, 2.85rem);
 }
 
 .sk--prose-h2,
 .sk--section-title {
   width: min(55%, 16rem);
-  height: clamp(1.35rem, 2.4vw, 1.85rem);
+  height: clamp(1.5rem, 2.6vw, 2rem);
   margin-top: 8px;
 }
 
 .sk--prose-line {
   width: 100%;
   max-width: 650px;
-  height: 0.95rem;
+  height: 1.2rem;
 }
 
 .sk--prose-line-mid {
@@ -116,33 +116,33 @@
 .sk--meta-inline {
   display: inline-block;
   width: 5.5rem;
-  height: 0.85rem;
+  height: 1rem;
   vertical-align: middle;
 }
 
 .sk--chip {
   display: inline-block;
   width: 4.25rem;
-  height: 1.4rem;
+  height: 1.55rem;
   border-radius: 999px;
   vertical-align: middle;
 }
 
 .sk--list-title {
   width: min(70%, 18rem);
-  height: 1.05rem;
+  height: 1.25rem;
 }
 
 .sk--list-meta {
   width: 9rem;
-  height: 0.75rem;
+  height: 0.95rem;
   margin-top: 6px;
 }
 
 .sk--list-summary {
   width: 100%;
   max-width: 36rem;
-  height: 2.6rem;
+  height: 3.1rem;
   margin-top: 8px;
 }
 

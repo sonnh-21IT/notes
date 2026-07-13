@@ -8,6 +8,7 @@ import DbLoadingScreen from '@/ui/DbLoadingScreen'
 import { NotesIntroSkeleton, NotesListSectionSkeleton } from '@/ui/skeletons'
 import { useDebouncedValue } from '@/hooks/useDebouncedValue'
 import { usePaginationState } from '@/hooks/usePaginationState'
+import { useSyncedReveal } from '@/hooks/useSyncedReveal'
 import { useCategoriesList, useNotesPage, usePageContent, useTagsList } from '@/hooks/usePageContent'
 
 const NOTES_PAGE_SIZE = 10
@@ -30,6 +31,14 @@ function NotesPage() {
     tagIds: activeTagIds,
     categoryIds: activeCategoryIds,
   })
+
+  // Fetches stay independent; skeletons dismiss together after the slowest settles.
+  const revealReady = useSyncedReveal(
+    page.isInitialLoading,
+    list.isInitialLoading,
+    tags.isInitialLoading,
+    categories.isInitialLoading,
+  )
 
   const notesPageContent = page.data
   const allTags = useMemo(() => tags.data ?? [], [tags.data])
@@ -91,6 +100,7 @@ function NotesPage() {
           error={page.error}
           hasData={Boolean(page.data)}
           skeleton={<NotesIntroSkeleton />}
+          ready={revealReady}
         >
           <MdxBody component={notesPageContent?.MdxContent} empty="notes" />
         </PageLoadState>
@@ -98,7 +108,11 @@ function NotesPage() {
         <section className="content-section notes-list-section" aria-label="Notes list">
           {listError && <p className="notes-empty">Couldn&apos;t load notes right now. Please try again.</p>}
 
-          <DbLoadingScreen loading={list.isInitialLoading} skeleton={<NotesListSectionSkeleton />}>
+          <DbLoadingScreen
+            loading={list.isInitialLoading}
+            skeleton={<NotesListSectionSkeleton />}
+            ready={revealReady}
+          >
             <div className="notes-list-controls">
               <div className="notes-toolbar">
                 <div className="notes-search-wrap">

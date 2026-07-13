@@ -1,7 +1,7 @@
 .notes-list-controls {
   display: grid;
   gap: 10px;
-  margin-bottom: 4px;
+  margin-bottom: 12px;
 }
 
 .notes-toolbar {
@@ -78,7 +78,7 @@
 }
 
 .notes-empty {
-  margin: 0;
+  margin: 12px 0 0;
   color: var(--text-muted);
   font-size: 16px;
   line-height: 1.6;
