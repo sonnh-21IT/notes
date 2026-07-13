@@ -20,6 +20,9 @@
   font-family: var(--font-mono);
   line-height: 1.25;
   list-style: none;
+  max-width: 100%;
+  min-width: 0;
+  overflow-x: auto;
 }
 
 .mdx-endpoint > summary.mdx-endpoint-bar {

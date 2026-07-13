@@ -9,7 +9,7 @@
   overflow: visible;
   width: 100%;
   max-width: 100%;
-  min-width: min(100%, 20rem);
+  min-width: 0;
 }
 
 /* media pane — same hairline as code shells */

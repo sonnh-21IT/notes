@@ -8,9 +8,17 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
 html {
-  scrollbar-gutter: stable;
   scrollbar-width: none;
+  max-width: 100%;
+  overflow-x: hidden;
+  overflow-x: clip;
 }
 
 @media (prefers-reduced-motion: no-preference) {
@@ -27,12 +35,19 @@ body {
   margin: 0;
   -ms-overflow-style: none;
   min-height: 100dvh;
+  max-width: 100%;
+  overflow-x: hidden;
+  overflow-x: clip;
 }
 
 #root {
   display: flex;
   flex-direction: column;
   min-height: 100dvh;
+  max-width: 100%;
+  min-width: 0;
+  overflow-x: hidden;
+  overflow-x: clip;
 }
 
 a {
@@ -44,4 +59,11 @@ h2,
 h3,
 p {
   margin: 0;
+}
+
+img,
+video,
+svg {
+  max-width: 100%;
+  height: auto;
 }

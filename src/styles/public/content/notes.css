@@ -18,9 +18,9 @@
 
 .notes-search-wrap {
   position: relative;
-  flex: 0 0 auto;
-  width: min(240px, 36%);
-  min-width: 140px;
+  flex: 0 1 auto;
+  width: min(240px, 42%);
+  min-width: 0;
 }
 
 .notes-search-input {

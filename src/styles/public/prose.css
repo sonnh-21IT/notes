@@ -4,6 +4,9 @@
   font-size: clamp(18px, 1.2vw, 20px);
   line-height: 1.75;
   color: var(--text-body);
+  min-width: 0;
+  max-width: 100%;
+  overflow-wrap: break-word;
 }
 
 .prose h1 {

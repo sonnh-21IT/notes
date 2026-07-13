@@ -1,13 +1,8 @@
+/* Tablet + phone: collapse chrome nav early — desktop nav often forces page-wide overflow. */
 @media (max-width: 900px) {
   .site-footer-inner {
     flex-direction: column;
     align-items: flex-start;
-  }
-}
-
-@media (max-width: 640px) {
-  .site-main {
-    padding: 32px 0 32px;
   }
 
   .site-header-inner {
@@ -24,6 +19,7 @@
     gap: 12px;
     grid-column: 1 / -1;
     min-height: 40px;
+    min-width: 0;
   }
 
   .site-brand {
@@ -48,6 +44,7 @@
     margin-top: 12px;
     padding-top: 12px;
     border-top: 1px solid var(--border-chrome);
+    max-width: 100%;
   }
 
   .site-nav.is-open {
@@ -56,15 +53,40 @@
 
   .site-logo {
     font-size: 18px;
+    overflow-wrap: anywhere;
   }
 
   .site-header .site-tagline {
     display: none;
   }
 
+  .notes-toolbar {
+    flex-wrap: wrap;
+  }
+
+  .notes-search-wrap {
+    flex: 1 1 100%;
+    width: 100%;
+    min-width: 0;
+    max-width: none;
+  }
+
+  .notes-tag-filters--scroll {
+    flex: 1 1 100%;
+    width: 100%;
+    max-width: 100%;
+  }
+}
+
+@media (max-width: 640px) {
+  .site-main {
+    padding: 32px 0 32px;
+  }
+
   .prose {
     font-size: 18px;
     line-height: 1.68;
+    overflow-wrap: break-word;
   }
 
   .prose table {
@@ -73,13 +95,19 @@
 
   .code-block-shell {
     margin: 20px 0;
+    max-width: 100%;
   }
 
   .mdx-embed {
     margin: 20px 0;
+    max-width: 100%;
   }
 
   .mdx-embed-tweet .mdx-embed-frame {
     min-height: 360px;
+  }
+
+  .content-error {
+    padding: 22px 18px 20px;
   }
 }

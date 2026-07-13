@@ -10,7 +10,9 @@
   --admin-control-focus: color-mix(in srgb, var(--accent) 16%, transparent 84%);
   display: flex;
   height: 100vh;
+  max-width: 100%;
   overflow: hidden;
+  overflow-x: clip;
   color: var(--text-body);
   background: var(--bg);
   -ms-overflow-style: none;
@@ -310,7 +312,10 @@ button.admin-sidebar-link {
 
   .admin-main {
     overflow: visible;
+    overflow-x: clip;
     padding: 20px var(--layout-gutter) 48px;
+    min-width: 0;
+    max-width: 100%;
   }
 
   .admin-main:has(.admin-form-footer--sticky, .admin-preview-actions) {

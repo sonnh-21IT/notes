@@ -95,14 +95,13 @@
   flex-wrap: wrap;
   gap: 10px;
   margin: 0;
-  padding: 12px max(
-    var(--admin-content-gutter),
-    calc((100vw - var(--admin-sidebar-w) - var(--admin-page-max, var(--admin-content-max))) / 2)
-  );
+  /* Avoid 100vw — includes scrollbar and overflows the layout on tablet. */
+  padding: 12px var(--admin-content-gutter);
   padding-bottom: max(12px, env(safe-area-inset-bottom));
   border-top: 1px solid var(--border-chrome);
   background: var(--bg-spot);
   box-sizing: border-box;
+  max-width: 100%;
 }
 
 @media (max-width: 768px) {
