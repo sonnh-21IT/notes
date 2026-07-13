@@ -1,0 +1,41 @@
+/* Sticky form toolbar */
+.admin-form-footer {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  padding-top: 4px;
+}
+
+.admin-form-footer--sticky,
+.admin-preview-actions {
+  position: fixed;
+  bottom: 0;
+  left: var(--admin-sidebar-w);
+  right: 0;
+  z-index: 10;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: 0;
+  /* Avoid 100vw — includes scrollbar and overflows the layout on tablet. */
+  padding: 12px var(--admin-content-gutter);
+  padding-bottom: max(12px, env(safe-area-inset-bottom));
+  border-top: 1px solid var(--border-chrome);
+  background: var(--bg-spot);
+  box-sizing: border-box;
+  max-width: 100%;
+}
+
+@media (max-width: 768px) {
+  .admin-form-footer--sticky,
+  .admin-preview-actions {
+    left: 0;
+    padding-left: var(--layout-gutter);
+    padding-right: var(--layout-gutter);
+  }
+}
+
+.admin-page--editor,
+.admin-page--preview {
+  --admin-page-max: 920px;
+}

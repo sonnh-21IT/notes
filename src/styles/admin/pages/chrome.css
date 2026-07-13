@@ -1,0 +1,153 @@
+/* Admin page chrome */
+.admin-page {
+  display: grid;
+  gap: 28px;
+  width: 100%;
+  max-width: var(--admin-page-max, var(--admin-content-max));
+  margin-inline: auto;
+  animation: admin-page-in 0.15s ease;
+}
+
+@keyframes admin-page-in {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+.admin-page-header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+  padding-bottom: 4px;
+}
+
+.admin-page-eyebrow {
+  margin: 0 0 6px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-subtle);
+}
+
+.admin-page-title {
+  margin: 0;
+  font-size: clamp(24px, 2.4vw, 28px);
+  font-weight: 600;
+  letter-spacing: -0.03em;
+  line-height: 1.2;
+  color: var(--text);
+}
+
+.admin-page-title-below {
+  margin-top: 10px;
+}
+
+.admin-page-desc {
+  margin: 6px 0 0;
+  max-width: 48ch;
+  font-size: 14px;
+  line-height: 1.55;
+  color: var(--text-muted);
+}
+
+.admin-page-action {
+  flex-shrink: 0;
+}
+
+.admin-breadcrumb {
+  margin: 0;
+  font-size: 13px;
+  color: var(--text-subtle);
+}
+
+.admin-breadcrumb a {
+  color: var(--link);
+  text-decoration: none;
+}
+
+.admin-breadcrumb a:hover {
+  text-decoration: underline;
+}
+
+.admin-stack {
+  display: grid;
+  gap: 20px;
+}
+
+.admin-stack--sm {
+  gap: 14px;
+}
+
+.admin-form-body {
+  display: grid;
+  gap: 24px;
+}
+
+/* RevealGate wraps async form sections — keep the same rhythm as direct form children. */
+.admin-form-body .page-load-state,
+.admin-form-body .page-load-content {
+  display: grid;
+  gap: 24px;
+  width: 100%;
+  min-width: 0;
+}
+
+.admin-section {
+  padding: 24px 0;
+  border-top: 1px solid var(--border-chrome);
+}
+
+.admin-section:first-child {
+  padding-top: 0;
+  border-top: 0;
+}
+
+.admin-section-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.admin-section-title {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  color: var(--text-muted);
+}
+
+/* ponytail: legacy class alias — restyled flat, no card chrome */
+.admin-card {
+  padding: 24px 0;
+  border-top: 1px solid var(--border-chrome);
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+.admin-card:first-child {
+  padding-top: 0;
+  border-top: 0;
+}
+
+.admin-card-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.admin-card-title {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-muted);
+}

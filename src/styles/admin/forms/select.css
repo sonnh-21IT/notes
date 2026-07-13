@@ -1,0 +1,115 @@
+/* AdminSelect */
+.admin-select-wrap {
+  position: relative;
+  width: 100%;
+  min-width: 0;
+}
+
+.admin-select-trigger {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  width: 100%;
+  text-align: left;
+  cursor: pointer;
+}
+
+.admin-select-value {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.admin-select-chevron {
+  flex-shrink: 0;
+  color: var(--text-muted);
+  transition: transform 0.15s ease;
+}
+
+.admin-select-wrap.is-open .admin-select-chevron {
+  transform: rotate(180deg);
+}
+
+.admin-select-wrap.is-open .admin-select-trigger,
+.admin-select-trigger:focus-visible {
+  outline: none;
+  border-color: color-mix(in srgb, var(--accent) 60%, var(--control-border) 40%);
+  box-shadow: 0 0 0 3px var(--admin-control-focus);
+  background: var(--bg-spot);
+}
+
+.admin-select-menu {
+  position: absolute;
+  z-index: 20;
+  top: calc(100% + 4px);
+  left: 0;
+  right: 0;
+  margin: 0;
+  padding: 4px;
+  list-style: none;
+  border: 1px solid var(--admin-control-border);
+  border-radius: var(--admin-control-radius);
+  background: var(--bg-spot);
+  box-shadow: 0 10px 28px color-mix(in srgb, var(--shadow-strong) 240%, transparent);
+  max-height: 220px;
+  overflow-y: auto;
+}
+
+.admin-select-option {
+  display: block;
+  width: 100%;
+  padding: 8px 10px;
+  border: 0;
+  border-radius: 6px;
+  font: inherit;
+  font-size: 14px;
+  line-height: 1.4;
+  text-align: left;
+  color: var(--text-body);
+  background: transparent;
+  cursor: pointer;
+  transition: background-color 0.12s ease, color 0.12s ease;
+}
+
+.admin-select-option:hover {
+  background: color-mix(in srgb, var(--border) 28%, transparent 72%);
+}
+
+.admin-select-option.is-active {
+  color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 12%, transparent 88%);
+}
+
+.admin-select-search {
+  padding: 4px 4px 6px;
+  border-bottom: 1px solid var(--border-chrome);
+}
+
+.admin-select-search-input {
+  font-size: 13px;
+  padding: 7px 10px;
+  box-shadow: none;
+}
+
+.admin-select-search-input:focus {
+  box-shadow: 0 0 0 2px var(--admin-control-focus);
+}
+
+.admin-select-option--create {
+  color: var(--accent);
+  font-weight: 500;
+}
+
+.admin-select-empty,
+.admin-select-error {
+  padding: 8px 10px;
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+.admin-select-error {
+  color: #c0392b;
+}

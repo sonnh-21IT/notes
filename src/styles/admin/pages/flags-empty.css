@@ -1,0 +1,90 @@
+/* Note flags + empty + responsive */
+.admin-empty {
+  padding: 48px 0;
+  text-align: center;
+}
+
+.admin-empty-title {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.admin-empty-desc {
+  margin: 8px auto 0;
+  max-width: 36ch;
+  font-size: 14px;
+  line-height: 1.55;
+  color: var(--text-muted);
+}
+
+.admin-empty-action {
+  margin-top: 18px;
+}
+
+.admin-auth-card {
+  width: min(100%, 380px);
+  padding: 32px 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+.admin-auth-title {
+  margin: 0 0 20px;
+  font-size: 24px;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  color: var(--text);
+}
+
+.admin-auth-subtitle {
+  margin: 0 0 16px;
+  font-size: 15px;
+  line-height: 1.55;
+  color: var(--text-muted);
+}
+
+.admin-text-link {
+  display: inline-block;
+  margin-top: 16px;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--link);
+  text-decoration: none;
+}
+
+.admin-text-link:hover {
+  text-decoration: underline;
+}
+
+@media (max-width: 768px) {
+  .admin-list-toolbar {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-list-filter {
+    min-width: 0;
+  }
+
+  .admin-status-filter {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .admin-status-chip {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .admin-list-pagination {
+    flex-wrap: wrap;
+  }
+
+  .admin-list-row {
+    flex-wrap: wrap;
+    align-items: flex-start;
+  }
+}

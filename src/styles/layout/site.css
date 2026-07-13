@@ -136,8 +136,8 @@
   display: flex;
   flex-direction: column;
   width: 100%;
+  /* Keep .container's --layout-max; only allow flex shrink on narrow viewports. */
   min-width: 0;
-  max-width: 100%;
   color: var(--text-body);
 }
 

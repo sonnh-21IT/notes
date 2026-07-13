@@ -1,0 +1,70 @@
+/* Note editor layout */
+.admin-note-status {
+  display: grid;
+  gap: 12px;
+  padding-top: 0;
+  border-top: 0;
+}
+
+.admin-note-metadata,
+.admin-note-body {
+  width: 100%;
+}
+
+.admin-note-metadata {
+  display: grid;
+  gap: 18px 28px;
+}
+
+.admin-note-meta {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px 28px;
+  width: 100%;
+}
+
+.admin-note-taxonomy {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 18px 28px;
+  align-items: start;
+  width: 100%;
+}
+
+.admin-note-status-hint {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 400;
+  color: var(--text-muted);
+}
+
+.admin-switch--compact {
+  width: auto;
+  justify-content: flex-start;
+  gap: 12px;
+}
+
+.admin-note-taxonomy > .admin-field,
+.admin-note-taxonomy > .admin-note-tags {
+  min-width: 0;
+}
+
+.admin-note-tags {
+  display: grid;
+  gap: 12px;
+  min-width: 0;
+}
+.admin-field--full {
+  grid-column: 1 / -1;
+}
+
+.admin-title-input-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.admin-title-input-row .admin-input {
+  flex: 1;
+  min-width: 0;
+}

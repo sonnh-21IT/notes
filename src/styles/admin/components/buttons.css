@@ -1,0 +1,79 @@
+/* Admin buttons */
+.admin-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 8px 14px;
+  border: 1px solid transparent;
+  border-radius: 999px;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  text-decoration: none;
+  transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+}
+
+.admin-button--primary {
+  color: #fff;
+  background: var(--accent);
+}
+
+.admin-button--primary:hover:not(:disabled) {
+  filter: brightness(1.06);
+}
+
+.admin-button--ghost {
+  color: var(--text-muted);
+  background: transparent;
+  border-color: var(--border-chrome);
+}
+
+.admin-button--ghost:hover {
+  color: var(--text);
+  border-color: var(--border);
+}
+
+.admin-button--danger {
+  color: #fff;
+  background: #b91c1c;
+}
+
+.admin-button--sm {
+  padding: 6px 10px;
+  font-size: 13px;
+}
+
+.admin-button--block {
+  width: 100%;
+}
+
+.admin-button:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.admin-icon-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border: 0;
+  border-radius: 999px;
+  color: var(--text-chrome);
+  background: transparent;
+  cursor: pointer;
+}
+
+.admin-icon-button:hover {
+  color: #b91c1c;
+  background: color-mix(in srgb, #b91c1c 8%, transparent 92%);
+}
+
+.admin-form-body > .admin-validation,
+.admin-form-body > .admin-flash {
+  margin-top: 20px;
+}

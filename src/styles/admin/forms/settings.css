@@ -1,0 +1,59 @@
+/* Settings page fields */
+.admin-settings-fields {
+  display: grid;
+  gap: 18px;
+  max-width: 40rem;
+}
+
+.admin-settings-links {
+  display: grid;
+  gap: 12px;
+  max-width: 40rem;
+  min-width: 0;
+}
+
+.admin-field-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-height: 2rem;
+}
+
+.admin-field-toolbar .admin-label {
+  margin: 0;
+}
+
+.admin-settings-links .admin-stack {
+  gap: 10px;
+  min-width: 0;
+}
+
+.admin-settings-links .admin-link-row {
+  grid-template-columns: minmax(5.5rem, 7rem) minmax(6rem, 8.5rem) minmax(0, 1fr) auto;
+  gap: 8px;
+  align-items: center;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+.admin-settings-links .admin-link-row .admin-input {
+  background: var(--admin-control-bg);
+}
+
+.admin-settings-links .admin-link-row .admin-input:focus {
+  background: var(--admin-control-bg);
+}
+
+.admin-settings-links .admin-icon-button {
+  color: var(--text-subtle);
+  flex-shrink: 0;
+}
+
+.admin-settings-links .admin-icon-button:hover {
+  color: #ef4444;
+  background: color-mix(in srgb, #ef4444 14%, transparent 86%);
+}

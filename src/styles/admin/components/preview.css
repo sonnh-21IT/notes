@@ -1,0 +1,25 @@
+/* Preview chrome */
+.admin-preview-banner {
+  padding: 0 0 0 12px;
+  border: 0;
+  border-left: 2px solid var(--accent);
+  border-radius: 0;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-muted);
+  background: transparent;
+}
+
+.admin-preview-article {
+  margin-top: 4px;
+}
+
+.admin-preview-hint {
+  margin-top: -4px;
+}
+
+.admin-preview-rendering {
+  margin: 24px 0;
+  font-size: 14px;
+  color: var(--text-muted);
+}
