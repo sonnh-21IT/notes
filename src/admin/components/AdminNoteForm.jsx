@@ -36,6 +36,7 @@ function AdminNoteForm({ form, onSubmit }) {
     setCategoryFieldError,
     creatingCategory,
     handleCreateCategory,
+    requestDeleteCategory,
     fieldErrors,
     clearFieldError,
     selectedTags,
@@ -55,6 +56,7 @@ function AdminNoteForm({ form, onSubmit }) {
     removeTag,
     toggleTag,
     selectTag,
+    requestDeleteTag,
     published,
     pinned,
     onTogglePublished,
@@ -150,6 +152,10 @@ function AdminNoteForm({ form, onSubmit }) {
                 creating={creatingCategory}
                 createError={categoryFieldError}
                 emptyLabel="None"
+                onRequestDelete={(option) => {
+                  const category = categories.find((item) => String(item.id) === String(option.value))
+                  if (category) requestDeleteCategory(category)
+                }}
               />
             </label>
           </div>
@@ -175,6 +181,8 @@ function AdminNoteForm({ form, onSubmit }) {
             onCreateTag={handleCreateTag}
             onRemoveTag={removeTag}
             onToggleTag={toggleTag}
+            onSelectTag={selectTag}
+            onRequestDeleteTag={requestDeleteTag}
             onAttachExisting={() => {
               selectTag(matchedExistingTag.id)
               setTagQuery('')

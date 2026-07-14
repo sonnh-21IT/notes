@@ -1,5 +1,6 @@
 import { useEffect, useId, useMemo, useRef, useState } from 'react'
 import { ChevronDown } from 'lucide-react'
+import AdminGestureActionButton from '@/admin/components/AdminGestureActionButton'
 
 function AdminSelect({
   value,
@@ -12,6 +13,7 @@ function AdminSelect({
   creating = false,
   createError = '',
   emptyLabel = 'None',
+  onRequestDelete,
   'aria-label': ariaLabel,
 }) {
   const [open, setOpen] = useState(false)
@@ -51,6 +53,8 @@ function AdminSelect({
     }
 
     function onPointerDown(event) {
+      // Keep select open while interacting with the fixed context menu.
+      if (event.target.closest?.('.admin-item-menu')) return
       if (!wrapRef.current?.contains(event.target)) closeMenu()
     }
 
@@ -131,17 +135,23 @@ function AdminSelect({
 
           {filteredOptions.map((option) => {
             const active = String(value) === String(option.value)
+            const deletable = Boolean(onRequestDelete) && option.value !== '' && option.value != null
             return (
               <li key={String(option.value)} role="presentation">
-                <button
-                  type="button"
+                <AdminGestureActionButton
                   role="option"
                   aria-selected={active}
                   className={`admin-select-option${active ? ' is-active' : ''}`}
+                  menuEnabled={deletable}
                   onClick={() => selectOption(option.value)}
+                  onMenuSelect={() => selectOption(option.value)}
+                  onMenuDelete={() => {
+                    onRequestDelete?.(option)
+                    closeMenu()
+                  }}
                 >
                   {option.label}
-                </button>
+                </AdminGestureActionButton>
               </li>
             )
           })}

@@ -116,6 +116,18 @@ export async function adminUpsertTag({ name }) {
   return data
 }
 
+export async function adminDeleteTag(id) {
+  const supabase = getSupabaseClient()
+  const { error } = await supabase.from('tags').delete().eq('id', id)
+  if (error) throw error
+}
+
+export async function adminDeleteCategory(id) {
+  const supabase = getSupabaseClient()
+  const { error } = await supabase.from('categories').delete().eq('id', id)
+  if (error) throw error
+}
+
 export async function adminListNotes() {
   const supabase = getSupabaseClient()
   const { data, error } = await supabase

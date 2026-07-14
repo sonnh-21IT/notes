@@ -4,11 +4,9 @@ import NotesList from '@/shared/notes/NotesList'
 import MdxBody from '@/mdx/MdxBody'
 import PageLoadState from '@/ui/PageLoadState'
 import PageMeta from '@/ui/PageMeta'
-import DbLoadingScreen from '@/ui/DbLoadingScreen'
-import { NotesIntroSkeleton, NotesListSectionSkeleton } from '@/ui/skeletons'
+import { NotesPageSkeleton } from '@/ui/skeletons'
 import { useDebouncedValue } from '@/hooks/useDebouncedValue'
 import { usePaginationState } from '@/hooks/usePaginationState'
-import { useSyncedReveal } from '@/hooks/useSyncedReveal'
 import { useCategoriesList, useNotesPage, usePageContent, useTagsList } from '@/hooks/usePageContent'
 
 const NOTES_PAGE_SIZE = 10
@@ -32,13 +30,11 @@ function NotesPage() {
     categoryIds: activeCategoryIds,
   })
 
-  // Fetches stay independent; skeletons dismiss together after the slowest settles.
-  const revealReady = useSyncedReveal(
-    page.isInitialLoading,
-    list.isInitialLoading,
-    tags.isInitialLoading,
-    categories.isInitialLoading,
-  )
+  // Parallel fetches; one skeleton until the slowest initial load settles.
+  const bootstrapping = page.isInitialLoading
+    || list.isInitialLoading
+    || tags.isInitialLoading
+    || categories.isInitialLoading
 
   const notesPageContent = page.data
   const allTags = useMemo(() => tags.data ?? [], [tags.data])
@@ -94,25 +90,18 @@ function NotesPage() {
         title={notesPageContent?.title || 'Notes'}
         path="/notes"
       />
-      <section className="page-stack content notes-page">
-        <PageLoadState
-          loading={page.isInitialLoading}
-          error={page.error}
-          hasData={Boolean(page.data)}
-          skeleton={<NotesIntroSkeleton />}
-          ready={revealReady}
-        >
+      <PageLoadState
+        loading={bootstrapping}
+        error={page.error}
+        hasData={Boolean(page.data) && !bootstrapping}
+        skeleton={<NotesPageSkeleton />}
+      >
+        <section className="page-stack content notes-page">
           <MdxBody component={notesPageContent?.MdxContent} empty="notes" />
-        </PageLoadState>
 
-        <section className="content-section notes-list-section" aria-label="Notes list">
-          {listError && <p className="notes-empty">Couldn&apos;t load notes right now. Please try again.</p>}
+          <section className="content-section notes-list-section" aria-label="Notes list">
+            {listError && <p className="notes-empty">Couldn&apos;t load notes right now. Please try again.</p>}
 
-          <DbLoadingScreen
-            loading={list.isInitialLoading}
-            skeleton={<NotesListSectionSkeleton />}
-            ready={revealReady}
-          >
             <div className="notes-list-controls">
               <div className="notes-toolbar">
                 <div className="notes-search-wrap">
@@ -157,34 +146,34 @@ function NotesPage() {
             ) : (
               <NotesList notes={notes} loading={list.isValidating && !list.isInitialLoading} />
             )}
-          </DbLoadingScreen>
 
-          {!listError && pageCount >= 1 && (
-            <nav className="notes-pagination" aria-label="Notes pagination">
-              <button
-                type="button"
-                className="notes-pagination-btn"
-                disabled={pageNumber <= 1 || list.loading}
-                onClick={() => setPageNumber((current) => current - 1)}
-              >
-                Previous
-              </button>
-              <span className="notes-pagination-status">
-                Page {pageNumber} of {pageCount}
-                {total > 0 && ` (${total} notes)`}
-              </span>
-              <button
-                type="button"
-                className="notes-pagination-btn"
-                disabled={pageNumber >= pageCount || list.loading}
-                onClick={() => setPageNumber((current) => current + 1)}
-              >
-                Next
-              </button>
-            </nav>
-          )}
+            {!listError && pageCount >= 1 && (
+              <nav className="notes-pagination" aria-label="Notes pagination">
+                <button
+                  type="button"
+                  className="notes-pagination-btn"
+                  disabled={pageNumber <= 1 || list.loading}
+                  onClick={() => setPageNumber((current) => current - 1)}
+                >
+                  Previous
+                </button>
+                <span className="notes-pagination-status">
+                  Page {pageNumber} of {pageCount}
+                  {total > 0 && ` (${total} notes)`}
+                </span>
+                <button
+                  type="button"
+                  className="notes-pagination-btn"
+                  disabled={pageNumber >= pageCount || list.loading}
+                  onClick={() => setPageNumber((current) => current + 1)}
+                >
+                  Next
+                </button>
+              </nav>
+            )}
+          </section>
         </section>
-      </section>
+      </PageLoadState>
     </>
   )
 }

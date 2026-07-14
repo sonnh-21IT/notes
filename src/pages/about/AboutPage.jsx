@@ -2,9 +2,7 @@ import MdxBody from '@/mdx/MdxBody'
 import NotesList from '@/shared/notes/NotesList'
 import PageLoadState from '@/ui/PageLoadState'
 import PageMeta from '@/ui/PageMeta'
-import DbLoadingScreen from '@/ui/DbLoadingScreen'
-import { AboutPageSkeleton, AboutPinnedSkeleton } from '@/ui/skeletons'
-import { useSyncedReveal } from '@/hooks/useSyncedReveal'
+import { AboutPageSkeleton } from '@/ui/skeletons'
 import { usePageContent, usePinnedNotes } from '@/hooks/usePageContent'
 
 function AboutPage() {
@@ -16,7 +14,7 @@ function AboutPage() {
   } = usePageContent('about')
   const pinned = usePinnedNotes({ limit: 5 })
   const pinnedNotes = pinned.data ?? []
-  const revealReady = useSyncedReveal(aboutLoading, pinned.isInitialLoading)
+  const bootstrapping = aboutLoading || pinned.isInitialLoading
 
   return (
     <>
@@ -24,22 +22,15 @@ function AboutPage() {
         title={aboutContent?.title || 'About'}
         path="/about"
       />
-      <article className="page-stack content about-page">
-        <PageLoadState
-          loading={loading}
-          error={error}
-          hasData={Boolean(aboutContent)}
-          skeleton={<AboutPageSkeleton />}
-          ready={revealReady}
-        >
+      <PageLoadState
+        loading={bootstrapping || loading}
+        error={error}
+        hasData={Boolean(aboutContent) && !bootstrapping}
+        skeleton={<AboutPageSkeleton />}
+      >
+        <article className="page-stack content about-page">
           <MdxBody component={aboutContent?.MdxContent} empty="about" />
-        </PageLoadState>
 
-        <DbLoadingScreen
-          loading={pinned.isInitialLoading}
-          skeleton={<AboutPinnedSkeleton />}
-          ready={revealReady}
-        >
           {pinnedNotes.length > 0 ? (
             <section className="content-section about-pinned-notes" aria-label="Pinned notes">
               <h2 className="content-section-title">Pinned notes</h2>
@@ -49,8 +40,8 @@ function AboutPage() {
               <NotesList notes={pinnedNotes} />
             </section>
           ) : null}
-        </DbLoadingScreen>
-      </article>
+        </article>
+      </PageLoadState>
     </>
   )
 }

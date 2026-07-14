@@ -97,6 +97,9 @@
   color: var(--text-muted);
   background: color-mix(in srgb, var(--border) 22%, transparent 78%);
   cursor: pointer;
+  user-select: none;
+  touch-action: manipulation;
+  -webkit-touch-callout: none;
 }
 
 .admin-tag-option:hover {

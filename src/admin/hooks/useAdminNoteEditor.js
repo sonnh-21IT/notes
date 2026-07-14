@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { useLocation, useNavigate, useParams } from 'react-router-dom'
 import { useAdminToast } from '@/admin/hooks/useAdminToast'
 import useMdxPreview from '@/admin/hooks/useMdxPreview'
@@ -9,8 +10,9 @@ export function useAdminNoteEditor() {
   const location = useLocation()
   const navigate = useNavigate()
   const toast = useAdminToast()
+  const [confirm, setConfirm] = useState(null)
 
-  const form = useNoteEditorForm({ routeSlug, location, toast })
+  const form = useNoteEditorForm({ routeSlug, location, toast, setConfirm })
   const isPreview = form.view === 'preview'
   const { MdxContent, loading: mdxLoading, error: mdxError } = useMdxPreview(form.body, isPreview)
 
@@ -19,6 +21,8 @@ export function useAdminNoteEditor() {
     navigate,
     toast,
     mdxError,
+    confirm,
+    setConfirm,
   })
 
   const categoryName = form.catalog.categories.find((item) => String(item.id) === form.categoryId)?.name ?? ''
@@ -39,8 +43,8 @@ export function useAdminNoteEditor() {
     isPreview,
     isDirty: form.isDirty,
     saveDisabled,
-    confirm: actions.confirm,
-    setConfirm: actions.setConfirm,
+    confirm,
+    setConfirm,
     setView: form.setView,
     mdxPreview: { MdxContent, loading: mdxLoading, error: mdxError },
     preview: {
@@ -74,6 +78,7 @@ export function useAdminNoteEditor() {
       setCategoryFieldError: form.catalog.setCategoryFieldError,
       creatingCategory: form.catalog.creatingCategory,
       handleCreateCategory: form.catalog.handleCreateCategory,
+      requestDeleteCategory: form.catalog.requestDeleteCategory,
       fieldErrors: form.fieldErrors,
       clearFieldError: form.clearFieldError,
       selectedTags: form.catalog.selectedTags,
@@ -93,6 +98,7 @@ export function useAdminNoteEditor() {
       removeTag: form.catalog.removeTag,
       toggleTag: form.catalog.toggleTag,
       selectTag: form.catalog.selectTag,
+      requestDeleteTag: form.catalog.requestDeleteTag,
       published: form.published,
       pinned: form.pinned,
       onTogglePublished: actions.togglePublished,

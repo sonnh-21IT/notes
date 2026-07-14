@@ -17,7 +17,6 @@ import { noteFlagsToastMessage } from '@/admin/lib/noteFlags'
 import { getAuthUserId, isContentAdmin, updateNoteFlags } from '@/data/admin'
 import { invalidateNoteContent } from '@/data/content'
 import { usePaginationState } from '@/hooks/usePaginationState'
-import { useSyncedReveal } from '@/hooks/useSyncedReveal'
 import { formatArticleDate } from '@/utils/formatArticleMeta'
 
 const NOTES_PAGE_SIZE = 10
@@ -42,11 +41,9 @@ function AdminNotesListPage() {
   const notesResource = useAdminNotesList()
   const tagsResource = useAdminTagsList()
   const categoriesResource = useAdminCategoriesList()
-  const revealReady = useSyncedReveal(
-    notesResource.isInitialLoading,
-    tagsResource.isInitialLoading,
-    categoriesResource.isInitialLoading,
-  )
+  const catalogLoading = notesResource.isInitialLoading
+    || tagsResource.isInitialLoading
+    || categoriesResource.isInitialLoading
   const catalogNotes = useMemo(() => notesResource.data ?? [], [notesResource.data])
   const [overrides, setOverrides] = useState({})
   const notes = useMemo(
@@ -245,9 +242,8 @@ function AdminNotesListPage() {
       </div>
 
       <DbLoadingScreen
-        loading={notesResource.isInitialLoading}
+        loading={catalogLoading}
         skeleton={<AdminNotesListSkeleton />}
-        ready={revealReady}
       >
         {notes.length === 0 ? (
           <AdminEmptyState

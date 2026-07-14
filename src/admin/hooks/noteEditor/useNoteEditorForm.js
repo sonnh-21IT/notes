@@ -16,7 +16,7 @@ import { useDebouncedValue } from '@/hooks/useDebouncedValue'
 import { sanitizeSlugInput, slugify } from '@/utils/slugify'
 
 /** Form fields, catalog/cover, load + slug availability for the note editor. */
-export function useNoteEditorForm({ routeSlug, location, toast }) {
+export function useNoteEditorForm({ routeSlug, location, toast, setConfirm }) {
   const slugCheckRef = useRef(0)
   const isNew = routeSlug === 'new'
   const initialFields = readInitialNoteFields(routeSlug, location.state)
@@ -59,7 +59,9 @@ export function useNoteEditorForm({ routeSlug, location, toast }) {
     toast,
     selectedTagIds,
     setSelectedTagIds,
+    categoryId,
     setCategoryId,
+    setConfirm,
   })
 
   const debouncedSlug = useDebouncedValue(slug, 400)

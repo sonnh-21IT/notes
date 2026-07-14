@@ -1,9 +1,24 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
-import { listCategories, listTags, upsertCategory, upsertTag } from '@/data/admin'
+import {
+  deleteCategory,
+  deleteTag,
+  listCategories,
+  listTags,
+  upsertCategory,
+  upsertTag,
+} from '@/data/admin'
 import { invalidateCategoriesList, invalidateTagsList } from '@/data/content'
 import { findTagByName } from '@/admin/lib/noteEditorModel'
 
-export function useNoteCatalog({ routeSlug, toast, selectedTagIds, setSelectedTagIds, setCategoryId }) {
+export function useNoteCatalog({
+  routeSlug,
+  toast,
+  selectedTagIds,
+  setSelectedTagIds,
+  categoryId,
+  setCategoryId,
+  setConfirm,
+}) {
   const [categoriesLoading, setCategoriesLoading] = useState(true)
   const [categoriesFailed, setCategoriesFailed] = useState(false)
   const [tagsLoading, setTagsLoading] = useState(true)
@@ -161,6 +176,56 @@ export function useNoteCatalog({ routeSlug, toast, selectedTagIds, setSelectedTa
     handleCreateTag()
   }, [matchedExistingTag, selectTag, handleCreateTag])
 
+  const performDeleteTag = useCallback(async (tag) => {
+    setConfirm(null)
+    try {
+      await deleteTag(tag.id)
+      invalidateTagsList()
+      setAllTags((current) => current.filter((item) => item.id !== tag.id))
+      removeTag(tag.id)
+      toast.showSuccess(`Tag “${tag.name}” deleted.`)
+    } catch (err) {
+      toast.showError(err instanceof Error ? err.message : String(err))
+    }
+  }, [removeTag, setConfirm, toast])
+
+  const requestDeleteTag = useCallback((tag) => {
+    setConfirm({
+      kind: 'delete-tag',
+      title: `Delete “${tag.name}”?`,
+      description: 'This removes the tag from the catalog and from every note that uses it. This cannot be undone.',
+      tone: 'danger',
+      confirmLabel: 'Delete tag',
+      onConfirm: () => performDeleteTag(tag),
+    })
+  }, [performDeleteTag, setConfirm])
+
+  const performDeleteCategory = useCallback(async (category) => {
+    setConfirm(null)
+    try {
+      await deleteCategory(category.id)
+      invalidateCategoriesList()
+      setCategories((current) => current.filter((item) => item.id !== category.id))
+      if (String(categoryId) === String(category.id)) {
+        setCategoryId('')
+      }
+      toast.showSuccess(`Category “${category.name}” deleted.`)
+    } catch (err) {
+      toast.showError(err instanceof Error ? err.message : String(err))
+    }
+  }, [categoryId, setCategoryId, setConfirm, toast])
+
+  const requestDeleteCategory = useCallback((category) => {
+    setConfirm({
+      kind: 'delete-category',
+      title: `Delete “${category.name}”?`,
+      description: 'This removes the category from the catalog. Notes using it become uncategorized. This cannot be undone.',
+      tone: 'danger',
+      confirmLabel: 'Delete category',
+      onConfirm: () => performDeleteCategory(category),
+    })
+  }, [performDeleteCategory, setConfirm])
+
   return {
     categories,
     categoriesDisabled: categoriesLoading || categoriesFailed,
@@ -168,6 +233,7 @@ export function useNoteCatalog({ routeSlug, toast, selectedTagIds, setSelectedTa
     setCategoryFieldError,
     creatingCategory,
     handleCreateCategory,
+    requestDeleteCategory,
     selectedTags,
     tagsDisabled: tagsLoading || tagsFailed,
     tagQuery,
@@ -184,5 +250,6 @@ export function useNoteCatalog({ routeSlug, toast, selectedTagIds, setSelectedTa
     removeTag,
     toggleTag,
     selectTag,
+    requestDeleteTag,
   }
 }

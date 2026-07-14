@@ -23,50 +23,62 @@ function NoteListRowSkeleton() {
   )
 }
 
-/** About MDX body only */
-export function AboutPageSkeleton() {
+/** About — body + pinned notes as one block */
+export function AboutPageSkeleton({ rows = 3 }) {
   return (
-    <SkeletonRoot className="prose page-skeleton-prose">
-      <Sk className="sk--prose-h1" />
-      <Sk className="sk--prose-line" />
-      <Sk className="sk--prose-line" />
-      <Sk className="sk--prose-line sk--prose-line-short" />
-      <Sk className="sk--prose-h2" />
-      <Sk className="sk--prose-line" />
-      <Sk className="sk--prose-line sk--prose-line-short" />
+    <SkeletonRoot className="page-stack content about-page">
+      <div className="prose page-skeleton-prose">
+        <Sk className="sk--prose-h1" />
+        <Sk className="sk--prose-line" />
+        <Sk className="sk--prose-line" />
+        <Sk className="sk--prose-line sk--prose-line-short" />
+        <Sk className="sk--prose-h2" />
+        <Sk className="sk--prose-line" />
+        <Sk className="sk--prose-line sk--prose-line-short" />
+      </div>
+      <section className="content-section about-pinned-notes">
+        <Sk className="sk--section-title" />
+        <Sk className="sk--prose-line sk--prose-line-mid" />
+        <ul className="content-list">
+          {Array.from({ length: rows }, (_, index) => (
+            <NoteListRowSkeleton key={index} />
+          ))}
+        </ul>
+      </section>
     </SkeletonRoot>
   )
 }
 
-/** About pinned block — heading + list (independent of About MDX) */
-export function AboutPinnedSkeleton({ rows = 3 }) {
+/** Notes index — intro + search/filters + list as one block */
+export function NotesPageSkeleton({ rows = 4 }) {
   return (
-    <SkeletonRoot className="content-section about-pinned-notes">
-      <Sk className="sk--section-title" />
-      <Sk className="sk--prose-line sk--prose-line-mid" />
-      <ul className="content-list">
-        {Array.from({ length: rows }, (_, index) => (
-          <NoteListRowSkeleton key={index} />
-        ))}
-      </ul>
+    <SkeletonRoot className="page-stack content notes-page">
+      <div className="prose page-skeleton-prose">
+        <Sk className="sk--prose-h1" />
+        <Sk className="sk--prose-line sk--prose-line-mid" />
+        <Sk className="sk--prose-line sk--prose-line-short" />
+      </div>
+      <section className="content-section notes-list-section">
+        <div className="notes-list-controls">
+          <div className="notes-toolbar">
+            <div className="notes-search-wrap">
+              <Sk className="sk--notes-search" />
+            </div>
+            <div className="notes-tag-filters" aria-hidden="true">
+              <Sk className="sk--chip" />
+              <Sk className="sk--chip" />
+              <Sk className="sk--chip" />
+            </div>
+          </div>
+        </div>
+        <ul className="content-list">
+          {Array.from({ length: rows }, (_, index) => (
+            <NoteListRowSkeleton key={index} />
+          ))}
+        </ul>
+      </section>
     </SkeletonRoot>
   )
-}
-
-/** Notes index intro MDX only */
-export function NotesIntroSkeleton() {
-  return (
-    <SkeletonRoot className="prose page-skeleton-prose">
-      <Sk className="sk--prose-h1" />
-      <Sk className="sk--prose-line sk--prose-line-mid" />
-      <Sk className="sk--prose-line sk--prose-line-short" />
-    </SkeletonRoot>
-  )
-}
-
-/** @deprecated use NotesIntroSkeleton — kept name for clarity at call sites */
-export function NotesPageSkeleton() {
-  return <NotesIntroSkeleton />
 }
 
 /** Single note — all primary content is from DB */
@@ -104,44 +116,6 @@ export function ContentPageSkeleton() {
       <Sk className="sk--prose-line" />
       <Sk className="sk--prose-line sk--prose-line-short" />
     </SkeletonRoot>
-  )
-}
-
-/** Notes index — search + filter chips (shown with list skeleton so chrome isn’t half-real) */
-export function NotesControlsSkeleton() {
-  return (
-    <SkeletonRoot className="notes-list-controls">
-      <div className="notes-toolbar">
-        <div className="notes-search-wrap">
-          <Sk className="sk--notes-search" />
-        </div>
-        <div className="notes-tag-filters" aria-hidden="true">
-          <Sk className="sk--chip" />
-          <Sk className="sk--chip" />
-          <Sk className="sk--chip" />
-        </div>
-      </div>
-    </SkeletonRoot>
-  )
-}
-
-export function NotesListSkeleton({ rows = 4 }) {
-  return (
-    <SkeletonRoot as="ul" className="content-list">
-      {Array.from({ length: rows }, (_, index) => (
-        <NoteListRowSkeleton key={index} />
-      ))}
-    </SkeletonRoot>
-  )
-}
-
-/** Notes index list section: controls + rows together */
-export function NotesListSectionSkeleton({ rows = 4 }) {
-  return (
-    <>
-      <NotesControlsSkeleton />
-      <NotesListSkeleton rows={rows} />
-    </>
   )
 }
 

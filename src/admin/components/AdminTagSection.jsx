@@ -1,4 +1,5 @@
 import { Plus, X } from 'lucide-react'
+import AdminGestureActionButton from '@/admin/components/AdminGestureActionButton'
 
 function AdminTagSection({
   selectedTags,
@@ -16,6 +17,8 @@ function AdminTagSection({
   onCreateTag,
   onRemoveTag,
   onToggleTag,
+  onSelectTag,
+  onRequestDeleteTag,
   onAttachExisting,
 }) {
   return (
@@ -88,16 +91,18 @@ function AdminTagSection({
           {visibleTags.map((tag) => {
             const selected = selectedTagIds.includes(tag.id)
             return (
-              <button
+              <AdminGestureActionButton
                 key={tag.id}
-                type="button"
                 className={`admin-tag-option${selected ? ' active' : ''}`}
                 aria-pressed={selected}
                 disabled={disabled}
+                menuEnabled={!selected && Boolean(onRequestDeleteTag)}
                 onClick={() => onToggleTag(tag.id)}
+                onMenuSelect={() => (onSelectTag ?? onToggleTag)(tag.id)}
+                onMenuDelete={() => onRequestDeleteTag?.(tag)}
               >
                 {tag.name}
-              </button>
+              </AdminGestureActionButton>
             )
           })}
           {visibleTags.length === 0 && (

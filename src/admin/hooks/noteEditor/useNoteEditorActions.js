@@ -1,4 +1,4 @@
-import { useCallback, useRef, useState } from 'react'
+import { useCallback, useRef } from 'react'
 import { buildNotePayload } from '@/admin/lib/noteEditorModel'
 import { noteFlagsToastMessage } from '@/admin/lib/noteFlags'
 import { clearNoteDraft } from '@/admin/lib/noteDraft'
@@ -18,10 +18,11 @@ export function useNoteEditorActions({
   navigate,
   toast,
   mdxError,
+  confirm,
+  setConfirm,
 }) {
   const saveInFlightRef = useRef(false)
   const togglingFlagsRef = useRef(false)
-  const [confirm, setConfirm] = useState(null)
 
   const {
     isNew,
@@ -146,6 +147,7 @@ export function useNoteEditorActions({
     clearSessionCovers,
     setBaseline,
     setView,
+    setConfirm,
   ])
 
   const performDelete = useCallback(async () => {
@@ -161,7 +163,7 @@ export function useNoteEditorActions({
       toast.showError(err instanceof Error ? err.message : String(err))
       saveInFlightRef.current = false
     }
-  }, [slug, navigate, toast])
+  }, [slug, navigate, toast, setConfirm])
 
   const handleShowPreview = useCallback(async () => {
     setConfirm(null)
@@ -170,7 +172,7 @@ export function useNoteEditorActions({
     if (!(await validateSlugAvailable())) return
 
     setView('preview')
-  }, [runValidation, validateSlugAvailable, setView])
+  }, [runValidation, validateSlugAvailable, setView, setConfirm])
 
   const requestSave = useCallback(async () => {
     setConfirm(null)
@@ -193,7 +195,7 @@ export function useNoteEditorActions({
       confirmLabel: 'Save note',
       onConfirm: performSave,
     })
-  }, [view, mdxError, runValidation, validateSlugAvailable, published, title, performSave, toast])
+  }, [view, mdxError, runValidation, validateSlugAvailable, published, title, performSave, toast, setConfirm])
 
   const handleDelete = useCallback(() => {
     if (isNew) return
@@ -205,7 +207,7 @@ export function useNoteEditorActions({
       confirmLabel: 'Delete note',
       onConfirm: performDelete,
     })
-  }, [isNew, title, slug, performDelete])
+  }, [isNew, title, slug, performDelete, setConfirm])
 
   const patchNoteFlags = useCallback(async (patch) => {
     if (isNew || !slug.trim() || togglingFlagsRef.current) return

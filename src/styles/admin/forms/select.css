@@ -72,6 +72,9 @@
   background: transparent;
   cursor: pointer;
   transition: background-color 0.12s ease, color 0.12s ease;
+  user-select: none;
+  touch-action: manipulation;
+  -webkit-touch-callout: none;
 }
 
 .admin-select-option:hover {
