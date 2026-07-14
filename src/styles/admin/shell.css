@@ -150,6 +150,8 @@
   display: flex;
   align-items: center;
   gap: 10px;
+  box-sizing: border-box;
+  width: 100%;
   padding: 8px 10px;
   border: 0;
   border-radius: 8px;
@@ -273,10 +275,25 @@ button.admin-sidebar-link {
     flex: none;
     gap: 8px;
     padding: 8px var(--layout-gutter) 14px;
+    box-sizing: border-box;
+    width: 100%;
+    min-width: 0;
   }
 
   .admin-shell--menu-open .admin-sidebar-panel {
-    display: grid;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .admin-sidebar-nav,
+  .admin-sidebar-footer {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    align-self: stretch;
+    width: auto;
+    min-width: 0;
   }
 
   .admin-sidebar-nav {
@@ -292,18 +309,22 @@ button.admin-sidebar-link {
 
   .admin-sidebar-theme {
     justify-content: flex-start;
+    align-self: stretch;
+    width: auto;
     padding: 4px 8px;
   }
 
-  .admin-sidebar-link {
+  .admin-sidebar-link,
+  a.admin-sidebar-link,
+  button.admin-sidebar-link {
+    display: flex;
+    align-self: stretch;
     justify-content: flex-start;
-    width: 100%;
+    box-sizing: border-box;
+    width: auto;
+    min-width: 0;
     padding: 10px 8px;
     font-size: 14px;
-  }
-
-  button.admin-sidebar-link {
-    width: 100%;
   }
 
   .admin-sidebar-brand {
